@@ -45,7 +45,7 @@ footer{text-align:center;padding:28px;border-top:1px solid #1b293d;color:#63728a
 .chat-launch{position:fixed;right:20px;bottom:20px;z-index:450;width:58px;height:58px;border-radius:50%;border:1px solid #70a4ff;background:linear-gradient(135deg,#397dff,#704cff);color:#fff;font-size:23px;cursor:pointer;box-shadow:0 0 30px #397dff66}
 .chat{display:none;position:fixed;right:20px;bottom:90px;width:390px;height:500px;z-index:451;background:#080f1a;border:1px solid #395071;border-radius:17px;box-shadow:0 25px 80px #000c;overflow:hidden}.chat.open{display:flex;flex-direction:column}.chat-head{padding:14px;border-bottom:1px solid #22334a;display:flex;justify-content:space-between}.chat-head strong{font-size:12px}.chat-head small{display:block;color:#20e5a0;font-size:9px;margin-top:4px}.chat-close{border:0;background:#111d2d;color:#fff;border-radius:7px;padding:5px 9px}.chat-body{padding:13px;flex:1;overflow:auto}.bubble{max-width:82%;padding:9px 11px;margin:6px 0;background:#101c2d;border:1px solid #263b58;border-radius:11px;font-size:10px;line-height:1.5}.bubble.user{margin-left:auto;background:#173661}.demo{margin-top:12px;padding:9px;border:1px dashed #3b4e6a;border-radius:8px;color:#71819a;font-size:9px}.quick{display:flex;gap:5px;padding:8px;border-top:1px solid #22334a;overflow:auto}.quick button{white-space:nowrap;border:1px solid #2d4565;background:#0d1726;color:#9cbcff;border-radius:18px;padding:7px 9px;font-size:9px}.chat-input{display:flex;gap:6px;padding:9px;border-top:1px solid #22334a}.chat-input input{flex:1;min-width:0;background:#0b1421;border:1px solid #2b3e5a;color:#fff;border-radius:8px;padding:8px;font-size:10px}.chat-input button{border:0;background:#3e82ff;color:#fff;border-radius:8px;padding:8px 11px;font-size:10px}
 .ai-mode{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:#0b1421;border-bottom:1px solid #22334a;font-size:9px;color:#9cbcff}.ai-mode b{color:#55d6a7}.ai-admin-btn{border:1px solid #4c8cff;background:#102754;color:#fff;border-radius:7px;padding:6px 9px;font-size:8px;cursor:pointer}.ai-admin-btn:hover{background:#173661}
-#cartBg{display:none;position:fixed;inset:0;background:#000b;z-index:600}.drawer{position:absolute;right:0;top:0;height:100%;width:min(420px,100%);background:#080f19;border-left:1px solid #334a69;padding:22px;overflow:auto}.drawer-head{display:flex;justify-content:space-between}.close{border:1px solid #2d405b;background:#101a2a;color:#fff;border-radius:7px;padding:6px 9px}.cart-item{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid #1c2b40;font-size:11px}.total{font-size:20px;font-weight:900;margin:20px 0}.checkout{width:100%;border:0;border-radius:9px;padding:12px;background:linear-gradient(135deg,#3c83ff,#6a4cff);color:#fff;font-weight:800}
+#cartBg{display:none;position:fixed;inset:0;background:#000b;z-index:600}.drawer{position:absolute;right:0;top:0;height:100%;width:min(620px,100%);background:#080f19;border-left:1px solid #334a69;padding:22px;overflow:auto}.drawer-head{display:flex;justify-content:space-between}.close{border:1px solid #2d405b;background:#101a2a;color:#fff;border-radius:7px;padding:6px 9px}.cart-item{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid #1c2b40;font-size:11px}.total{font-size:20px;font-weight:900;margin:20px 0}.checkout{width:100%;border:0;border-radius:9px;padding:12px;background:linear-gradient(135deg,#3c83ff,#6a4cff);color:#fff;font-weight:800}
 
 @keyframes stars{to{background-position:90px 90px}}@keyframes sweep{to{transform:translateX(25px)}}@keyframes float{50%{transform:translateY(-10px)}}@keyframes pulse{50%{text-shadow:0 0 18px #fff,0 0 65px #3e82ff,0 0 120px #3e82ff99}}@keyframes cta{50%{box-shadow:0 0 42px #397dff99}}
 @media(max-width:1200px){.grid{grid-template-columns:repeat(4,1fr)}.categories{grid-template-columns:repeat(3,1fr)}.hero-inner{grid-template-columns:1fr}.side{display:none}}
@@ -170,7 +170,7 @@ body.auth-locked{overflow:hidden}
 .account-action{margin-top:6px}
 .orders-modal,.checkout-modal{display:none;position:fixed;inset:0;z-index:900;background:#000c;padding:18px;align-items:center;justify-content:center}
 .orders-modal.open,.checkout-modal.open{display:flex}
-.orders-card,.checkout-card{width:min(980px,100%);max-height:92vh;overflow:auto;background:#080f1a;border:1px solid #3b5578;border-radius:20px;box-shadow:0 30px 100px #000e}
+.orders-card,.checkout-card{width:min(1180px,96vw);max-height:94vh;overflow:auto;background:#080f1a;border:1px solid #3b5578;border-radius:20px;box-shadow:0 30px 100px #000e}
 .orders-head,.checkout-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #263950}
 .orders-head h2,.checkout-head h2{font-size:18px}.orders-head small,.checkout-head small{display:block;color:#7e8da5;font-size:9px;margin-top:4px}
 .orders-body,.checkout-body{padding:20px}
@@ -182,14 +182,28 @@ body.auth-locked{overflow:hidden}
 .order-detail{margin-top:14px;padding-top:14px;border-top:1px solid #263950}.order-items{display:grid;gap:7px;margin:10px 0}.order-item-row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #17263a;font-size:10px}.order-item-row span{color:#aebbd0}.order-info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}.order-info-box{background:#08111d;border:1px solid #22354e;border-radius:9px;padding:10px}.order-info-box small{display:block;color:#718096;font-size:8px;margin-bottom:4px}.order-info-box b{font-size:10px}
 .checkout-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}.checkout-section{background:#0b1421;border:1px solid #263950;border-radius:13px;padding:16px}.checkout-section h3{font-size:12px;margin-bottom:13px}.checkout-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.checkout-field label{display:block;color:#9eabc0;font-size:9px;margin-bottom:5px}.checkout-field input{width:100%;height:40px;background:#08111d;border:1px solid #2b3e5a;color:#fff;border-radius:8px;padding:0 11px;outline:none;font-size:10px}.checkout-field input:focus{border-color:#4c8cff}.checkout-field.full{grid-column:1/-1}.shipping-options{display:grid;gap:8px}.shipping-option{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #293d58;background:#08111d;border-radius:9px;cursor:pointer}.shipping-option:has(input:checked){border-color:#4c8cff;background:#102754}.shipping-option input{accent-color:#4389ff}.shipping-option span{font-size:10px}.shipping-option b{margin-left:auto;font-size:10px;color:#22e5a0}.checkout-summary{position:sticky;top:0}.checkout-summary-list{display:grid;gap:7px;max-height:260px;overflow:auto}.checkout-summary-item{display:flex;justify-content:space-between;gap:8px;font-size:10px;padding:7px 0;border-bottom:1px solid #17263a}.checkout-total{display:flex;justify-content:space-between;padding-top:12px;margin-top:10px;border-top:1px solid #30445f;font-size:12px}.checkout-total b{font-size:21px;color:#22e5a0}.checkout-note{color:#718096;font-size:9px;line-height:1.5;margin-top:12px}.checkout-error{min-height:15px;color:#ff7373;font-size:9px;margin:8px 0}.checkout-submit{width:100%;height:44px;border:1px solid #74a4ff;border-radius:10px;background:linear-gradient(135deg,#3b83ff,#6a4cff);color:#fff;font-weight:800;cursor:pointer}
 .admin-order{display:grid;grid-template-columns:1fr auto;gap:12px;background:#0b1421;border:1px solid #263950;border-radius:11px;padding:13px}.admin-order-info b{font-size:11px}.admin-order-info small{display:block;color:#7d8ca3;font-size:9px;margin-top:4px;line-height:1.5}.admin-order-actions{display:flex;align-items:center;gap:7px}.admin-order-actions select{background:#08111d;color:#fff;border:1px solid #30445f;border-radius:8px;padding:8px;font-size:9px}
+
+/* Didesni langai ir patogesnis skaitymas */
+.drawer h2{font-size:24px}.drawer{padding:28px}.cart-item{font-size:13px;padding:17px 0}.cart-item-name{font-size:15px}.cart-item-price{font-size:12px}.cart-controls button,.coupon-remove{font-size:12px}.checkout{font-size:13px;padding:15px}.coupon-box{font-size:13px}.coupon-row input{height:44px;font-size:13px}.coupon-row button{min-height:44px}
+.orders-card,.checkout-card{font-size:13px}.orders-head,.checkout-head{padding:24px 28px}.orders-head h2,.checkout-head h2{font-size:24px}.orders-body,.checkout-body{padding:28px}.order-card{padding:20px}.order-number{font-size:15px}.order-date{font-size:11px}.order-status{font-size:11px;padding:8px 12px}.order-item-row,.order-info-box{font-size:12px}.checkout-section{padding:22px}.checkout-section h3{font-size:14px}.checkout-field label{font-size:10px}.checkout-field input{height:48px;font-size:13px}.shipping-option{padding:14px}.shipping-option span,.shipping-option b{font-size:12px}.checkout-summary-list{max-height:360px}.checkout-summary-item{font-size:12px}.checkout-total{font-size:14px}.checkout-total b{font-size:25px}.checkout-submit{height:52px;font-size:13px}
+.admin-order{padding:18px}.admin-order-info b{font-size:14px}.admin-order-info small{font-size:11px;line-height:1.6}.admin-order-actions select,.admin-order-actions input{min-height:42px;font-size:11px}
+
+.tracking-box{margin-top:12px;padding:12px;border:1px solid #31557e;background:#0b1a2b;border-radius:10px;font-size:11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tracking-box span{font-family:monospace;color:#7fb0ff;font-weight:800}.tracking-box button{margin-left:auto;border:1px solid #31557e;background:#101f33;color:#fff;border-radius:7px;padding:7px 9px;cursor:pointer}
 @media(max-width:750px){.checkout-layout{grid-template-columns:1fr}.checkout-summary{position:static}.checkout-grid,.order-info-grid{grid-template-columns:1fr}.checkout-field.full{grid-column:auto}.admin-order{grid-template-columns:1fr}.admin-order-actions{justify-content:flex-start}}
 
 
 
 .admin-chat-notification{display:none;position:fixed;right:20px;top:84px;z-index:2500;width:min(370px,calc(100% - 40px));background:#0b1421;border:1px solid #4c8cff;border-radius:13px;padding:12px;box-shadow:0 18px 55px #000c;cursor:pointer;align-items:center;gap:10px;animation:chatNoticeIn .25s ease}.admin-chat-notification.show{display:flex}.admin-chat-notification-icon{width:36px;height:36px;border-radius:10px;background:#173661;display:grid;place-items:center;font-size:18px;flex:0 0 auto}.admin-chat-notification b{display:block;font-size:10px}.admin-chat-notification small{display:block;color:#8b9bb2;font-size:8px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:245px}.admin-chat-notification button{margin-left:auto;border:0;background:#111d2d;color:#fff;border-radius:6px;padding:4px 7px;cursor:pointer}.admin-chat-user.unread{border-color:#20e5a0;box-shadow:0 0 0 1px #20e5a033}.admin-chat-user .unread-dot{float:right;color:#20e5a0;font-size:9px}@keyframes chatNoticeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 .admin-chat-layout{display:grid;grid-template-columns:280px 1fr;gap:12px;min-height:420px}.admin-chat-users,.admin-chat-window{background:#0b1421;border:1px solid #263950;border-radius:12px;overflow:hidden}.admin-chat-users{padding:10px}.admin-chat-user{padding:10px;border:1px solid #22354e;background:#08111d;border-radius:9px;cursor:pointer;margin-bottom:7px}.admin-chat-user:hover,.admin-chat-user.active{border-color:#4c8cff;background:#102754}.admin-chat-user b{font-size:10px}.admin-chat-user small{display:block;color:#718096;font-size:8px;margin-top:4px}.admin-chat-title{padding:13px;border-bottom:1px solid #263950;font-size:11px;font-weight:800}.admin-chat-body{height:340px;overflow:auto;padding:12px}.admin-chat-bubble{max-width:80%;padding:8px 10px;border-radius:10px;background:#101c2d;border:1px solid #263b58;margin:6px 0;font-size:9px;line-height:1.5}.admin-chat-bubble.admin{margin-left:auto;background:#173661}.admin-chat-time{display:block;color:#68788e;font-size:7px;margin-top:4px}.admin-chat-reply{display:flex;gap:7px;padding:9px;border-top:1px solid #263950}.admin-chat-reply input{flex:1;background:#08111d;border:1px solid #2b3e5a;color:#fff;border-radius:8px;padding:9px;font-size:9px;outline:none}@media(max-width:700px){.admin-chat-layout{grid-template-columns:1fr}.admin-chat-users{max-height:220px}.admin-chat-body{height:300px}}
-.order-cancel-btn{border:1px solid #a64b5d;background:#24101a;color:#ff9aad;border-radius:8px;padding:8px 11px;font-size:10px;cursor:pointer;margin-top:8px}.order-cancel-btn:hover{background:#351521}.pay-disabled{opacity:.45!important;cursor:not-allowed!important}.pay-note{font-size:9px;color:#71819a;margin-top:6px;line-height:1.4}.order-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:10px}.order-pay-btn{border:1px solid #5579ad;background:#16243a;color:#fff;border-radius:8px;padding:8px 11px;font-size:10px;opacity:.45;cursor:not-allowed}.order-cancel-btn{border:1px solid #a64b5d;background:#24101a;color:#ff9aad;border-radius:8px;padding:8px 11px;font-size:10px;cursor:pointer}.order-cancel-btn:hover{background:#351521}.pay-note{width:100%;font-size:9px;color:#71819a;line-height:1.4}.save-check{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px;border:1px solid #263950;background:#08111d;border-radius:9px;color:#9aa9bf;font-size:9px;cursor:pointer}.save-check input{accent-color:#4389ff}.admin-order-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}.admin-order-stat{background:#0b1421;border:1px solid #263950;border-radius:10px;padding:11px}.admin-order-stat b{display:block;font-size:17px}.admin-order-stat small{color:#718096;font-size:8px}@media(max-width:750px){.admin-order-stats{grid-template-columns:repeat(2,1fr)}}
-.chat-solve{width:100%;border:0;border-top:1px solid #22334a;background:#0d1726;color:#55d6a7;padding:9px;font-size:9px;cursor:pointer}.chat-solved{text-align:center;padding:30px 15px;color:#cdd8e8}.chat-solved p{font-size:10px;color:#8190a8;margin:8px 0}.rating-stars{display:flex;justify-content:center;gap:4px;margin:12px 0}.rating-stars button{border:0;background:none;color:#ffd45c;font-size:28px;cursor:pointer}.chat-solved input{width:100%;background:#08111d;border:1px solid #2b3e5a;color:#fff;border-radius:8px;padding:9px;font-size:9px}.chat-rate-submit{margin-top:8px;width:100%;border:1px solid #4c8cff;background:#102754;color:#fff;border-radius:8px;padding:9px;font-size:9px}
+.order-cancel-btn{border:1px solid #a64b5d;background:#24101a;color:#ff9aad;border-radius:8px;padding:8px 11px;font-size:10px;cursor:pointer;margin-top:8px}.order-cancel-btn:hover{background:#351521}.pay-disabled{opacity:.45!important;cursor:not-allowed!important}.pay-note{font-size:9px;color:#71819a;margin-top:6px;line-height:1.4}.order-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:10px}.order-pay-btn{border:1px solid #5579ad;background:#16243a;color:#fff;border-radius:8px;padding:8px 11px;font-size:10px;opacity:.45;cursor:not-allowed}.order-cancel-btn{border:1px solid #a64b5d;background:#24101a;color:#ff9aad;border-radius:8px;padding:8px 11px;font-size:10px;cursor:pointer}.order-cancel-btn:hover{background:#351521}.pay-note{width:100%;font-size:9px;color:#71819a;line-height:1.4}.save-check{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px;border:1px solid #263950;background:#08111d;border-radius:9px;color:#9aa9bf;font-size:9px;cursor:pointer}.save-check input{accent-color:#4389ff}.admin-order-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}.admin-order-stat{background:#0b1421;border:1px solid #263950;border-radius:10px;padding:11px}.admin-order-stat b{display:block;font-size:17px}.admin-order-stat small{color:#718096;font-size:8px}
+/* Didesni langai ir patogesnis skaitymas */
+.drawer h2{font-size:24px}.drawer{padding:28px}.cart-item{font-size:13px;padding:17px 0}.cart-item-name{font-size:15px}.cart-item-price{font-size:12px}.cart-controls button,.coupon-remove{font-size:12px}.checkout{font-size:13px;padding:15px}.coupon-box{font-size:13px}.coupon-row input{height:44px;font-size:13px}.coupon-row button{min-height:44px}
+.orders-card,.checkout-card{font-size:13px}.orders-head,.checkout-head{padding:24px 28px}.orders-head h2,.checkout-head h2{font-size:24px}.orders-body,.checkout-body{padding:28px}.order-card{padding:20px}.order-number{font-size:15px}.order-date{font-size:11px}.order-status{font-size:11px;padding:8px 12px}.order-item-row,.order-info-box{font-size:12px}.checkout-section{padding:22px}.checkout-section h3{font-size:14px}.checkout-field label{font-size:10px}.checkout-field input{height:48px;font-size:13px}.shipping-option{padding:14px}.shipping-option span,.shipping-option b{font-size:12px}.checkout-summary-list{max-height:360px}.checkout-summary-item{font-size:12px}.checkout-total{font-size:14px}.checkout-total b{font-size:25px}.checkout-submit{height:52px;font-size:13px}
+.admin-order{padding:18px}.admin-order-info b{font-size:14px}.admin-order-info small{font-size:11px;line-height:1.6}.admin-order-actions select,.admin-order-actions input{min-height:42px;font-size:11px}
+
+.tracking-box{margin-top:12px;padding:12px;border:1px solid #31557e;background:#0b1a2b;border-radius:10px;font-size:11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tracking-box span{font-family:monospace;color:#7fb0ff;font-weight:800}.tracking-box button{margin-left:auto;border:1px solid #31557e;background:#101f33;color:#fff;border-radius:7px;padding:7px 9px;cursor:pointer}
+@media(max-width:750px){.admin-order-stats{grid-template-columns:repeat(2,1fr)}}
+.chat-solve{width:100%;border:0;border-top:1px solid #22334a;background:#0d1726;color:#55d6a7;padding:9px;font-size:9px;cursor:pointer}.chat-solved{text-align:center;padding:30px 15px;color:#cdd8e8}.chat-solved p{font-size:10px;color:#8190a8;margin:8px 0}.rating-stars{display:flex;justify-content:center;gap:4px;margin:12px 0}.rating-stars button{border:0;background:none;color:#ffd45c;font-size:28px;cursor:pointer}.chat-solved input{width:100%;background:#08111d;border:1px solid #2b3e5a;color:#fff;border-radius:8px;padding:9px;font-size:9px}.chat-rate-submit{margin-top:8px;width:100%;border:1px solid #4c8cff;background:#102754;color:#fff;border-radius:8px;padding:9px;font-size:9px}.coupon-applied-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;padding:8px 10px;border:1px solid #23523f;background:#0b2019;border-radius:8px}.coupon-applied-row span{font-size:9px;color:#50d6a0}.coupon-remove{border:1px solid #7b3340;background:#29131a;color:#ff9aaa;border-radius:7px;padding:5px 8px;font-size:8px;cursor:pointer}
 </style>
 </head>
 <body class="auth-locked">
@@ -421,7 +435,7 @@ body.auth-locked{overflow:hidden}
 <div class="drawer-head"><div><h2>🛒 Krepšelis</h2><small style="color:#718096;font-size:9px">Tavo pasirinktos prekės</small></div><button class="close" onclick="closeCart()">✕</button></div>
 <div id="items"></div>
 <div class="coupon-box"><label class="coupon-toggle"><input id="couponToggle" type="checkbox" onchange="toggleCouponBox()"><span>Turiu nuolaidos kodą</span></label><div id="couponForm" class="coupon-hidden"><div class="coupon-row"><input id="couponInput" placeholder="Įrašyk nuolaidos kodą"><button class="admin-primary" onclick="applyCoupon()">Pritaikyti</button></div><div class="coupon-message" id="couponMessage"></div></div></div>
-<div class="cart-summary"><div class="cart-summary-row"><span>Tarpinė suma</span><strong id="subtotal">0.00 €</strong></div><div class="cart-summary-row"><span>Nuolaida</span><strong id="discountTotal">− 0.00 €</strong></div><div class="cart-summary-total"><span>Iš viso</span><b id="total">0.00 €</b></div><div id="couponApplied" style="font-size:9px;color:#50d6a0;margin-top:7px"></div></div>
+<div class="cart-summary"><div class="cart-summary-row"><span>Tarpinė suma</span><strong id="subtotal">0.00 €</strong></div><div class="cart-summary-row"><span>Nuolaida</span><strong id="discountTotal">− 0.00 €</strong></div><div class="cart-summary-total"><span>Iš viso</span><b id="total">0.00 €</b></div><div id="couponApplied"></div></div>
 <button class="checkout" style="margin-top:14px" onclick="openCheckout()">TĘSTI Į UŽSAKYMO FORMĄ →</button>
 </aside></div>
 
@@ -509,8 +523,10 @@ function subscribeToChat(){if(chatChannel||!chatThread)return;chatChannel=supaba
 async function initChat(){if(chatReady)return;setChatStatus("Jungiamasi...");try{await ensureChatUser();await ensureChatThread();await loadChatMessages();subscribeToChat()}catch(e){console.error(e);setChatStatus("Nepavyko prisijungti");bubble("Nepavyko prisijungti prie pokalbio. Pabandykite perkrauti puslapį.")}}
 async function sendChatMessage(text){const message=String(text||"").trim();if(!message)return;try{await initChat();const {error}=await supabaseClient.from("messages").insert({session_id:chatThread.thread_id,sender:"customer",message});if(error)throw error;await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("id",chatThread.id)}catch(e){console.error(e);bubble("Žinutės išsiųsti nepavyko. Pabandykite dar kartą.")}}
 async function solveChat(){if(!chatThread)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("id",chatThread.id);if(r.error)return alert("Nepavyko uždaryti pokalbio.");showChatRating()}
-function showChatRating(){const body=document.getElementById("chatBody");body.innerHTML=`<div class="chat-solved"><b>✓ Pokalbis išspręstas</b><p>Įvertink administratorių nuo 1 iki 5 ⭐</p><div class="rating-stars">${[1,2,3,4,5].map(n=>`<button onclick="rateChat(${n})">☆</button>`).join("")}</div><input id="ratingText" placeholder="Komentaras (nebūtina)"><button class="chat-rate-submit" onclick="rateChat(0)">Pateikti įvertinimą</button></div>`}
-async function rateChat(star){if(!chatThread)return;if(!star){return alert("Pasirink žvaigždučių skaičių.")}const comment=document.getElementById("ratingText")?.value.trim()||null;const {error}=await supabaseClient.from("chat_sessions").update({rating:star,rating_comment:comment,rated_at:new Date().toISOString(),status:"rated",closed_at:new Date().toISOString()}).eq("id",chatThread.id);if(error)return alert("Nepavyko išsaugoti įvertinimo.");if(chatChannel){supabaseClient.removeChannel(chatChannel);chatChannel=null}chatReady=false;chatThread=null;renderedMessageIds.clear();document.getElementById("chat").classList.remove("open");toast("✓ Ačiū už įvertinimą!")}
+function showChatRating(){const body=document.getElementById("chatBody");body.innerHTML=`<div class="chat-solved"><b>✓ Pokalbis uždarytas</b><p>Jeigu nori, dabar gali įvertinti administratoriaus pagalbą nuo 1 iki 5 ⭐</p><div class="rating-stars">${[1,2,3,4,5].map(n=>`<button id="ratingStar${n}" onclick="selectChatRating(${n})">☆</button>`).join("")}</div><input id="ratingText" placeholder="Komentaras (nebūtina)"><button class="chat-rate-submit" onclick="rateChat()">⭐ Pateikti įvertinimą</button><button class="chat-rate-submit" style="margin-top:6px;border-color:#33465f;background:#0d1726" onclick="closeChatWithoutRating()">Įvertinsiu vėliau</button></div>`;window.selectedChatRating=0}
+function selectChatRating(star){window.selectedChatRating=star;for(let i=1;i<=5;i++){const b=document.getElementById("ratingStar"+i);if(b)b.textContent=i<=star?"★":"☆"}}
+function closeChatWithoutRating(){document.getElementById("chat").classList.remove("open")}
+async function rateChat(){const star=Number(window.selectedChatRating||0);if(!chatThread)return;if(!star)return alert("Pirmiausia pasirink 1–5 žvaigždutes.");const comment=document.getElementById("ratingText")?.value.trim()||null;const {error}=await supabaseClient.from("chat_sessions").update({rating:star,rating_comment:comment,rated_at:new Date().toISOString(),status:"rated",closed_at:new Date().toISOString()}).eq("id",chatThread.id);if(error)return alert("Nepavyko išsaugoti įvertinimo.");if(chatChannel){supabaseClient.removeChannel(chatChannel);chatChannel=null}chatReady=false;chatThread=null;renderedMessageIds.clear();window.selectedChatRating=0;document.getElementById("chat").classList.remove("open");toast("✓ Ačiū už įvertinimą!")}
 
 setTimeout(()=>{const intro=document.getElementById("intro"); if(intro) intro.remove()},4300);
 
@@ -813,10 +829,27 @@ async function loadAdminOrders(){
   const {data,error}=await supabaseClient.from("orders").select("*, order_items(*)").order("created_at",{ascending:false});
   if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti užsakymų. Patikrink RLS/SQL.</div>';return}
   if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas užsakymų nėra.</div>';await loadAdminOrderStats();return}
-  list.innerHTML=data.map(o=>`<div class="admin-order"><div class="admin-order-info"><b>#${escapeHtml(o.order_number)}</b><small>${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")} • ${formatDate(o.created_at)}<br>${escapeHtml(o.phone||"")} • ${escapeHtml(o.address||"")}, ${escapeHtml(o.city||"")} ${escapeHtml(o.postal_code||"")}<br>${escapeHtml(o.shipping_method||"")} • <strong>${statusLabel(o.status)}</strong> • ${money(o.total_amount)}</small></div><div class="admin-order-actions"><select onchange="updateOrderStatus('${o.id}',this.value)">${["pending","paid","processing","shipped","completed","cancelled"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${statusLabel(s)}</option>`).join("")}</select><button class="admin-secondary" onclick='showOrderDetails(${JSON.stringify(o).replace(/'/g,"&#39;")})'>👁️</button><button class="admin-danger" onclick="deleteAdminOrder('${o.id}')">🗑️</button></div></div>`).join("");
+  list.innerHTML=data.map(o=>`<div class="admin-order"><div class="admin-order-info"><b>#${escapeHtml(o.order_number)}</b><small>${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")} • ${formatDate(o.created_at)}<br>${escapeHtml(o.phone||"")} • ${escapeHtml(o.address||"")}, ${escapeHtml(o.city||"")} ${escapeHtml(o.postal_code||"")}<br>${escapeHtml(o.shipping_method||"")} • <strong>${statusLabel(o.status)}</strong> • ${money(o.total_amount)}</small></div><div class="admin-order-actions"><select onchange="updateOrderStatus('${o.id}',this.value)">${["pending","paid","processing","shipped","completed","cancelled"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${statusLabel(s)}</option>`).join("")}</select><input id="tracking-${o.id}" value="${escapeHtml(o.tracking_number||"")}" placeholder="Siuntimo nr." title="Siuntimo numeris"><button class="admin-primary" onclick="saveTracking('${o.id}')">💾</button><button class="admin-secondary" onclick='showOrderDetails(${JSON.stringify(o).replace(/'/g,"&#39;")})'>👁️</button><button class="admin-danger" onclick="deleteAdminOrder('${o.id}')">🗑️</button></div></div>`).join("");
   await loadAdminOrderStats();
 }
-async function updateOrderStatus(id,status){if(!isAdmin)return;const {error}=await supabaseClient.from("orders").update({status}).eq("id",id);if(error)return alert("Nepavyko pakeisti užsakymo būsenos.");await loadAdminOrders();await loadAdminStats()}
+async function updateOrderStatus(id,status){
+  if(!isAdmin)return;
+  const {data:before}=await supabaseClient.from("orders").select("status,order_number,user_id,tracking_number,email").eq("id",id).maybeSingle();
+  const patch={status,updated_at:new Date().toISOString()};
+  const {error}=await supabaseClient.from("orders").update(patch).eq("id",id);
+  if(error)return alert("Nepavyko pakeisti užsakymo būsenos. Jei updated_at stulpelio nėra, paleisk naują SQL.");
+  if(before?.status!==status) toast(`✓ Užsakymas #${before?.order_number||""}: ${statusLabel(status)}`);
+  await loadAdminOrders();await loadAdminStats();
+}
+async function saveTracking(id){
+  if(!isAdmin)return;
+  const input=document.getElementById("tracking-"+id);
+  const tracking=input?.value.trim()||null;
+  const {error}=await supabaseClient.from("orders").update({tracking_number:tracking,updated_at:new Date().toISOString()}).eq("id",id);
+  if(error)return alert("Nepavyko išsaugoti siuntimo numerio. Patikrink ar paleidai naują SQL.");
+  await loadAdminOrders();
+  toast(tracking?"✓ Siuntimo numeris išsaugotas":"✓ Siuntimo numeris pašalintas");
+}
 async function deleteAdminOrder(id){if(!isAdmin)return alert("Neturite administratoriaus teisių.");if(!confirm("Ar tikrai visam laikui ištrinti šį užsakymą? Jis nebebus rodomas sistemoje."))return;const {error}=await supabaseClient.from("orders").delete().eq("id",id);if(error){console.error(error);return alert("Nepavyko ištrinti užsakymo. Patikrink RLS SQL.")}await loadAdminOrders();await loadAdminStats();toast("✓ Užsakymas ištrintas iš sistemos")}
 
 function showOrderDetails(o){
@@ -881,6 +914,7 @@ async function applyCoupon(){
 
 
 async function openOrders(){
+  subscribeMyOrderUpdates();
   const modal=document.getElementById("ordersModal");
   modal.classList.add("open");
   await loadMyOrders();
@@ -898,6 +932,23 @@ async function cancelMyOrder(orderId){
   toast("✓ Užsakymas atšauktas");
 }
 
+let myOrdersChannel=null;
+function subscribeMyOrderUpdates(){
+  if(myOrdersChannel)return;
+  supabaseClient.auth.getUser().then(({data})=>{
+    const uid=data?.user?.id;if(!uid)return;
+    myOrdersChannel=supabaseClient.channel("my-order-updates-"+uid)
+      .on("postgres_changes",{event:"UPDATE",schema:"public",table:"orders",filter:"user_id=eq."+uid},payload=>{
+        const o=payload.new||{};
+        const old=payload.old||{};
+        if(o.status!==old.status){toast(`📦 Užsakymas #${o.order_number||""}: ${statusLabel(o.status)}`);}
+        if(o.tracking_number!==old.tracking_number && o.tracking_number){toast(`📦 Siuntimo numeris: ${o.tracking_number}`);}
+        loadMyOrders();
+      }).subscribe();
+  });
+}
+async function copyTracking(v){try{await navigator.clipboard.writeText(v);toast("✓ Siuntimo numeris nukopijuotas")}catch(e){toast(v)}}
+
 async function loadMyOrders(){
   const list=document.getElementById("ordersList");
   list.innerHTML='<div class="admin-empty">Kraunama...</div>';
@@ -911,6 +962,7 @@ async function loadMyOrders(){
    <div class="order-card" onclick="toggleOrderDetail('${o.id}')">
     <div class="order-top"><div><div class="order-number">#${escapeHtml(o.order_number)}</div><div class="order-date">${formatDate(o.created_at)}</div></div><span class="order-status ${statusClass(o.status)}">${statusLabel(o.status)}</span></div>
     <div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div>
+    ${o.tracking_number?`<div class="tracking-box">📦 <b>Siuntimo numeris:</b> <span>${escapeHtml(o.tracking_number)}</span><button onclick="copyTracking('${escapeHtml(o.tracking_number)}');event.stopPropagation()">📋 Kopijuoti</button></div>`:""}
     <div class="order-actions" onclick="event.stopPropagation()">
       ${o.status==="pending"?`<button class="order-pay-btn" disabled title="Paysera dar neprijungta">💳 Apmokėti užsakymą</button><button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button><div class="pay-note">Apmokėjimas bus aktyvuotas, kai bus prijungta Paysera.</div>`:""}
     </div>
@@ -921,6 +973,7 @@ async function loadMyOrders(){
        <div class="order-info-box"><small>ADRESAS</small><b>${escapeHtml(o.address||"—")}, ${escapeHtml(o.city||"")}</b></div>
        <div class="order-info-box"><small>EL. PAŠTAS</small><b>${escapeHtml(o.email||"—")}</b></div>
        <div class="order-info-box"><small>TELEFONAS</small><b>${escapeHtml(o.phone||"—")}</b></div>
+       <div class="order-info-box"><small>SIUNTIMO NUMERIS</small><b>${escapeHtml(o.tracking_number||"Dar nepriskirtas")}</b></div>
       </div>
     </div>
    </div>`).join("");
@@ -981,6 +1034,7 @@ async function submitOrder(){
   if(error){console.error(error);errorEl.textContent=error.message||"Nepavyko sukurti užsakymo.";return}
   const order=data?.[0]||data;
   cart=[];activeCoupon=null;renderCart();closeCheckout();
+  subscribeMyOrderUpdates();
   await loadMyOrders();
   document.getElementById("ordersModal").classList.add("open");
   toast(`✓ Užsakymas #${order.order_number||"sukurtas"}`);
@@ -1004,6 +1058,7 @@ function changeQty(i,delta){
   renderCart();
 }
 function removeItem(i){cart.splice(i,1);renderCart()}
+function removeCoupon(){activeCoupon=null;const input=document.getElementById("couponInput");if(input)input.value="";setCouponMessage("Nuolaidos kodas panaikintas.",true);renderCart();toast("✓ Nuolaidos kodas panaikintas")}
 function renderCart(){
   const subtotal=cart.reduce((a,b)=>a+b.price*b.qty,0);
   const pct=activeCoupon?Number(activeCoupon.discount_percent||0):0;
@@ -1015,7 +1070,7 @@ function renderCart(){
   document.getElementById("subtotal").textContent=money(subtotal);
   document.getElementById("discountTotal").textContent="− "+money(discount);
   document.getElementById("total").textContent=money(total);
-  const a=document.getElementById("couponApplied");if(a)a.textContent=activeCoupon?`✓ ${activeCoupon.code} −${pct}% (sutaupai ${money(discount)})`:"";
+  const a=document.getElementById("couponApplied");if(a)a.innerHTML=activeCoupon?`<div class="coupon-applied-row"><span>✓ ${escapeHtml(activeCoupon.code)} −${pct}% • sutaupai ${money(discount)}</span><button class="coupon-remove" onclick="removeCoupon()">✕ Panaikinti nuolaidą</button></div>`:"";
   if(document.getElementById("checkoutModal")?.classList.contains("open")) renderCheckoutSummary();
 }
 function openCart(){document.getElementById("cartBg").style.display="block";renderCart()}
