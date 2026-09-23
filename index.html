@@ -253,6 +253,13 @@ body.auth-locked{overflow:hidden}
 }
 </style>
 
+
+<style id="checkout-hard-fix">
+#checkoutModal{display:none!important;position:fixed!important;inset:0!important;z-index:9999!important;align-items:center!important;justify-content:center!important}
+#checkoutModal.open{display:flex!important}
+#checkoutModal .checkout-card{display:block!important;visibility:visible!important;opacity:1!important}
+#cartBg{z-index:600!important}
+</style>
 </head>
 <body class="auth-locked">
 
@@ -522,7 +529,7 @@ body.auth-locked{overflow:hidden}
 </div>
 <div class="coupon-box"><label class="coupon-toggle"><input id="couponToggle" type="checkbox" onchange="toggleCouponBox()"><span>Turiu nuolaidos kodą</span></label><div id="couponForm" class="coupon-hidden"><div class="coupon-row"><input id="couponInput" placeholder="Įrašyk nuolaidos kodą"><button class="admin-primary" onclick="applyCoupon()">Pritaikyti</button></div><div class="coupon-message" id="couponMessage"></div></div></div>
 <div class="cart-summary"><div class="cart-summary-row"><span>Tarpinė suma</span><strong id="subtotal">0.00 €</strong></div><div class="cart-summary-row"><span>Kupono nuolaida</span><strong id="discountTotal">− 0.00 €</strong></div><div class="cart-summary-row" id="bulkDiscountRow" style="display:none"><span id="bulkDiscountLabel">Kiekio akcija</span><strong id="bulkDiscountTotal">− 0.00 €</strong></div><div class="cart-summary-total"><span>Iš viso</span><b id="total">0.00 €</b></div><div id="couponApplied"></div></div>
-<button class="checkout" style="margin-top:14px" onclick="continueToCheckout()">TĘSTI Į UŽSAKYMO FORMĄ →</button>
+<button class="checkout" style="margin-top:14px" onclick="openCheckout()">TĘSTI Į UŽSAKYMO FORMĄ →</button>
 </aside></div>
 
 <div id="productModal" class="product-modal" onclick="closeProductModal()">
@@ -1424,74 +1431,75 @@ async function handleCheckoutSaveToggle(checked){
   clearCheckoutFields();
   if(data?.user?.email)document.getElementById("coEmail").value=data.user.email;
 }
-window.continueToCheckout = async function(){
-  try{
-    if(!Array.isArray(cart) || !cart.length){
-      alert("Krepšelis tuščias.");
-      return;
-    }
-
-    const cartBg=document.getElementById("cartBg");
-    const modal=document.getElementById("checkoutModal");
-    const errorEl=document.getElementById("checkoutError");
-
-    if(!modal){
-      console.error("checkoutModal nerastas.");
-      alert("Nepavyko atidaryti užsakymo formos. Perkrauk puslapį.");
-      return;
-    }
-
-    if(cartBg) cartBg.style.display="none";
-    if(errorEl) errorEl.textContent="";
-
-    modal.classList.add("open");
-    document.body.style.overflow="hidden";
-
-    clearCheckoutFields();
-
-    const saveBox=document.getElementById("saveCheckoutData");
-    const savedRaw=localStorage.getItem("ltparduotuve_checkout");
-    let saved=null;
-    try{ saved=savedRaw?JSON.parse(savedRaw):null; }catch(e){ saved=null; }
-
-    if(saveBox) saveBox.checked=!!saved;
-
-    const {data}=await supabaseClient.auth.getUser();
-
-    if(data?.user?.email){
-      const email=document.getElementById("coEmail");
-      if(email) email.value=data.user.email;
-    }
-
-    if(saved){
-      const map={
-        coFirstName:saved.first_name||"",
-        coLastName:saved.last_name||"",
-        coPhone:saved.phone||"",
-        coAddress:saved.address||"",
-        coCity:saved.city||"",
-        coPostal:saved.postal_code||""
-      };
-      Object.entries(map).forEach(([id,value])=>{
-        const el=document.getElementById(id);
-        if(el) el.value=value;
-      });
-    }
-
-    renderCheckoutSummary();
-  }catch(err){
-    console.error("Checkout atidarymo klaida:",err);
-    alert("Nepavyko atidaryti užsakymo formos. Perkrauk puslapį ir bandyk dar kartą.");
+function openCheckout(){
+  if(!Array.isArray(cart) || !cart.length){
+    alert("Krepšelis tuščias.");
+    return false;
   }
-};
 
-window.openCheckout=window.continueToCheckout;
-
-window.closeCheckout=function(){
+  const cartBg=document.getElementById("cartBg");
   const modal=document.getElementById("checkoutModal");
-  if(modal) modal.classList.remove("open");
+  if(!modal){
+    alert("Užsakymo forma nerasta. Perkrauk puslapį.");
+    return false;
+  }
+
+  // Open the checkout FIRST. Nothing asynchronous can block the navigation.
+  if(cartBg) cartBg.style.display="none";
+  modal.classList.add("open");
+  modal.style.display="flex";
+  document.body.style.overflow="hidden";
+
+  const errorEl=document.getElementById("checkoutError");
+  if(errorEl) errorEl.textContent="";
+
+  clearCheckoutFields();
+
+  const saveBox=document.getElementById("saveCheckoutData");
+  let saved=null;
+  try{
+    const raw=localStorage.getItem("ltparduotuve_checkout");
+    saved=raw?JSON.parse(raw):null;
+  }catch(e){ saved=null; }
+
+  if(saveBox) saveBox.checked=!!saved;
+
+  if(saved){
+    const fields={
+      coFirstName:saved.first_name||"",
+      coLastName:saved.last_name||"",
+      coPhone:saved.phone||"",
+      coAddress:saved.address||"",
+      coCity:saved.city||"",
+      coPostal:saved.postal_code||""
+    };
+    Object.entries(fields).forEach(([id,value])=>{
+      const el=document.getElementById(id);
+      if(el) el.value=value;
+    });
+  }
+
+  // Email is only read after the checkout is already visible.
+  supabaseClient.auth.getUser().then(({data})=>{
+    const email=document.getElementById("coEmail");
+    if(email && data?.user?.email) email.value=data.user.email;
+  }).catch(err=>console.warn("Auth email:",err));
+
+  renderCheckoutSummary();
+  return false;
+}
+
+function closeCheckout(){
+  const modal=document.getElementById("checkoutModal");
+  if(modal){
+    modal.classList.remove("open");
+    modal.style.display="none";
+  }
   document.body.style.overflow="";
-};
+}
+
+window.openCheckout=openCheckout;
+window.closeCheckout=closeCheckout;
 function renderCheckoutSummary(){
   const subtotal=cart.reduce((a,b)=>a+b.price*b.qty,0);
   const free=freeShippingProgress().free;
