@@ -45,7 +45,7 @@ footer{text-align:center;padding:28px;border-top:1px solid #1b293d;color:#63728a
 .chat-launch{position:fixed;right:20px;bottom:20px;z-index:450;width:58px;height:58px;border-radius:50%;border:1px solid #70a4ff;background:linear-gradient(135deg,#397dff,#704cff);color:#fff;font-size:23px;cursor:pointer;box-shadow:0 0 30px #397dff66}
 .chat{display:none;position:fixed;right:20px;bottom:90px;width:390px;height:500px;z-index:451;background:#080f1a;border:1px solid #395071;border-radius:17px;box-shadow:0 25px 80px #000c;overflow:hidden}.chat.open{display:flex;flex-direction:column}.chat-head{padding:14px;border-bottom:1px solid #22334a;display:flex;justify-content:space-between}.chat-head strong{font-size:12px}.chat-head small{display:block;color:#20e5a0;font-size:9px;margin-top:4px}.chat-close{border:0;background:#111d2d;color:#fff;border-radius:7px;padding:5px 9px}.chat-body{padding:13px;flex:1;overflow:auto}.bubble{max-width:82%;padding:9px 11px;margin:6px 0;background:#101c2d;border:1px solid #263b58;border-radius:11px;font-size:10px;line-height:1.5}.bubble.user{margin-left:auto;background:#173661}.demo{margin-top:12px;padding:9px;border:1px dashed #3b4e6a;border-radius:8px;color:#71819a;font-size:9px}.quick{display:flex;gap:5px;padding:8px;border-top:1px solid #22334a;overflow:auto}.quick button{white-space:nowrap;border:1px solid #2d4565;background:#0d1726;color:#9cbcff;border-radius:18px;padding:7px 9px;font-size:9px}.chat-input{display:flex;gap:6px;padding:9px;border-top:1px solid #22334a}.chat-input input{flex:1;min-width:0;background:#0b1421;border:1px solid #2b3e5a;color:#fff;border-radius:8px;padding:8px;font-size:10px}.chat-input button{border:0;background:#3e82ff;color:#fff;border-radius:8px;padding:8px 11px;font-size:10px}
 .ai-mode{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:#0b1421;border-bottom:1px solid #22334a;font-size:9px;color:#9cbcff}.ai-mode b{color:#55d6a7}.ai-admin-btn{border:1px solid #4c8cff;background:#102754;color:#fff;border-radius:7px;padding:6px 9px;font-size:8px;cursor:pointer}.ai-admin-btn:hover{background:#173661}
-#cartBg{display:none;position:fixed;inset:0;background:#000b;z-index:600}.drawer{position:absolute;right:0;top:0;height:100%;width:min(620px,100%);background:#080f19;border-left:1px solid #334a69;padding:22px;overflow:auto}.drawer-head{display:flex;justify-content:space-between}.close{border:1px solid #2d405b;background:#101a2a;color:#fff;border-radius:7px;padding:6px 9px}.cart-item{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid #1c2b40;font-size:11px}.total{font-size:20px;font-weight:900;margin:20px 0}.checkout{width:100%;border:0;border-radius:9px;padding:12px;background:linear-gradient(135deg,#3c83ff,#6a4cff);color:#fff;font-weight:800}
+#cartBg{display:none;position:fixed;inset:0;background:#000b;z-index:600}.drawer{position:absolute;right:0;top:0;height:100%;width:min(620px,100%);background:#080f19;border-left:1px solid #334a69;padding:22px;overflow:auto}.drawer-head{display:flex;justify-content:space-between}.close{border:1px solid #2d405b;background:#101a2a;color:#fff;border-radius:7px;padding:6px 9px}.cart-item{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid #1c2b40;font-size:11px}.total{font-size:20px;font-weight:900;margin:20px 0}.checkout{width:100%;border:0;border-radius:9px;padding:12px;background:linear-gradient(135deg,#3c83ff,#6a4cff);color:#fff;font-weight:800;cursor:pointer;pointer-events:auto;position:relative;z-index:2}
 
 @keyframes stars{to{background-position:90px 90px}}@keyframes sweep{to{transform:translateX(25px)}}@keyframes float{50%{transform:translateY(-10px)}}@keyframes pulse{50%{text-shadow:0 0 18px #fff,0 0 65px #3e82ff,0 0 120px #3e82ff99}}@keyframes cta{50%{box-shadow:0 0 42px #397dff99}}
 @media(max-width:1200px){.grid{grid-template-columns:repeat(4,1fr)}.categories{grid-template-columns:repeat(3,1fr)}.hero-inner{grid-template-columns:1fr}.side{display:none}}
@@ -522,7 +522,7 @@ body.auth-locked{overflow:hidden}
 </div>
 <div class="coupon-box"><label class="coupon-toggle"><input id="couponToggle" type="checkbox" onchange="toggleCouponBox()"><span>Turiu nuolaidos kodą</span></label><div id="couponForm" class="coupon-hidden"><div class="coupon-row"><input id="couponInput" placeholder="Įrašyk nuolaidos kodą"><button class="admin-primary" onclick="applyCoupon()">Pritaikyti</button></div><div class="coupon-message" id="couponMessage"></div></div></div>
 <div class="cart-summary"><div class="cart-summary-row"><span>Tarpinė suma</span><strong id="subtotal">0.00 €</strong></div><div class="cart-summary-row"><span>Kupono nuolaida</span><strong id="discountTotal">− 0.00 €</strong></div><div class="cart-summary-row" id="bulkDiscountRow" style="display:none"><span id="bulkDiscountLabel">Kiekio akcija</span><strong id="bulkDiscountTotal">− 0.00 €</strong></div><div class="cart-summary-total"><span>Iš viso</span><b id="total">0.00 €</b></div><div id="couponApplied"></div></div>
-<button class="checkout" style="margin-top:14px" onclick="openCheckout()">TĘSTI Į UŽSAKYMO FORMĄ →</button>
+<button class="checkout" style="margin-top:14px" onclick="continueToCheckout()">TĘSTI Į UŽSAKYMO FORMĄ →</button>
 </aside></div>
 
 <div id="productModal" class="product-modal" onclick="closeProductModal()">
@@ -1424,23 +1424,74 @@ async function handleCheckoutSaveToggle(checked){
   clearCheckoutFields();
   if(data?.user?.email)document.getElementById("coEmail").value=data.user.email;
 }
-function openCheckout(){
-  if(!cart.length)return alert("Krepšelis tuščias.");
-  document.getElementById("cartBg").style.display="none";
-  document.getElementById("checkoutError").textContent="";
-  document.getElementById("checkoutModal").classList.add("open");
-  clearCheckoutFields();
-  const saved=JSON.parse(localStorage.getItem("ltparduotuve_checkout")||"null");
-  document.getElementById("saveCheckoutData").checked=!!saved;
-  supabaseClient.auth.getUser().then(async ({data})=>{
-    if(data.user?.email)document.getElementById("coEmail").value=data.user.email;
-    if(saved){
-      document.getElementById("coFirstName").value=saved.first_name||"";document.getElementById("coLastName").value=saved.last_name||"";document.getElementById("coPhone").value=saved.phone||"";document.getElementById("coAddress").value=saved.address||"";document.getElementById("coCity").value=saved.city||"";document.getElementById("coPostal").value=saved.postal_code||"";
+window.continueToCheckout = async function(){
+  try{
+    if(!Array.isArray(cart) || !cart.length){
+      alert("Krepšelis tuščias.");
+      return;
     }
-  });
-  renderCheckoutSummary();
-}
-function closeCheckout(){document.getElementById("checkoutModal").classList.remove("open")}
+
+    const cartBg=document.getElementById("cartBg");
+    const modal=document.getElementById("checkoutModal");
+    const errorEl=document.getElementById("checkoutError");
+
+    if(!modal){
+      console.error("checkoutModal nerastas.");
+      alert("Nepavyko atidaryti užsakymo formos. Perkrauk puslapį.");
+      return;
+    }
+
+    if(cartBg) cartBg.style.display="none";
+    if(errorEl) errorEl.textContent="";
+
+    modal.classList.add("open");
+    document.body.style.overflow="hidden";
+
+    clearCheckoutFields();
+
+    const saveBox=document.getElementById("saveCheckoutData");
+    const savedRaw=localStorage.getItem("ltparduotuve_checkout");
+    let saved=null;
+    try{ saved=savedRaw?JSON.parse(savedRaw):null; }catch(e){ saved=null; }
+
+    if(saveBox) saveBox.checked=!!saved;
+
+    const {data}=await supabaseClient.auth.getUser();
+
+    if(data?.user?.email){
+      const email=document.getElementById("coEmail");
+      if(email) email.value=data.user.email;
+    }
+
+    if(saved){
+      const map={
+        coFirstName:saved.first_name||"",
+        coLastName:saved.last_name||"",
+        coPhone:saved.phone||"",
+        coAddress:saved.address||"",
+        coCity:saved.city||"",
+        coPostal:saved.postal_code||""
+      };
+      Object.entries(map).forEach(([id,value])=>{
+        const el=document.getElementById(id);
+        if(el) el.value=value;
+      });
+    }
+
+    renderCheckoutSummary();
+  }catch(err){
+    console.error("Checkout atidarymo klaida:",err);
+    alert("Nepavyko atidaryti užsakymo formos. Perkrauk puslapį ir bandyk dar kartą.");
+  }
+};
+
+window.openCheckout=window.continueToCheckout;
+
+window.closeCheckout=function(){
+  const modal=document.getElementById("checkoutModal");
+  if(modal) modal.classList.remove("open");
+  document.body.style.overflow="";
+};
 function renderCheckoutSummary(){
   const subtotal=cart.reduce((a,b)=>a+b.price*b.qty,0);
   const free=freeShippingProgress().free;
