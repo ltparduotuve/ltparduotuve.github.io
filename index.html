@@ -244,6 +244,10 @@ body.auth-locked{overflow:hidden}
           <label>SLAPTAŽODIS</label>
           <input id="loginPassword" type="password" autocomplete="current-password" required>
         </div>
+        <label class="save-check" style="margin:8px 0 4px">
+          <input id="rememberLoginEmail" type="checkbox">
+          <span>💾 Išsaugoti el. paštą šiame įrenginyje</span>
+        </label>
         <button class="auth-submit" type="submit">PRISIJUNGTI →</button>
         <div class="auth-msg" id="loginMsg"></div>
       </form>
@@ -566,7 +570,8 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3SNNvvuBtT4waMTznfCjnA_xYJZANED
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
+  SUPABASE_PUBLISHABLE_KEY,
+  { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage } }
 );
 
 let chatUser=null,chatThread=null,chatChannel=null,chatReady=false;const renderedMessageIds=new Set();
@@ -657,7 +662,11 @@ async function loginUser(event){
   event.preventDefault();
   const email=document.getElementById("loginEmail").value.trim();
   const password=document.getElementById("loginPassword").value;
+  const rememberEmail=document.getElementById("rememberLoginEmail")?.checked;
   const msg=document.getElementById("loginMsg");
+
+  if(rememberEmail) localStorage.setItem("ltparduotuve_login_email",email);
+  else localStorage.removeItem("ltparduotuve_login_email");
 
   msg.textContent="Jungiamasi...";
 
@@ -974,7 +983,11 @@ function randomPaymentReference(){
 }
 async function ensurePaymentReference(orderId){
   const {data,error}=await supabaseClient.rpc("assign_order_payment_reference",{p_order_id:orderId});
-  if(error){console.error(error);return null}
+  if(error){
+    console.error("PAYMENT REFERENCE ERROR",error);
+    alert("Mokėjimo kodo klaida: " + (error.message || error.details || error.hint || "Nežinoma Supabase klaida"));
+    return null;
+  }
   return data||null;
 }
 let activeBankPayment={};
