@@ -123,9 +123,7 @@ body.auth-locked{overflow:hidden}
 @media(max-width:700px){.admin-grid,.admin-form{grid-template-columns:1fr}.admin-form .full{grid-column:auto}.admin-product{align-items:flex-start}}
 
 .coupon-box{margin-top:18px;padding:18px;border:1px solid #263750;border-radius:14px;background:#080f1b}.coupon-row{display:flex;gap:8px;align-items:center;margin-top:10px}.coupon-row input,.coupon-row select{flex:1}.coupon-code{font-family:monospace;font-weight:800;letter-spacing:1px}.discount-old{text-decoration:line-through;color:#6f7d91;font-size:9px;margin-right:5px}.discount-new{color:#fff;font-weight:800}.admin-product small{display:block}.coupon-status{font-size:9px;color:#8492a6;margin-top:4px}.coupon-status.ok{color:#50d6a0}.coupon-status.off{color:#ff7373}
-.coupon-toggle{display:flex;align-items:center;gap:9px;cursor:pointer;color:#dce6f8;font-size:10px}.coupon-toggle input{width:16px;height:16px;accent-color:#4389ff}.coupon-hidden{display:none}.coupon-hidden.open{display:block}.coupon-message{font-size:9px;margin-top:7px;min-height:13px}.coupon-message.ok{color:#50d6a0}.coupon-message.err{color:#ff7373}.admin-list-title{font-size:12px;font-weight:800;margin:18px 0 8px;color:#dbe7f8}
-.updates-modal{display:none;position:fixed;inset:0;z-index:1950;background:#000c;padding:18px;align-items:center;justify-content:center}.updates-modal.open{display:flex}.updates-card{width:min(900px,96vw);max-height:92vh;overflow:auto;background:#080f1a;border:1px solid #3b5578;border-radius:20px;box-shadow:0 30px 100px #000e}.updates-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #263950}.updates-head h2{font-size:18px}.updates-head small{display:block;color:#7e8da5;font-size:9px;margin-top:4px}.updates-body{padding:20px}.updates-item{background:#0b1421;border:1px solid #263950;border-radius:13px;padding:16px;margin-bottom:10px}.updates-item:last-child{margin-bottom:0}.updates-item-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}.updates-item-title{font-size:14px;font-weight:800}.updates-item-date{font-size:9px;color:#718096;white-space:nowrap}.updates-block{margin-top:10px}.updates-block h4{font-size:10px;margin-bottom:5px}.updates-block.added h4{color:#42d99b}.updates-block.removed h4{color:#ff7184}.updates-block.changed h4{color:#6ea0ff}.updates-block ul{margin:0;padding-left:18px;color:#b8c5d8;font-size:10px;line-height:1.7}.updates-empty{text-align:center;color:#718096;font-size:10px;padding:30px}.updates-badge{display:inline-grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#286dff;color:#fff;font-size:8px;margin-left:4px;vertical-align:middle}.admin-update-preview{color:#718096;font-size:9px;line-height:1.5;margin-top:8px}.admin-update-actions{display:flex;gap:6px;flex-wrap:wrap}.admin-update-card{background:#0b1421;border:1px solid #263950;border-radius:10px;padding:12px}.admin-update-card b{font-size:11px}.admin-update-card small{display:block;color:#718096;font-size:8px;margin-top:4px}.admin-update-card .admin-update-preview{white-space:pre-line;max-height:65px;overflow:hidden}
-.admin-product-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.admin-secondary.green{border-color:#247a61;background:#0d2b24}.admin-secondary.orange{border-color:#87651e;background:#2c220c}
+.coupon-toggle{display:flex;align-items:center;gap:9px;cursor:pointer;color:#dce6f8;font-size:10px}.coupon-toggle input{width:16px;height:16px;accent-color:#4389ff}.coupon-hidden{display:none}.coupon-hidden.open{display:block}.coupon-message{font-size:9px;margin-top:7px;min-height:13px}.coupon-message.ok{color:#50d6a0}.coupon-message.err{color:#ff7373}.admin-list-title{font-size:12px;font-weight:800;margin:18px 0 8px;color:#dbe7f8}.admin-product-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.admin-secondary.green{border-color:#247a61;background:#0d2b24}.admin-secondary.orange{border-color:#87651e;background:#2c220c}
 
 /* === PRODUCT DETAILS + ENHANCED CART === */
 .product{cursor:pointer}
@@ -185,6 +183,9 @@ body.auth-locked{overflow:hidden}
 .checkout-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}.checkout-section{background:#0b1421;border:1px solid #263950;border-radius:13px;padding:16px}.checkout-section h3{font-size:12px;margin-bottom:13px}.checkout-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.checkout-field label{display:block;color:#9eabc0;font-size:9px;margin-bottom:5px}.checkout-field input{width:100%;height:40px;background:#08111d;border:1px solid #2b3e5a;color:#fff;border-radius:8px;padding:0 11px;outline:none;font-size:10px}.checkout-field input:focus{border-color:#4c8cff}.checkout-field.full{grid-column:1/-1}.shipping-options{display:grid;gap:8px}.shipping-option{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #293d58;background:#08111d;border-radius:9px;cursor:pointer}.shipping-option:has(input:checked){border-color:#4c8cff;background:#102754}.shipping-option input{accent-color:#4389ff}.shipping-option span{font-size:10px}.shipping-option b{margin-left:auto;font-size:10px;color:#22e5a0}.checkout-summary{position:sticky;top:0}.checkout-summary-list{display:grid;gap:7px;max-height:260px;overflow:auto}.checkout-summary-item{display:flex;justify-content:space-between;gap:8px;font-size:10px;padding:7px 0;border-bottom:1px solid #17263a}.checkout-total{display:flex;justify-content:space-between;padding-top:12px;margin-top:10px;border-top:1px solid #30445f;font-size:12px}.checkout-total b{font-size:21px;color:#22e5a0}.checkout-note{color:#718096;font-size:9px;line-height:1.5;margin-top:12px}.checkout-error{min-height:15px;color:#ff7373;font-size:9px;margin:8px 0}.checkout-submit{width:100%;height:44px;border:1px solid #74a4ff;border-radius:10px;background:linear-gradient(135deg,#3b83ff,#6a4cff);color:#fff;font-weight:800;cursor:pointer}
 .admin-order{display:grid;grid-template-columns:1fr auto;gap:12px;background:#0b1421;border:1px solid #263950;border-radius:11px;padding:13px}.admin-order-info b{font-size:11px}.admin-order-info small{display:block;color:#7d8ca3;font-size:9px;margin-top:4px;line-height:1.5}.admin-order-actions{display:flex;align-items:center;gap:7px}.admin-order-actions select{background:#08111d;color:#fff;border:1px solid #30445f;border-radius:8px;padding:8px;font-size:9px}
 
+
+.free-shipping-box{margin:14px 0 16px;padding:15px 16px;border-radius:15px;background:linear-gradient(135deg,#35d477,#20c968);color:#fff;box-shadow:0 10px 28px #20c96835}.free-shipping-top{display:flex;align-items:center;gap:12px}.free-shipping-icon{font-size:28px;line-height:1}.free-shipping-title{font-size:13px;font-weight:900;line-height:1.25}.free-shipping-sub{font-size:10px;opacity:.95;margin-top:3px}.free-shipping-percent{margin-left:auto;font-size:11px;font-weight:900}.free-shipping-track{height:9px;margin-top:12px;border-radius:999px;background:#ffffff45;overflow:hidden;border:1px solid #ffffff55}.free-shipping-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#ffca28,#ffd95c);box-shadow:0 0 8px #ffe26a99;transition:width .3s ease}.free-shipping-free{font-size:11px;font-weight:900;margin-top:7px}.free-shipping-box.free{background:linear-gradient(135deg,#24c96b,#16b95c)}
+
 /* Didesni langai ir patogesnis skaitymas */
 .drawer h2{font-size:24px}.drawer{padding:28px}.cart-item{font-size:13px;padding:17px 0}.cart-item-name{font-size:15px}.cart-item-price{font-size:12px}.cart-controls button,.coupon-remove{font-size:12px}.checkout{font-size:13px;padding:15px}.coupon-box{font-size:13px}.coupon-row input{height:44px;font-size:13px}.coupon-row button{min-height:44px}
 .orders-card,.checkout-card{font-size:13px}.orders-head,.checkout-head{padding:24px 28px}.orders-head h2,.checkout-head h2{font-size:24px}.orders-body,.checkout-body{padding:28px}.order-card{padding:20px}.order-number{font-size:15px}.order-date{font-size:11px}.order-status{font-size:11px;padding:8px 12px}.order-item-row,.order-info-box{font-size:12px}.checkout-section{padding:22px}.checkout-section h3{font-size:14px}.checkout-field label{font-size:10px}.checkout-field input{height:48px;font-size:13px}.shipping-option{padding:14px}.shipping-option span,.shipping-option b{font-size:12px}.checkout-summary-list{max-height:360px}.checkout-summary-item{font-size:12px}.checkout-total{font-size:14px}.checkout-total b{font-size:25px}.checkout-submit{height:52px;font-size:13px}
@@ -197,7 +198,8 @@ body.auth-locked{overflow:hidden}
 
 .admin-chat-notification{display:none;position:fixed;right:20px;top:84px;z-index:2500;width:min(370px,calc(100% - 40px));background:#0b1421;border:1px solid #4c8cff;border-radius:13px;padding:12px;box-shadow:0 18px 55px #000c;cursor:pointer;align-items:center;gap:10px;animation:chatNoticeIn .25s ease}.admin-chat-notification.show{display:flex}.admin-chat-notification-icon{width:36px;height:36px;border-radius:10px;background:#173661;display:grid;place-items:center;font-size:18px;flex:0 0 auto}.admin-chat-notification b{display:block;font-size:10px}.admin-chat-notification small{display:block;color:#8b9bb2;font-size:8px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:245px}.admin-chat-notification button{margin-left:auto;border:0;background:#111d2d;color:#fff;border-radius:6px;padding:4px 7px;cursor:pointer}.admin-chat-user.unread{border-color:#20e5a0;box-shadow:0 0 0 1px #20e5a033}.admin-chat-user .unread-dot{float:right;color:#20e5a0;font-size:9px}@keyframes chatNoticeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 .admin-chat-layout{display:grid;grid-template-columns:280px 1fr;gap:12px;min-height:420px}.admin-chat-users,.admin-chat-window{background:#0b1421;border:1px solid #263950;border-radius:12px;overflow:hidden}.admin-chat-users{padding:10px}.admin-chat-user{padding:10px;border:1px solid #22354e;background:#08111d;border-radius:9px;cursor:pointer;margin-bottom:7px}.admin-chat-user:hover,.admin-chat-user.active{border-color:#4c8cff;background:#102754}.admin-chat-user b{font-size:10px}.admin-chat-user small{display:block;color:#718096;font-size:8px;margin-top:4px}.admin-chat-title{padding:13px;border-bottom:1px solid #263950;font-size:11px;font-weight:800}.admin-chat-body{height:340px;overflow:auto;padding:12px}.admin-chat-bubble{max-width:80%;padding:8px 10px;border-radius:10px;background:#101c2d;border:1px solid #263b58;margin:6px 0;font-size:9px;line-height:1.5}.admin-chat-bubble.admin{margin-left:auto;background:#173661}.admin-chat-time{display:block;color:#68788e;font-size:7px;margin-top:4px}.admin-chat-reply{display:flex;gap:7px;padding:9px;border-top:1px solid #263950}.admin-chat-reply input{flex:1;background:#08111d;border:1px solid #2b3e5a;color:#fff;border-radius:8px;padding:9px;font-size:9px;outline:none}@media(max-width:700px){.admin-chat-layout{grid-template-columns:1fr}.admin-chat-users{max-height:220px}.admin-chat-body{height:300px}}
-.order-cancel-btn{border:1px solid #a64b5d;background:#24101a;color:#ff9aad;border-radius:8px;padding:8px 11px;font-size:10px;cursor:pointer;margin-top:8px}.order-cancel-btn:hover{background:#351521}.pay-disabled{opacity:.45!important;cursor:not-allowed!important}.pay-note{font-size:9px;color:#71819a;margin-top:6px;line-height:1.4}.order-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:10px}.order-pay-btn{border:1px solid #5579ad;background:#16243a;color:#fff;border-radius:8px;padding:8px 11px;font-size:10px;opacity:.45;cursor:not-allowed}.order-cancel-btn{border:1px solid #a64b5d;background:#24101a;color:#ff9aad;border-radius:8px;padding:8px 11px;font-size:10px;cursor:pointer}.order-cancel-btn:hover{background:#351521}.pay-note{width:100%;font-size:9px;color:#71819a;line-height:1.4}.save-check{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px;border:1px solid #263950;background:#08111d;border-radius:9px;color:#9aa9bf;font-size:9px;cursor:pointer}.save-check input{accent-color:#4389ff}.admin-order-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}.admin-order-stat{background:#0b1421;border:1px solid #263950;border-radius:10px;padding:11px}.admin-order-stat b{display:block;font-size:17px}.admin-order-stat small{color:#718096;font-size:8px}
+.order-cancel-btn{border:1px solid #a64b5d;background:#24101a;color:#ff9aad;border-radius:8px;padding:8px 11px;font-size:10px;cursor:pointer;margin-top:8px}.order-cancel-btn:hover{background:#351521}.pay-disabled{opacity:.45!important;cursor:not-allowed!important}.pay-note{font-size:9px;color:#71819a;margin-top:6px;line-height:1.4}
+.bank-pay-modal{display:none;position:fixed;inset:0;background:#000b;z-index:2400;align-items:center;justify-content:center;padding:18px}.bank-pay-modal.open{display:flex}.bank-pay-card{width:min(560px,100%);max-height:90vh;overflow:auto;background:#0b1421;border:1px solid #31557e;border-radius:16px;box-shadow:0 25px 80px #000c}.bank-pay-head{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid #263950}.bank-pay-head h2{font-size:19px}.bank-pay-head small{display:block;color:#8290a8;margin-top:4px}.bank-pay-body{padding:22px}.bank-pay-amount{background:#101f33;border:1px solid #31557e;border-radius:12px;padding:15px;margin-bottom:12px}.bank-pay-amount span{display:block;color:#8290a8;font-size:10px}.bank-pay-amount b{display:block;font-size:28px;color:#22e5a0;margin-top:4px}.bank-pay-grid{display:grid;gap:9px}.bank-pay-row{display:flex;justify-content:space-between;gap:15px;padding:12px;background:#08111d;border:1px solid #22354e;border-radius:9px}.bank-pay-row span{color:#8290a8;font-size:10px}.bank-pay-row b{font-size:11px;text-align:right;word-break:break-all}.bank-pay-ref{color:#7fb0ff!important;font-family:monospace;font-size:13px!important}.bank-pay-copy{border:1px solid #31557e;background:#101f33;color:#fff;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:9px}.bank-pay-note{margin-top:13px;padding:12px;background:#0d2b24;border:1px solid #247a61;border-radius:10px;color:#b9f5dd;font-size:10px;line-height:1.55}.bank-pay-actions{display:flex;gap:8px;margin-top:15px}.bank-pay-actions button{flex:1;min-height:43px}.admin-payment-box{margin-top:12px}.admin-payment-help{color:#718096;font-size:9px;line-height:1.5;margin-top:8px}.order-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:10px}.order-pay-btn{border:1px solid #5579ad;background:#16243a;color:#fff;border-radius:8px;padding:8px 11px;font-size:10px;opacity:1;cursor:pointer}.order-pay-btn:hover{background:#1d3150;border-color:#6d98d4;transform:translateY(-1px)}.order-cancel-btn{border:1px solid #a64b5d;background:#24101a;color:#ff9aad;border-radius:8px;padding:8px 11px;font-size:10px;cursor:pointer}.order-cancel-btn:hover{background:#351521}.pay-note{width:100%;font-size:9px;color:#71819a;line-height:1.4}.save-check{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px;border:1px solid #263950;background:#08111d;border-radius:9px;color:#9aa9bf;font-size:9px;cursor:pointer}.save-check input{accent-color:#4389ff}.admin-order-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}.admin-order-stat{background:#0b1421;border:1px solid #263950;border-radius:10px;padding:11px}.admin-order-stat b{display:block;font-size:17px}.admin-order-stat small{color:#718096;font-size:8px}
 /* Didesni langai ir patogesnis skaitymas */
 .drawer h2{font-size:24px}.drawer{padding:28px}.cart-item{font-size:13px;padding:17px 0}.cart-item-name{font-size:15px}.cart-item-price{font-size:12px}.cart-controls button,.coupon-remove{font-size:12px}.checkout{font-size:13px;padding:15px}.coupon-box{font-size:13px}.coupon-row input{height:44px;font-size:13px}.coupon-row button{min-height:44px}
 .orders-card,.checkout-card{font-size:13px}.orders-head,.checkout-head{padding:24px 28px}.orders-head h2,.checkout-head h2{font-size:24px}.orders-body,.checkout-body{padding:28px}.order-card{padding:20px}.order-number{font-size:15px}.order-date{font-size:11px}.order-status{font-size:11px;padding:8px 12px}.order-item-row,.order-info-box{font-size:12px}.checkout-section{padding:22px}.checkout-section h3{font-size:14px}.checkout-field label{font-size:10px}.checkout-field input{height:48px;font-size:13px}.shipping-option{padding:14px}.shipping-option span,.shipping-option b{font-size:12px}.checkout-summary-list{max-height:360px}.checkout-summary-item{font-size:12px}.checkout-total{font-size:14px}.checkout-total b{font-size:25px}.checkout-submit{height:52px;font-size:13px}
@@ -208,26 +210,48 @@ body.auth-locked{overflow:hidden}
 .chat-solve{width:100%;border:0;border-top:1px solid #22334a;background:#0d1726;color:#55d6a7;padding:9px;font-size:9px;cursor:pointer}.chat-solved{text-align:center;padding:30px 15px;color:#cdd8e8}.chat-solved p{font-size:10px;color:#8190a8;margin:8px 0}.rating-stars{display:flex;justify-content:center;gap:4px;margin:12px 0}.rating-stars button{border:0;background:none;color:#ffd45c;font-size:28px;cursor:pointer}.chat-solved input{width:100%;background:#08111d;border:1px solid #2b3e5a;color:#fff;border-radius:8px;padding:9px;font-size:9px}.chat-rate-submit{margin-top:8px;width:100%;border:1px solid #4c8cff;background:#102754;color:#fff;border-radius:8px;padding:9px;font-size:9px}.coupon-applied-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;padding:8px 10px;border:1px solid #23523f;background:#0b2019;border-radius:8px}.coupon-applied-row span{font-size:9px;color:#50d6a0}.coupon-remove{border:1px solid #7b3340;background:#29131a;color:#ff9aaa;border-radius:7px;padding:5px 8px;font-size:8px;cursor:pointer}
 </style>
 
-<style id="floating-bg-style">
-/* === LT PARDUOTUVĖ — gyvas skraidantis fono sluoksnis === */
-#floating-bg{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden;isolation:isolate}
-#floating-bg .fb-item{position:absolute;left:-15vw;top:var(--top);font-size:var(--size);opacity:var(--opacity);filter:drop-shadow(0 0 9px rgba(75,125,255,.35));animation:fbFly var(--duration) linear var(--delay) infinite;will-change:transform}
-#floating-bg .fb-item.money{filter:drop-shadow(0 0 12px rgba(70,255,170,.25));}
-#floating-bg .fb-item.coin{filter:drop-shadow(0 0 12px rgba(255,205,70,.35));}
-#floating-bg .fb-item.box{filter:drop-shadow(0 0 12px rgba(120,145,255,.3));}
-#floating-bg .fb-item.label{font-family:Arial,sans-serif;font-weight:900;letter-spacing:1px;color:#dce7ff;background:rgba(12,22,45,.62);border:1px solid rgba(100,145,255,.35);border-radius:10px;padding:6px 10px;backdrop-filter:blur(5px);box-shadow:0 0 18px rgba(70,105,255,.18)}
-#floating-bg .fb-item.spark{color:#9ebcff;text-shadow:0 0 14px #628cff,0 0 28px rgba(90,120,255,.65)}
-@keyframes fbFly{
-  0%{transform:translate3d(-18vw,0,0) rotate(var(--r1)) scale(var(--scale));}
-  25%{transform:translate3d(18vw,var(--drift1),0) rotate(calc(var(--r1) + 75deg)) scale(var(--scale));}
-  50%{transform:translate3d(52vw,var(--drift2),0) rotate(calc(var(--r1) + 170deg)) scale(var(--scale));}
-  75%{transform:translate3d(84vw,var(--drift3),0) rotate(calc(var(--r1) + 255deg)) scale(var(--scale));}
-  100%{transform:translate3d(118vw,var(--drift4),0) rotate(calc(var(--r1) + 360deg)) scale(var(--scale));}
-}
-#floating-bg .fb-glow{position:absolute;border-radius:50%;width:280px;height:280px;filter:blur(70px);opacity:.13;animation:fbPulse 7s ease-in-out infinite alternate}
-#floating-bg .g1{left:8%;top:14%;background:#315cff}.g2{right:10%;top:46%;background:#7b3cff;animation-delay:-2s}.g3{left:40%;bottom:4%;background:#00aaff;animation-delay:-4s}
-@keyframes fbPulse{from{transform:scale(.75);opacity:.07}to{transform:scale(1.25);opacity:.16}}
-@media (prefers-reduced-motion:reduce){#floating-bg .fb-item,#floating-bg .fb-glow{animation:none!important}}
+<style id="checkout-redesign">
+.checkout-modal{background:rgba(2,5,12,.94);backdrop-filter:blur(12px);align-items:flex-start;overflow:auto;padding:48px 18px}
+.checkout-card{width:min(1120px,100%);margin:20px auto;background:#080b12;border:1px solid #1e2b3d;border-radius:18px;box-shadow:0 30px 100px #000c;overflow:hidden}
+.checkout-head{padding:22px 28px;border-bottom:1px solid #182435;background:linear-gradient(180deg,#0b111b,#080b12);display:flex;justify-content:space-between;align-items:center}
+.checkout-head h2{margin:0;font-size:20px}.checkout-head small{display:block;color:#75859b;margin-top:5px}
+.checkout-body{padding:24px}
+.checkout-steps{display:flex;align-items:center;gap:10px;margin-bottom:24px;padding:0 4px}
+.checkout-step{display:flex;align-items:center;gap:8px;color:#56657a;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.3px}
+.checkout-step .step-dot{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;border:1px solid #2a3b52;background:#0c1420;color:#708198}
+.checkout-step.active{color:#fff}.checkout-step.active .step-dot{background:#2587ff;border-color:#4b9dff;color:#fff;box-shadow:0 0 20px #2587ff55}
+.checkout-step.done{color:#39df9a}.checkout-step.done .step-dot{background:#103a2b;border-color:#2b9d73;color:#39df9a}
+.checkout-step-line{height:1px;background:#1d2a3b;flex:1;max-width:120px}
+.checkout-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,.8fr);gap:18px}
+.checkout-left,.checkout-right{min-width:0}
+.checkout-section{background:#0b0f16;border:1px solid #1d2939;border-radius:15px;padding:20px}
+.checkout-section h3{margin:0 0 17px;font-size:14px}
+.checkout-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.checkout-field.full{grid-column:1/-1}
+.checkout-field label{display:block;font-size:9px;color:#8190a5;font-weight:800;letter-spacing:.6px;margin:0 0 6px}
+.checkout-field input{height:43px;width:100%;box-sizing:border-box;background:#080c13;border:1px solid #243248;color:#fff;border-radius:9px;padding:0 12px;outline:none}
+.checkout-field input:focus{border-color:#378eff;box-shadow:0 0 0 3px #378eff14}
+.save-check{display:flex;align-items:center;gap:8px;margin-top:14px;color:#8492a7;font-size:10px}.save-check input{accent-color:#4389ff}
+.payment-choice{display:block;border:1px solid #328cff66;background:linear-gradient(135deg,#0e1c2c,#0a1019);border-radius:12px;padding:15px;cursor:default}
+.payment-choice-top{display:flex;align-items:center;gap:12px}.payment-choice-icon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:#12304a;border:1px solid #245d87;font-size:18px}
+.payment-choice-title{font-size:12px;font-weight:800}.payment-choice-sub{font-size:9px;color:#77879b;margin-top:3px}
+.payment-choice-check{margin-left:auto;width:19px;height:19px;border-radius:50%;background:#278dff;display:grid;place-items:center;font-size:11px}
+.payment-choice-info{margin-top:13px;padding-top:12px;border-top:1px solid #1d2b3c;color:#7f8da1;font-size:9px;line-height:1.6}
+.checkout-summary{position:sticky;top:18px;height:max-content}
+.checkout-summary h3{margin-bottom:13px}
+.checkout-summary-list{max-height:220px;overflow:auto;margin-bottom:8px}
+.checkout-summary-list .checkout-summary-item{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #182334;font-size:10px}
+.checkout-summary-list .checkout-summary-item small{color:#748398;display:block;margin-top:2px}
+.cart-summary-row{font-size:10px!important}
+.checkout-total{margin-top:13px;padding-top:14px;border-top:1px solid #263347;display:flex;justify-content:space-between;align-items:center}
+.checkout-total span{font-size:11px;color:#9aa7b8}.checkout-total b{font-size:25px;color:#fff}
+.checkout-submit{width:100%;height:46px;margin-top:17px;border:1px solid #75aaff;border-radius:10px;background:linear-gradient(135deg,#2f83ff,#674cff);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 10px 30px #347cff22}
+.checkout-submit:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.checkout-note{margin-top:11px;text-align:center;color:#65748a;font-size:8px;line-height:1.5}
+.checkout-error{color:#ff8c8c;font-size:9px;margin-top:8px}
+.checkout-empty-space{min-height:115px;margin-top:18px;border:1px dashed #1c2a3b;border-radius:15px;background:rgba(7,11,18,.35);display:flex;align-items:center;justify-content:center;color:#3f4e61;font-size:9px}
+@media(max-width:850px){.checkout-layout{grid-template-columns:1fr}.checkout-summary{position:static}.checkout-step-line{max-width:50px}}
+@media(max-width:560px){.checkout-body{padding:14px}.checkout-head{padding:17px}.checkout-grid{grid-template-columns:1fr}.checkout-field.full{grid-column:auto}.checkout-steps{gap:5px}.checkout-step{font-size:8px}.checkout-step-line{max-width:18px}.checkout-step .step-dot{width:21px;height:21px}}
 </style>
 
 </head>
@@ -259,12 +283,16 @@ body.auth-locked{overflow:hidden}
       <form id="loginForm" class="auth-form active" onsubmit="loginUser(event)">
         <div class="auth-field">
           <label>EL. PAŠTAS</label>
-          <input id="loginEmail" type="email" autocomplete="email" required>
+          <input id="loginEmail" type="email" autocomplete="username" required>
         </div>
         <div class="auth-field">
           <label>SLAPTAŽODIS</label>
           <input id="loginPassword" type="password" autocomplete="current-password" required>
         </div>
+        <label class="save-check" style="margin:8px 0 4px">
+          <input id="rememberLoginEmail" type="checkbox" onchange="toggleRememberLogin(this.checked)">
+          <span>💾 Išsaugoti prisijungimo duomenis šiame įrenginyje</span>
+        </label>
         <button class="auth-submit" type="submit">PRISIJUNGTI →</button>
         <div class="auth-msg" id="loginMsg"></div>
       </form>
@@ -311,7 +339,6 @@ body.auth-locked{overflow:hidden}
 <a class="logo" href="#top"><b>LT</b><span>PARDUOTUVĖ</span></a>
 <nav id="mainNav"><a class="active" href="#top">Pagrindinis</a></nav>
 <input id="search" class="search" placeholder="🔎 Ieškoti prekių...">
-<button class="nav-icon" onclick="openUpdates()" title="Parduotuvės atnaujinimai">🔔<span class="updates-badge" id="updatesBadge" style="display:none">0</span></button>
 <div class="user-menu">
 <button class="nav-icon" onclick="toggleUserMenu()">♙</button>
 <div class="user-dropdown" id="userDropdown">
@@ -324,7 +351,7 @@ body.auth-locked{overflow:hidden}
 
 <section class="hero" id="top"><div class="hero-inner">
 <div class="side">
-<a class="side-card" href="https://discord.gg/FGsRsNNBuQ" target="_blank" rel="noopener"><strong>💬 Discord</strong><br><span class="link-btn">ATIDARYTI DISCORD →</span></a>
+<a class="side-card" href="https://discord.com/invite/ltparduotuve" target="_blank" rel="noopener"><strong>💬 Discord</strong><br><span class="link-btn">ATIDARYTI DISCORD →</span></a>
 <a class="side-card" href="mailto:nedasliubinas4@gmail.com"><strong>✉️ El. paštas</strong><br><span class="link-btn">RAŠYTI EL. PAŠTU →</span></a>
 </div>
 <div class="hero-main"><div class="crown">♛</div><div class="lt">LT</div><h1>PARDUOTUVĖ</h1><div class="sub">DAUGIAU NEI TIK PARDUOTUVĖ</div><a class="cta" href="#prekes">APSIPIRKTI DABAR →</a></div>
@@ -352,7 +379,7 @@ body.auth-locked{overflow:hidden}
 
 <div class="grid" id="grid"></div>
 
-<div class="contact"><div class="contact-card"><h3>✉️ El. paštas</h3><p>Klausimams ir pagalbai.</p><a class="contact-btn" href="mailto:nedasliubinas4@gmail.com">RAŠYTI EL. PAŠTU →</a></div><div class="contact-card"><h3>💬 Discord / Ticket</h3><p>Prisijunk ir susisiek per ticket.</p><a class="contact-btn" href="https://discord.gg/FGsRsNNBuQ" target="_blank" rel="noopener">ATIDARYTI DISCORD →</a></div></div>
+<div class="contact"><div class="contact-card"><h3>✉️ El. paštas</h3><p>Klausimams ir pagalbai.</p><a class="contact-btn" href="mailto:nedasliubinas4@gmail.com">RAŠYTI EL. PAŠTU →</a></div><div class="contact-card"><h3>💬 Discord / Ticket</h3><p>Prisijunk ir susisiek per ticket.</p><a class="contact-btn" href="https://discord.com/invite/ltparduotuve" target="_blank" rel="noopener">ATIDARYTI DISCORD →</a></div></div>
 </main>
 <footer>© 2026 LT PARDUOTUVĖ • Pagalba 24/7</footer>
 
@@ -362,16 +389,9 @@ body.auth-locked{overflow:hidden}
 <div class="bubble">Sveiki! 👋 Kaip galime padėti?</div>
 <div class="bubble">Pasirinkite dažną klausimą arba parašykite savo klausimą. Žinutė bus išsaugota ir matoma administratoriui.</div>
 </div>
-<div class="quick"><button onclick="quick('Kur mano užsakymas?')">📦 Kur mano užsakymas?</button><button onclick="quick('Kokia tai prekė?')">🛍️ Kokia tai prekė?</button><button onclick="quick('Kiek kainuoja pristatymas?')">🚚 Pristatymas</button><button onclick="quick('Kaip galiu apmokėti užsakymą?')">💳 Apmokėjimas</button><button onclick="quick('Kaip panaudoti nuolaidos kuponą?')">🎟️ Kuponas</button><button onclick="quick('Noriu susisiekti su administratoriumi.')">👤 Administratorius</button></div>
+
 <div class="chat-input"><input id="msg" placeholder="Parašykite žinutę..."><button onclick="send()">Siųsti</button></div></div>
 
-
-<div class="updates-modal" id="updatesModal">
- <div class="updates-card">
-  <div class="updates-head"><div><h2>📢 Parduotuvės atnaujinimai</h2><small>Čia rasi informaciją apie pridėtas, išimtas ir pakeistas parduotuvės dalis.</small></div><button class="admin-close" onclick="closeUpdates()">✕ Uždaryti</button></div>
-  <div class="updates-body" id="updatesBody"><div class="updates-empty">Kraunama...</div></div>
- </div>
-</div>
 
 <div id="adminPanel">
  <div class="admin-wrap">
@@ -381,9 +401,10 @@ body.auth-locked{overflow:hidden}
    <button class="admin-tab" onclick="adminTab('products',this)">📦 Prekės</button>
    <button class="admin-tab" onclick="adminTab('categories',this)">🏷️ Kategorijos</button>
    <button class="admin-tab" onclick="adminTab('coupons',this)">🎟️ Kuponai</button>
+   <button class="admin-tab" onclick="adminTab('bulk',this)">🛍️ Kiekio akcijos</button>
     <button class="admin-tab" onclick="adminTab('orders',this)">🧾 Užsakymai</button>
+   <button class="admin-tab" onclick="adminTab('payments',this)">🏦 Apmokėjimai</button>
    <button class="admin-tab" onclick="adminTab('chat',this)">💬 Klientų chat</button>
-   <button class="admin-tab" onclick="adminTab('updates',this)">📢 Atnaujinimai</button>
   </div>
   <section class="admin-section active" id="admin-dashboard">
    <div class="admin-grid">
@@ -441,29 +462,34 @@ body.auth-locked{overflow:hidden}
    <div class="admin-actions" style="margin:12px 0 10px"><button class="admin-secondary" onclick="loadAdminCoupons()">↻ Atnaujinti</button></div>
    <div class="admin-list" id="adminCouponList"><div class="admin-empty">Kraunama...</div></div>
   </section>
+  <section class="admin-section" id="admin-bulk">
+   <div class="admin-note"><b>🛍️ Kiekio akcijos</b><br>Čia nustatai automatinę nuolaidą pagal bendrą prekių kiekį krepšelyje. Pvz. 2+ prekės → 5 %, 3+ → 10 %, 5+ → 15 %.</div>
+   <div class="admin-form">
+    <input type="hidden" id="bulkEditId">
+    <div class="admin-field"><label>NUO KIEK PREKIŲ</label><input id="bulkMinItems" type="number" min="1" step="1" placeholder="2"></div>
+    <div class="admin-field"><label>NUOLAIDA (%)</label><input id="bulkDiscount" type="number" min="0" max="100" step="0.1" placeholder="5"></div>
+    <div class="admin-field"><label>AKTYVI</label><select id="bulkActive"><option value="true">Taip</option><option value="false">Ne</option></select></div>
+    <div class="admin-actions full"><button class="admin-primary" onclick="saveBulkDiscount()">💾 Išsaugoti akciją</button><button class="admin-secondary" onclick="clearBulkDiscountForm()">Išvalyti</button></div>
+   </div>
+   <div class="admin-actions" style="margin-bottom:10px"><button class="admin-secondary" onclick="loadAdminBulkDiscounts()">↻ Atnaujinti</button></div>
+   <div class="admin-list" id="adminBulkList"><div class="admin-empty">Kraunama...</div></div>
+  </section>
   <section class="admin-section" id="admin-orders">
    <div class="admin-order-stats" id="adminOrderStats"></div>
    <div class="admin-actions" style="margin-bottom:10px"><button class="admin-secondary" onclick="loadAdminOrders()">↻ Atnaujinti užsakymus</button></div>
    <div class="admin-list" id="adminOrderList"><div class="admin-empty">Kraunama...</div></div>
   </section>
-  <section class="admin-section" id="admin-updates">
-   <div class="admin-note"><b>📢 Parduotuvės atnaujinimai</b><br>Čia gali paskelbti klientams, kas buvo pridėta, išimta arba pakeista. Kiekvieną naują punktą rašyk naujoje eilutėje.</div>
+  <section class="admin-section" id="admin-payments">
+   <div class="admin-note"><b>🏦 Bankinio pavedimo apmokėjimai</b><br>Čia nustatai duomenis, kuriuos klientas matys pasirinkęs apmokėjimą bankiniu pavedimu. Šie duomenys bus rodomi klientams, todėl įrašyk tik tuos duomenis, kuriuos teisėtai naudoji mokėjimams priimti.</div>
    <div class="admin-form">
-    <input type="hidden" id="updateEditId">
-    <div class="admin-field full"><label>ATNAUJINIMO PAVADINIMAS</label><input id="updateTitle" placeholder="Pvz. Naujausias parduotuvės atnaujinimas"></div>
-    <div class="admin-field"><label>➕ PRIDĖTA</label><textarea id="updateAdded" placeholder="Pridėti nauji produktai
-Pridėta nauja kategorija
-Įkeltos naujos nuotraukos"></textarea></div>
-    <div class="admin-field"><label>➖ IŠIMTA</label><textarea id="updateRemoved" placeholder="Išimti tokie ir tokie produktai
-Išimta sena kategorija"></textarea></div>
-    <div class="admin-field full"><label>✏️ PAKEISTA</label><textarea id="updateChanged" placeholder="Pakeistos produktų kainos
-Atnaujinti pristatymo būdai
-Pakeistas dizainas"></textarea></div>
-    <div class="admin-actions full"><button class="admin-primary" onclick="publishStoreUpdate()">📢 Paskelbti atnaujinimą</button><button class="admin-secondary" onclick="clearUpdateForm()">Išvalyti</button></div>
+    <div class="admin-field"><label>BANKAS</label><input id="payBankName" placeholder="Pvz. Revolut / SEB / Swedbank"></div>
+    <div class="admin-field"><label>BANKO SĄSKAITA (IBAN)</label><input id="payAccountNumber" placeholder="LT00 0000 0000 0000 0000"></div>
+    <div class="admin-field full"><label>GAVĖJO VARDAS / PAVADINIMAS</label><input id="payBeneficiary" placeholder="LT PARDUOTUVĖ"></div>
+    <div class="admin-field full"><label>PAPILDOMA INFORMACIJA KLIENTUI</label><textarea id="payInstructions" placeholder="Po apmokėjimo palaukite, kol mokėjimas bus patikrintas."></textarea></div>
+    <div class="admin-field"><label>RODYTI BANKINĮ APMOKĖJIMĄ</label><select id="payEnabled"><option value="true">Taip</option><option value="false">Ne</option></select></div>
+    <div class="admin-actions full"><button class="admin-primary" onclick="savePaymentSettings()">💾 Išsaugoti apmokėjimo duomenis</button><button class="admin-secondary" onclick="loadPaymentSettings()">↻ Atkurti</button></div>
    </div>
-   <div class="admin-actions" style="margin-bottom:10px"><button class="admin-secondary" onclick="loadAdminUpdates()">↻ Atnaujinti sąrašą</button></div>
-   <div class="admin-list-title">📋 Paskelbti atnaujinimai</div>
-   <div class="admin-list" id="adminUpdateList"><div class="admin-empty">Kraunama...</div></div>
+   <div class="admin-payment-help">Mokėjimo paskirtis kiekvienam užsakymui sugeneruojama atskirai, pvz. <b>LT-2026-A7F3K9Q2</b>. Klientas turi naudoti būtent savo užsakymo kodą.</div>
   </section>
   <section class="admin-section" id="admin-chat">
    <div class="admin-note"><b>💬 Tiesioginis klientų chat</b><br>Žinutės atkeliauja realiu laiku. Kai klientas parašo, gausi pranešimą ir vienu paspaudimu galėsi atsidaryti pokalbį.</div>
@@ -487,8 +513,16 @@ Pakeistas dizainas"></textarea></div>
 <div id="cartBg" onclick="closeCart()"><aside class="drawer" onclick="event.stopPropagation()">
 <div class="drawer-head"><div><h2>🛒 Krepšelis</h2><small style="color:#718096;font-size:9px">Tavo pasirinktos prekės</small></div><button class="close" onclick="closeCart()">✕</button></div>
 <div id="items"></div>
+<div id="freeShippingBox" class="free-shipping-box">
+ <div class="free-shipping-top">
+  <div class="free-shipping-icon">🚚</div>
+  <div><div id="freeShippingTitle" class="free-shipping-title">Pridėk prekių iki nemokamo pristatymo</div><div id="freeShippingSub" class="free-shipping-sub">Nemokamas pristatymas nuo 30,00 €</div></div>
+  <div id="freeShippingPercent" class="free-shipping-percent">0%</div>
+ </div>
+ <div class="free-shipping-track"><div id="freeShippingFill" class="free-shipping-fill" style="width:0%"></div></div>
+</div>
 <div class="coupon-box"><label class="coupon-toggle"><input id="couponToggle" type="checkbox" onchange="toggleCouponBox()"><span>Turiu nuolaidos kodą</span></label><div id="couponForm" class="coupon-hidden"><div class="coupon-row"><input id="couponInput" placeholder="Įrašyk nuolaidos kodą"><button class="admin-primary" onclick="applyCoupon()">Pritaikyti</button></div><div class="coupon-message" id="couponMessage"></div></div></div>
-<div class="cart-summary"><div class="cart-summary-row"><span>Tarpinė suma</span><strong id="subtotal">0.00 €</strong></div><div class="cart-summary-row"><span>Nuolaida</span><strong id="discountTotal">− 0.00 €</strong></div><div class="cart-summary-total"><span>Iš viso</span><b id="total">0.00 €</b></div><div id="couponApplied"></div></div>
+<div class="cart-summary"><div class="cart-summary-row"><span>Tarpinė suma</span><strong id="subtotal">0.00 €</strong></div><div class="cart-summary-row"><span>Kupono nuolaida</span><strong id="discountTotal">− 0.00 €</strong></div><div class="cart-summary-row" id="bulkDiscountRow" style="display:none"><span id="bulkDiscountLabel">Kiekio akcija</span><strong id="bulkDiscountTotal">− 0.00 €</strong></div><div class="cart-summary-total"><span>Iš viso</span><b id="total">0.00 €</b></div><div id="couponApplied"></div></div>
 <button class="checkout" style="margin-top:14px" onclick="openCheckout()">TĘSTI Į UŽSAKYMO FORMĄ →</button>
 </aside></div>
 
@@ -512,14 +546,46 @@ Pakeistas dizainas"></textarea></div>
  </div>
 </div>
 
+<div id="bankPaymentModal" class="bank-pay-modal" onclick="closeBankPayment()">
+ <div class="bank-pay-card" onclick="event.stopPropagation()">
+  <div class="bank-pay-head"><div><h2>💳 Apmokėti užsakymą</h2><small id="bankPayOrderTitle">Bankinis pavedimas</small></div><button class="close" onclick="closeBankPayment()">✕</button></div>
+  <div class="bank-pay-body">
+   <div class="bank-pay-amount"><span>APMOKĖTI SUMĄ</span><b id="bankPayAmount">0,00 €</b></div>
+   <div class="bank-pay-grid">
+    <div class="bank-pay-row"><span>BANKAS</span><b id="bankPayBank">—</b></div>
+    <div class="bank-pay-row"><span>BANKO SĄSKAITA</span><div><b id="bankPayAccount">—</b> <button class="bank-pay-copy" onclick="copyBankPaymentField('account')">📋</button></div></div>
+    <div class="bank-pay-row"><span>GAVĖJAS</span><b id="bankPayBeneficiary">—</b></div>
+    <div class="bank-pay-row"><span>MOKĖJIMO PASKIRTIS</span><div><b id="bankPayReference" class="bank-pay-ref">—</b> <button class="bank-pay-copy" onclick="copyBankPaymentField('reference')">📋</button></div></div>
+   </div>
+   <div class="bank-pay-note">Po apmokėjimo palaukite, kol mokėjimas bus gautas ir patikrintas. Įprastai mokėjimo gavimas gali užtrukti iki 1–2 darbo dienų. Užsakymas bus pradėtas vykdyti tik patvirtinus apmokėjimą.</div>
+   <div id="bankPayInstructions" class="pay-note"></div>
+   <div class="bank-pay-actions"><button class="admin-secondary" onclick="copyBankPaymentAll()">📋 Kopijuoti duomenis</button><button class="admin-primary" onclick="closeBankPayment()">✓ Supratau</button></div>
+  </div>
+ </div>
+</div>
+
+
 <div id="checkoutModal" class="checkout-modal" onclick="closeCheckout()">
  <div class="checkout-card" onclick="event.stopPropagation()">
-  <div class="checkout-head"><div><h2>🧾 Užsakymo pateikimas</h2><small>Užpildyk pristatymo informaciją</small></div><button class="close" onclick="closeCheckout()">✕</button></div>
+  <div class="checkout-head">
+   <div><h2>🧾 Užsakymo pateikimas</h2><small>Patikrink duomenis ir pasirink apmokėjimą</small></div>
+   <button class="close" onclick="closeCheckout()">✕</button>
+  </div>
   <div class="checkout-body">
+   <div class="checkout-steps">
+    <div class="checkout-step done"><span class="step-dot">✓</span><span>Krepšelis</span></div>
+    <span class="checkout-step-line"></span>
+    <div class="checkout-step active"><span class="step-dot">2</span><span>Duomenys</span></div>
+    <span class="checkout-step-line"></span>
+    <div class="checkout-step"><span class="step-dot">3</span><span>Apmokėjimas</span></div>
+    <span class="checkout-step-line"></span>
+    <div class="checkout-step"><span class="step-dot">4</span><span>Patvirtinimas</span></div>
+   </div>
+
    <div class="checkout-layout">
-    <div>
+    <div class="checkout-left">
      <div class="checkout-section">
-      <h3>👤 Kontaktai ir pristatymas</h3>
+      <h3>📦 Pristatymo duomenys</h3>
       <div class="checkout-grid">
        <div class="checkout-field"><label>VARDAS</label><input id="coFirstName" autocomplete="given-name"></div>
        <div class="checkout-field"><label>PAVARDĖ</label><input id="coLastName" autocomplete="family-name"></div>
@@ -529,31 +595,45 @@ Pakeistas dizainas"></textarea></div>
        <div class="checkout-field"><label>MIESTAS</label><input id="coCity" autocomplete="address-level2"></div>
        <div class="checkout-field"><label>PAŠTO KODAS</label><input id="coPostal" autocomplete="postal-code"></div>
       </div>
-      <label class="save-check"><input id="saveCheckoutData" type="checkbox" onchange="if(!this.checked)localStorage.removeItem('ltparduotuve_checkout')"> <span>💾 Išsaugoti mano duomenis kitam užsakymui</span></label>
+      <label class="save-check"><input id="saveCheckoutData" type="checkbox" onchange="handleCheckoutSaveToggle(this.checked)"> <span>💾 Išsaugoti mano duomenis kitam užsakymui</span></label>
      </div>
-     <div class="checkout-section" style="margin-top:12px">
-      <h3>🚚 Pristatymas Lietuvoje</h3>
-      <div class="shipping-options">
-       <label class="shipping-option"><input type="radio" name="shipping" value="LP EXPRESS" data-price="2.40" checked onchange="renderCheckoutSummary()"><span>LP EXPRESS</span><b>2,40 €</b></label>
-       <label class="shipping-option"><input type="radio" name="shipping" value="DPD" data-price="2.80" onchange="renderCheckoutSummary()"><span>DPD</span><b>2,80 €</b></label>
-       <label class="shipping-option"><input type="radio" name="shipping" value="OMNIVA" data-price="2.80" onchange="renderCheckoutSummary()"><span>OMNIVA</span><b>2,80 €</b></label>
+
+     <div class="checkout-section" style="margin-top:14px">
+      <h3>💳 Apmokėjimo būdas</h3>
+      <div class="payment-choice">
+       <div class="payment-choice-top">
+        <div class="payment-choice-icon">🏦</div>
+        <div><div class="payment-choice-title">Bankinis pavedimas</div><div class="payment-choice-sub">Saugus atsiskaitymas tiesioginiu banko pavedimu</div></div>
+        <div class="payment-choice-check">✓</div>
+       </div>
+       <div class="payment-choice-info">
+        Šiuo metu galimas tik bankinis pavedimas. Po užsakymo pateikimo gausi banko rekvizitus ir unikalų mokėjimo paskirties kodą.
+       </div>
       </div>
      </div>
+
+     <div class="checkout-empty-space">
+      <!-- Vieta papildomai informacijai ateityje -->
+     </div>
     </div>
+
     <div class="checkout-section checkout-summary">
      <h3>🛒 Užsakymo santrauka</h3>
      <div id="checkoutSummaryList" class="checkout-summary-list"></div>
      <div class="cart-summary-row"><span>Prekės</span><strong id="coSubtotal">0.00 €</strong></div>
-     <div class="cart-summary-row"><span>Nuolaida</span><strong id="coDiscount">− 0.00 €</strong></div>
+     <div class="cart-summary-row"><span>Kupono nuolaida</span><strong id="coDiscount">− 0.00 €</strong></div>
+     <div class="cart-summary-row" id="coBulkDiscountRow" style="display:none"><span id="coBulkDiscountLabel">Kiekio akcija</span><strong id="coBulkDiscount">− 0.00 €</strong></div>
      <div class="cart-summary-row"><span>Pristatymas</span><strong id="coShipping">2.40 €</strong></div>
      <div class="checkout-total"><span>Iš viso</span><b id="coTotal">0.00 €</b></div>
      <div id="checkoutError" class="checkout-error"></div>
      <button class="checkout-submit" onclick="submitOrder()">PATVIRTINTI UŽSAKYMĄ →</button>
-     <div class="checkout-note">Užsakymas pirmiausia bus sukurtas kaip „Laukia apmokėjimo“. Mokėjimo sistemą vėliau prijungsime prie šio užsakymo.</div>
+     <div class="checkout-note">Užsakymas bus sukurtas kaip „Laukia apmokėjimo“. Po pateikimo galėsi atlikti bankinį pavedimą.</div>
     </div>
    </div>
   </div>
  </div>
+</div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -563,20 +643,21 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3SNNvvuBtT4waMTznfCjnA_xYJZANED
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
+  SUPABASE_PUBLISHABLE_KEY,
+  { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage } }
 );
 
 let chatUser=null,chatThread=null,chatChannel=null,chatReady=false;const renderedMessageIds=new Set();
 async function ensureChatUser(){if(chatUser)return chatUser;const {data,error}=await supabaseClient.auth.getSession();if(error)throw error;if(!data.session?.user)throw new Error("Reikia prisijungti prie paskyros.");chatUser=data.session.user;return chatUser}
 function setChatStatus(text,online=false){const s=document.querySelector(".chat-head small");if(s){s.textContent="● "+text;s.style.color=online?"#20e5a0":"#f0b44d"}}
-async function ensureChatThread(){const user=await ensureChatUser();const {data,error}=await supabaseClient.from("chat_sessions").select("*").eq("user_id",user.id).order("created_at",{ascending:false}).limit(1).maybeSingle();if(error)throw error;const expired=data&&data.status==="open"&&data.last_activity&&Date.now()-new Date(data.last_activity).getTime()>86400000;if(data&&data.status==="open"&&!expired){chatThread=data;return data}if(data&&data.status==="solved"&&!data.rating&&data.solved_at&&Date.now()-new Date(data.solved_at).getTime()<=86400000){chatThread=data;return data}if(data&&(data.status==="open"||data.status==="solved")&&(expired||(data.status==="solved"&&data.solved_at&&Date.now()-new Date(data.solved_at).getTime()>86400000)))await supabaseClient.from("chat_sessions").update({status:"closed",closed_at:new Date().toISOString()}).eq("id",data.id);const thread={user_id:user.id,user_email:user.email||"",thread_id:crypto.randomUUID(),status:"open"};const ins=await supabaseClient.from("chat_sessions").insert(thread).select("*").single();if(ins.error)throw ins.error;chatThread=ins.data;return ins.data}
-async function loadChatMessages(){await ensureChatThread();const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",chatThread.thread_id).order("created_at",{ascending:true});if(error)throw error;const body=document.getElementById("chatBody");body.innerHTML="";(data||[]).forEach(renderChatMessage);if(chatThread.status==="solved"&&!chatThread.rating){showChatRating();return}if(!data?.length){bubble("Sveiki! 👋 Kaip galime padėti?");bubble("Parašykite savo klausimą — žinutė bus perduota administratoriui.")} }
+async function ensureChatThread(){const user=await ensureChatUser();const {data,error}=await supabaseClient.from("chat_sessions").select("*").eq("user_id",user.id).order("created_at",{ascending:false}).limit(1).maybeSingle();if(error)throw error;const expired=data&&data.status==="open"&&data.last_activity&&Date.now()-new Date(data.last_activity).getTime()>86400000;if(data&&data.status==="open"&&!expired){chatThread=data;return data}if(data&&data.status==="solved"&&!data.rating){chatThread=data;return data}if(data&&(data.status==="open"||data.status==="solved")&&(expired||(data.status==="solved"&&data.solved_at&&Date.now()-new Date(data.solved_at).getTime()>86400000)))await supabaseClient.from("chat_sessions").update({status:"closed",closed_at:new Date().toISOString()}).eq("id",data.id);const thread={user_id:user.id,user_email:user.email||"",thread_id:crypto.randomUUID(),status:"open",last_activity:new Date().toISOString()};const ins=await supabaseClient.from("chat_sessions").insert(thread).select("*").single();if(ins.error)throw ins.error;chatThread=ins.data;return ins.data}
+async function loadChatMessages(){await ensureChatThread();const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",chatThread.thread_id).order("created_at",{ascending:true});if(error)throw error;const body=document.getElementById("chatBody");body.innerHTML="";renderedMessageIds.clear();(data||[]).forEach(renderChatMessage);if(chatThread.status==="solved"&&!chatThread.rating){showChatRating();return}if(!data?.length){bubble("Sveiki! 👋 Kaip galime padėti?");bubble("Parašykite savo klausimą — žinutė bus perduota administratoriui.")}}
 function renderChatMessage(row){if(!row||renderedMessageIds.has(row.id))return;renderedMessageIds.add(row.id);bubble(row.message,row.sender==="customer"?"user":"")}
-function subscribeToChat(){if(chatChannel||!chatThread)return;chatChannel=supabaseClient.channel("customer-live-"+chatThread.thread_id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"session_id=eq."+chatThread.thread_id},p=>renderChatMessage(p.new)).on("postgres_changes",{event:"UPDATE",schema:"public",table:"chat_sessions",filter:"id=eq."+chatThread.id},async p=>{chatThread=p.new;if(p.new.status==="solved"&&!p.new.rating){showChatRating()}else if(p.new.status==="open"){await loadChatMessages()}}).subscribe(st=>{if(st==="SUBSCRIBED"){chatReady=true;setChatStatus("Administratorius prisijungęs • LIVE",true)}})}
+function subscribeToChat(){if(chatChannel||!chatThread)return;chatChannel=supabaseClient.channel("customer-live-"+chatThread.thread_id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"session_id=eq."+chatThread.thread_id},p=>renderChatMessage(p.new)).on("postgres_changes",{event:"UPDATE",schema:"public",table:"chat_sessions",filter:"id=eq."+chatThread.id},p=>{chatThread=p.new;if(p.new.status==="solved"&&!p.new.rating)showChatRating()}).subscribe(st=>{if(st==="SUBSCRIBED"){chatReady=true;setChatStatus("Administratorius prisijungęs • LIVE",true)}})}
 async function initChat(){if(chatReady)return;setChatStatus("Jungiamasi...");try{await ensureChatUser();await ensureChatThread();await loadChatMessages();subscribeToChat()}catch(e){console.error(e);setChatStatus("Nepavyko prisijungti");bubble("Nepavyko prisijungti prie pokalbio. Pabandykite perkrauti puslapį.")}}
-async function sendChatMessage(text){const message=String(text||"").trim();if(!message)return;try{await initChat();if(!chatThread)return;if(chatThread.status==="solved"){const reopened=await supabaseClient.from("chat_sessions").update({status:"open",solved_at:null,last_activity:new Date().toISOString()}).eq("id",chatThread.id).select("*").single();if(reopened.error)throw reopened.error;chatThread=reopened.data;document.getElementById("chatBody").innerHTML=""}const {error}=await supabaseClient.from("messages").insert({session_id:chatThread.thread_id,sender:"customer",message});if(error)throw error;await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("id",chatThread.id)}catch(e){console.error(e);bubble("Žinutės išsiųsti nepavyko. Pabandykite dar kartą.")}}
-async function solveChat(){if(!chatThread)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("id",chatThread.id);if(r.error)return alert("Nepavyko uždaryti pokalbio.");showChatRating()}
-function showChatRating(){const body=document.getElementById("chatBody");body.innerHTML=`<div class="chat-solved"><b>✓ Pokalbis uždarytas</b><p>Jeigu nori, dabar gali įvertinti administratoriaus pagalbą nuo 1 iki 5 ⭐</p><div class="rating-stars">${[1,2,3,4,5].map(n=>`<button id="ratingStar${n}" onclick="selectChatRating(${n})">☆</button>`).join("")}</div><input id="ratingText" placeholder="Komentaras (nebūtina)"><button class="chat-rate-submit" onclick="rateChat()">⭐ Pateikti įvertinimą</button><button class="chat-rate-submit" style="margin-top:6px;border-color:#33465f;background:#0d1726" onclick="closeChatWithoutRating()">Įvertinsiu vėliau</button></div>`;window.selectedChatRating=0}
+async function sendChatMessage(text){const message=String(text||"").trim();if(!message)return;try{await initChat();if(!chatThread)return;if(chatThread.status==="solved"){showChatRating();return}const {error}=await supabaseClient.from("messages").insert({session_id:chatThread.thread_id,sender:"customer",message});if(error)throw error;await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("id",chatThread.id)}catch(e){console.error(e);bubble("Žinutės išsiųsti nepavyko. Pabandykite dar kartą.")}}
+async function solveChat(){if(!chatThread)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("id",chatThread.id).eq("status","open");if(r.error)return alert("Nepavyko uždaryti pokalbio.");chatThread={...chatThread,status:"solved"};showChatRating()}
+function showChatRating(){const body=document.getElementById("chatBody");body.innerHTML=`<div class="chat-solved"><b>✓ Pokalbis uždarytas</b><p>Jeigu nori, gali įvertinti administratoriaus pagalbą nuo 1 iki 5 ⭐</p><div class="rating-stars">${[1,2,3,4,5].map(n=>`<button id="ratingStar${n}" onclick="selectChatRating(${n})">☆</button>`).join("")}</div><input id="ratingText" placeholder="Komentaras (nebūtina)"><button class="chat-rate-submit" onclick="rateChat()">⭐ Pateikti įvertinimą</button><button class="chat-rate-submit" style="margin-top:6px;border-color:#33465f;background:#0d1726" onclick="closeChatWithoutRating()">Uždaryti</button></div>`;window.selectedChatRating=0}
 function selectChatRating(star){window.selectedChatRating=star;for(let i=1;i<=5;i++){const b=document.getElementById("ratingStar"+i);if(b)b.textContent=i<=star?"★":"☆"}}
 function closeChatWithoutRating(){document.getElementById("chat").classList.remove("open")}
 async function rateChat(){const star=Number(window.selectedChatRating||0);if(!chatThread)return;if(!star)return alert("Pirmiausia pasirink 1–5 žvaigždutes.");const comment=document.getElementById("ratingText")?.value.trim()||null;const {error}=await supabaseClient.from("chat_sessions").update({rating:star,rating_comment:comment,rated_at:new Date().toISOString(),status:"rated",closed_at:new Date().toISOString()}).eq("id",chatThread.id);if(error)return alert("Nepavyko išsaugoti įvertinimo.");if(chatChannel){supabaseClient.removeChannel(chatChannel);chatChannel=null}chatReady=false;chatThread=null;renderedMessageIds.clear();window.selectedChatRating=0;document.getElementById("chat").classList.remove("open");toast("✓ Ačiū už įvertinimą!")}
@@ -597,6 +678,7 @@ setTimeout(()=>{
   if(intro) intro.style.display="none";
 },3900);
 initAuth();
+loadRememberedLogin();
 
 
 function showAuth(mode){
@@ -650,11 +732,28 @@ async function registerUser(event){
   }
 }
 
+function toggleRememberLogin(checked){
+  const email=document.getElementById("loginEmail")?.value.trim()||"";
+  if(checked && email) localStorage.setItem("ltparduotuve_login_email",email);
+  if(!checked) localStorage.removeItem("ltparduotuve_login_email");
+}
+
+function loadRememberedLogin(){
+  const saved=localStorage.getItem("ltparduotuve_login_email")||"";
+  const email=document.getElementById("loginEmail");
+  const cb=document.getElementById("rememberLoginEmail");
+  if(saved && email){email.value=saved;if(cb)cb.checked=true;}
+}
+
 async function loginUser(event){
   event.preventDefault();
   const email=document.getElementById("loginEmail").value.trim();
   const password=document.getElementById("loginPassword").value;
+  const rememberEmail=document.getElementById("rememberLoginEmail")?.checked;
   const msg=document.getElementById("loginMsg");
+
+  if(rememberEmail) localStorage.setItem("ltparduotuve_login_email",email);
+  else localStorage.removeItem("ltparduotuve_login_email");
 
   msg.textContent="Jungiamasi...";
 
@@ -684,31 +783,73 @@ function toggleUserMenu(){
 }
 
 async function logoutUser(){
-  await supabaseClient.auth.signOut();
-  document.getElementById("userDropdown").classList.remove("open");
+  await logoutAndLock("Atsijungta.");
+}
+
+const AUTH_SESSION_VERSION="2026-09-23-force-logout-1";
+const AUTH_SESSION_MAX_MS=60*60*1000;
+let authExpiryTimer=null;
+let authResetInProgress=false;
+
+function clearAuthExpiry(){
+  if(authExpiryTimer){clearTimeout(authExpiryTimer);authExpiryTimer=null;}
+  localStorage.removeItem("ltparduotuve_auth_started_at");
+}
+
+async function logoutAndLock(message="Sesija baigėsi. Prisijunkite iš naujo."){
+  clearAuthExpiry();
+  chatUser=null;chatThread=null;chatReady=false;
+  if(chatChannel){try{supabaseClient.removeChannel(chatChannel)}catch(e){} chatChannel=null;}
+  try{await supabaseClient.auth.signOut({scope:"local"});}catch(e){console.error(e)}
+  document.getElementById("userDropdown")?.classList.remove("open");
+  document.getElementById("adminPanel")?.classList.remove("open");
   document.getElementById("authGate").style.display="flex";
   document.body.classList.add("auth-locked");
   showAuth("login");
-  document.getElementById("loginMsg").textContent="Atsijungta.";
+  const msg=document.getElementById("loginMsg");if(msg)msg.textContent=message;
+}
+
+function startAuthExpiry(){
+  clearTimeout(authExpiryTimer);
+  let started=Number(localStorage.getItem("ltparduotuve_auth_started_at")||0);
+  if(!started){started=Date.now();localStorage.setItem("ltparduotuve_auth_started_at",String(started));}
+  const left=AUTH_SESSION_MAX_MS-(Date.now()-started);
+  if(left<=0){logoutAndLock();return;}
+  authExpiryTimer=setTimeout(()=>logoutAndLock("Sesija baigėsi po 1 valandos. Prisijunkite iš naujo."),left);
+}
+
+async function forceLogoutOldSessions(){
+  if(authResetInProgress)return false;
+  const seen=localStorage.getItem("ltparduotuve_auth_reset_version");
+  if(seen===AUTH_SESSION_VERSION)return false;
+  authResetInProgress=true;
+  localStorage.setItem("ltparduotuve_auth_reset_version",AUTH_SESSION_VERSION);
+  try{await supabaseClient.auth.signOut({scope:"local"});}catch(e){console.error(e)}
+  clearAuthExpiry();
+  authResetInProgress=false;
+  return true;
 }
 
 async function initAuth(){
+  await forceLogoutOldSessions();
   const {data,error}=await supabaseClient.auth.getSession();
-
-  if(error){
-    console.error("Auth error:",error);
-    return;
-  }
-
+  if(error){console.error("Auth error:",error);return;}
   if(data.session?.user){
     enterStore(data.session.user);
+    startAuthExpiry();
   }else{
     document.getElementById("authGate").style.display="flex";
     document.body.classList.add("auth-locked");
   }
-
   supabaseClient.auth.onAuthStateChange((_event,session)=>{
-    if(session?.user) enterStore(session.user);
+    if(session?.user){
+      enterStore(session.user);
+      startAuthExpiry();
+    }else{
+      clearAuthExpiry();
+      document.getElementById("authGate").style.display="flex";
+      document.body.classList.add("auth-locked");
+    }
   });
 }
 
@@ -728,17 +869,17 @@ async function checkAdmin(user){
   if(btn) btn.style.display=isAdmin?"block":"none";
   return isAdmin;
 }
-async function initAdmin(user){await checkAdmin(user);await loadCategories();await loadStoreProducts();await loadStoreUpdates();if(isAdmin)subscribeAdminChat();}
+async function initAdmin(user){await checkAdmin(user);await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();await loadPaymentSettings();if(isAdmin)subscribeAdminChat();}
 async function openAdmin(){
   if(!isAdmin)return alert("Neturite administratoriaus teisių.");
   document.getElementById("adminPanel").classList.add("open");
-  await loadAdminStats();await loadCategories();await loadAdminProducts();await loadAdminCoupons();await loadAdminOrders();await loadAdminUpdates();subscribeAdminOrders();await loadAdminChats();
+  await loadAdminStats();await loadCategories();await loadAdminProducts();await loadAdminCoupons();await loadAdminBulkDiscounts();await loadAdminOrders();await loadPaymentSettings();subscribeAdminOrders();await loadAdminChats();
 }
 function closeAdmin(){document.getElementById("adminPanel").classList.remove("open")}
 function adminTab(name,btn){
   document.querySelectorAll(".admin-tab").forEach(x=>x.classList.remove("active"));
   document.querySelectorAll(".admin-section").forEach(x=>x.classList.remove("active"));
-  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="updates")loadAdminUpdates();
+  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="bulk")loadAdminBulkDiscounts();if(name==="payments")loadPaymentSettings();
 }
 async function loadAdminStats(){
   const p=await supabaseClient.from("products").select("id",{count:"exact",head:true});
@@ -752,6 +893,41 @@ async function loadAdminStats(){
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 function money(v){return Number(v||0).toFixed(2)+" €"}
 function salePrice(p){const d=Math.min(100,Math.max(0,Number(p.discount_percent||0)));return Number(p.price||0)*(1-d/100)}
+let bulkDiscountRules=[];
+async function loadBulkDiscountRules(){
+  const {data,error}=await supabaseClient.from("bulk_discounts").select("*").eq("active",true).order("min_items",{ascending:true});
+  if(error){console.error("Bulk discounts:",error);bulkDiscountRules=[];return}
+  bulkDiscountRules=data||[];
+}
+function getBulkDiscountInfo(){
+  const count=cart.reduce((n,x)=>n+Number(x.qty||0),0);
+  let rule=null;
+  for(const r of bulkDiscountRules){if(Number(r.min_items)<=count && (!rule||Number(r.min_items)>Number(rule.min_items)))rule=r}
+  const subtotal=cart.reduce((a,b)=>a+b.price*b.qty,0);
+  const pct=rule?Number(rule.discount_percent||0):0;
+  return {count,rule,pct,amount:subtotal*pct/100};
+}
+async function loadAdminBulkDiscounts(){
+  const list=document.getElementById("adminBulkList");if(!list||!isAdmin)return;
+  const {data,error}=await supabaseClient.from("bulk_discounts").select("*").order("min_items",{ascending:true});
+  if(error){list.innerHTML='<div class="admin-empty">Nepavyko įkelti kiekio akcijų. Paleisk bulk akcijų SQL.</div>';return}
+  list.innerHTML=data?.length?data.map(r=>`<div class="admin-product"><div class="admin-product-info"><b>${Number(r.min_items)}+ prekės → −${Number(r.discount_percent)}%</b><small>${r.active?"🟢 Aktyvi":"🔴 Išjungta"}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editBulkDiscount(${JSON.stringify(r).replace(/'/g,"&#39;")})'>✏️ Koreguoti</button><button class="admin-secondary ${r.active?"orange":"green"}" onclick="toggleBulkDiscount('${r.id}',${!r.active})">${r.active?"🔴 Išjungti":"🟢 Įjungti"}</button><button class="admin-danger" onclick="deleteBulkDiscount('${r.id}')">🗑️ Ištrinti</button></div></div>`).join(""):'<div class="admin-empty">Dar nėra kiekio akcijų.</div>';
+}
+function editBulkDiscount(r){document.getElementById("bulkEditId").value=r.id||"";document.getElementById("bulkMinItems").value=r.min_items??"";document.getElementById("bulkDiscount").value=r.discount_percent??"";document.getElementById("bulkActive").value=String(r.active!==false)}
+function clearBulkDiscountForm(){document.getElementById("bulkEditId").value="";document.getElementById("bulkMinItems").value="";document.getElementById("bulkDiscount").value="";document.getElementById("bulkActive").value="true"}
+async function saveBulkDiscount(){
+  if(!isAdmin)return alert("Neturite administratoriaus teisių.");
+  const id=document.getElementById("bulkEditId").value;const min=Math.floor(Number(document.getElementById("bulkMinItems").value));const pct=Number(document.getElementById("bulkDiscount").value);const active=document.getElementById("bulkActive").value==="true";
+  if(!Number.isInteger(min)||min<1)return alert("Nuo kiek prekių turi būti bent 1.");
+  if(!Number.isFinite(pct)||pct<0||pct>100)return alert("Nuolaida turi būti nuo 0 iki 100%.");
+  const payload={min_items:min,discount_percent:pct,active};
+  const result=id?await supabaseClient.from("bulk_discounts").update(payload).eq("id",id):await supabaseClient.from("bulk_discounts").insert(payload);
+  if(result.error)return alert("Nepavyko išsaugoti kiekio akcijos. Patikrink bulk akcijų SQL.");
+  clearBulkDiscountForm();await loadAdminBulkDiscounts();await loadBulkDiscountRules();renderCart();toast("✓ Kiekio akcija išsaugota");
+}
+async function toggleBulkDiscount(id,active){if(!isAdmin)return;const {error}=await supabaseClient.from("bulk_discounts").update({active}).eq("id",id);if(error)return alert("Nepavyko pakeisti akcijos.");await loadAdminBulkDiscounts();await loadBulkDiscountRules();renderCart()}
+async function deleteBulkDiscount(id){if(!isAdmin||!confirm("Ar tikrai ištrinti šią kiekio akciją?"))return;const {error}=await supabaseClient.from("bulk_discounts").delete().eq("id",id);if(error)return alert("Nepavyko ištrinti akcijos.");await loadAdminBulkDiscounts();await loadBulkDiscountRules();renderCart()}
+
 async function loadCategories(){
   const {data,error}=await supabaseClient.from("categories").select("*").eq("active",true).order("sort_order",{ascending:true}).order("name",{ascending:true});
   if(error){console.error(error);return}
@@ -869,6 +1045,60 @@ function statusClass(status){
 }
 function formatDate(v){return v?new Date(v).toLocaleString("lt-LT"):"—"}
 
+async function loadPaymentSettings(){
+  const {data,error}=await supabaseClient.from("store_payment_settings").select("*").eq("id",1).maybeSingle();
+  if(error){console.warn("Payment settings SQL not installed:",error);return null}
+  if(data){
+    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v??""};
+    set("payBankName",data.bank_name);set("payAccountNumber",data.account_number);set("payBeneficiary",data.beneficiary);set("payInstructions",data.instructions);set("payEnabled",String(data.enabled!==false));
+  }
+  return data;
+}
+async function savePaymentSettings(){
+  if(!isAdmin)return alert("Neturite administratoriaus teisių.");
+  const payload={id:1,bank_name:document.getElementById("payBankName")?.value.trim()||"",account_number:document.getElementById("payAccountNumber")?.value.trim()||"",beneficiary:document.getElementById("payBeneficiary")?.value.trim()||"",instructions:document.getElementById("payInstructions")?.value.trim()||"",enabled:document.getElementById("payEnabled")?.value!=="false",updated_at:new Date().toISOString()};
+  if(!payload.account_number||!payload.beneficiary)return alert("Įrašyk banko sąskaitą ir gavėją.");
+  const {error}=await supabaseClient.from("store_payment_settings").upsert(payload,{onConflict:"id"});
+  if(error){console.error(error);return alert("Nepavyko išsaugoti. Paleisk mokėjimų SQL.")}
+  toast("✓ Apmokėjimo duomenys išsaugoti");
+}
+function randomPaymentReference(){
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let out="";
+  if(window.crypto?.getRandomValues){const a=new Uint32Array(8);crypto.getRandomValues(a);for(let i=0;i<a.length;i++)out+=chars[a[i]%chars.length]}
+  else for(let i=0;i<8;i++)out+=chars[Math.floor(Math.random()*chars.length)];
+  return `LT-${new Date().getFullYear()}-${out}`;
+}
+async function ensurePaymentReference(orderId){
+  const {data,error}=await supabaseClient.rpc("assign_order_payment_reference",{p_order_id:orderId});
+  if(error){
+    console.error("PAYMENT REFERENCE ERROR",error);
+    alert("Mokėjimo kodo klaida: " + (error.message || error.details || error.hint || "Nežinoma Supabase klaida"));
+    return null;
+  }
+  return data||null;
+}
+let activeBankPayment={};
+async function openPaymentModal(order){
+  if(!order||order.status!=="pending")return alert("Šio užsakymo apmokėti nebegalima pagal dabartinę būseną.");
+  const settings=await loadPaymentSettings();
+  if(!settings?.enabled)return alert("Šiuo metu bankinis apmokėjimas neaktyvus.");
+  if(!settings.account_number||!settings.beneficiary)return alert("Apmokėjimo duomenys dar nesukonfigūruoti.");
+  let ref=order.payment_reference||await ensurePaymentReference(order.id);
+  if(!ref)return alert("Nepavyko sugeneruoti mokėjimo paskirties kodo. Paleisk mokėjimų SQL.");
+  activeBankPayment={order,settings,reference:ref};
+  document.getElementById("bankPayOrderTitle").textContent=`Užsakymas #${order.order_number}`;
+  document.getElementById("bankPayAmount").textContent=money(order.total_amount);
+  document.getElementById("bankPayBank").textContent=settings.bank_name||"—";
+  document.getElementById("bankPayAccount").textContent=settings.account_number;
+  document.getElementById("bankPayBeneficiary").textContent=settings.beneficiary;
+  document.getElementById("bankPayReference").textContent=ref;
+  document.getElementById("bankPayInstructions").textContent=settings.instructions||"";
+  document.getElementById("bankPaymentModal").classList.add("open");
+}
+function closeBankPayment(){document.getElementById("bankPaymentModal")?.classList.remove("open")}
+async function copyBankPaymentField(type){const v=type==="account"?activeBankPayment.settings?.account_number:activeBankPayment.reference;if(!v)return;try{await navigator.clipboard.writeText(v);toast("✓ Nukopijuota")}catch(e){toast(v)}}
+async function copyBankPaymentAll(){const s=activeBankPayment.settings||{};const text=`Apmokėti: ${money(activeBankPayment.order?.total_amount||0)}\nBankas: ${s.bank_name||""}\nBanko sąskaita: ${s.account_number||""}\nGavėjas: ${s.beneficiary||""}\nMokėjimo paskirtis: ${activeBankPayment.reference||""}`;try{await navigator.clipboard.writeText(text);toast("✓ Mokėjimo duomenys nukopijuoti")}catch(e){alert(text)}}
+
 async function loadAdminOrderStats(){
   const box=document.getElementById("adminOrderStats");if(!box||!isAdmin)return;
   const {data,error}=await supabaseClient.from("orders").select("status,total_amount");
@@ -882,7 +1112,7 @@ async function loadAdminOrders(){
   const {data,error}=await supabaseClient.from("orders").select("*, order_items(*)").order("created_at",{ascending:false});
   if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti užsakymų. Patikrink RLS/SQL.</div>';return}
   if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas užsakymų nėra.</div>';await loadAdminOrderStats();return}
-  list.innerHTML=data.map(o=>`<div class="admin-order"><div class="admin-order-info"><b>#${escapeHtml(o.order_number)}</b><small>${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")} • ${formatDate(o.created_at)}<br>${escapeHtml(o.phone||"")} • ${escapeHtml(o.address||"")}, ${escapeHtml(o.city||"")} ${escapeHtml(o.postal_code||"")}<br>${escapeHtml(o.shipping_method||"")} • <strong>${statusLabel(o.status)}</strong> • ${money(o.total_amount)}</small></div><div class="admin-order-actions"><select onchange="updateOrderStatus('${o.id}',this.value)">${["pending","paid","processing","shipped","completed","cancelled"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${statusLabel(s)}</option>`).join("")}</select><input id="tracking-${o.id}" value="${escapeHtml(o.tracking_number||"")}" placeholder="Siuntimo nr." title="Siuntimo numeris"><button class="admin-primary" onclick="saveTracking('${o.id}')">💾</button><button class="admin-secondary" onclick='showOrderDetails(${JSON.stringify(o).replace(/'/g,"&#39;")})'>👁️</button><button class="admin-danger" onclick="deleteAdminOrder('${o.id}')">🗑️</button></div></div>`).join("");
+  list.innerHTML=data.map(o=>`<div class="admin-order"><div class="admin-order-info"><b>#${escapeHtml(o.order_number)}</b><small>${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")} • ${formatDate(o.created_at)}<br>${escapeHtml(o.phone||"")} • ${escapeHtml(o.address||"")}, ${escapeHtml(o.city||"")} ${escapeHtml(o.postal_code||"")}<br>${escapeHtml(o.shipping_method||"")} • <strong>${statusLabel(o.status)}</strong> • ${money(o.total_amount)}<br>💳 Mokėjimo paskirtis: <strong>${escapeHtml(o.payment_reference||"Dar nesugeneruota")}</strong></small></div><div class="admin-order-actions"><select onchange="updateOrderStatus('${o.id}',this.value)">${["pending","paid","processing","shipped","completed","cancelled"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${statusLabel(s)}</option>`).join("")}</select><input id="tracking-${o.id}" value="${escapeHtml(o.tracking_number||"")}" placeholder="Siuntimo nr." title="Siuntimo numeris"><button class="admin-primary" onclick="saveTracking('${o.id}')">💾</button><button class="admin-secondary" onclick='showOrderDetails(${JSON.stringify(o).replace(/'/g,"&#39;")})'>👁️</button><button class="admin-danger" onclick="deleteAdminOrder('${o.id}')">🗑️</button></div></div>`).join("");
   await loadAdminOrderStats();
 }
 async function updateOrderStatus(id,status){
@@ -914,48 +1144,13 @@ let adminChatSessionId=null,adminChatRows=[],adminChatChannel=null,adminChatNoti
 function showAdminNotification(row){if(!isAdmin||row?.sender!=="customer")return;adminChatNotificationSession=row.session_id;const n=document.getElementById("adminChatNotification");document.getElementById("adminChatNotificationTitle")?.replaceChildren(document.createTextNode("💬 Nauja kliento žinutė"));const x=document.getElementById("adminChatNotificationText");if(x)x.textContent=(row.message||"").slice(0,90);n?.classList.add("show");adminUnreadChats.add(row.session_id);refreshAdminChatUsers();if("Notification"in window&&Notification.permission==="granted")new Notification("LT Parduotuvė — nauja žinutė",{body:row.message||"Klientas parašė."})}
 function hideAdminNotification(){document.getElementById("adminChatNotification")?.classList.remove("show")}
 function openAdminFromNotification(){const sid=adminChatNotificationSession;hideAdminNotification();document.getElementById("adminPanel")?.classList.add("open");const tab=[...document.querySelectorAll(".admin-tab")].find(x=>x.textContent.includes("Klientų chat"));if(tab)adminTab("chat",tab);if(sid)openAdminChat(sid)}
-async function loadAdminChats(){if(!isAdmin)return;const {data,error}=await supabaseClient.from("chat_sessions").select("*").order("created_at",{ascending:false});if(error){console.error(error);return}window.adminChatSessions=Object.fromEntries((data||[]).map(x=>[x.thread_id,x]));const active=(data||[]).filter(x=>x.status==="open");const users=document.getElementById("adminChatUsers");if(!users)return;users.innerHTML=active.length?active.map(x=>`<div class="admin-chat-user ${x.thread_id===adminChatSessionId?"active":""}" onclick="openAdminChat('${x.thread_id}')"><b>${escapeHtml(x.user_email||x.user_id.slice(0,8)+"…")}</b><small>${x.status.toUpperCase()} • ${formatDate(x.last_activity||x.created_at)}</small></div>`).join(""):'<div class="admin-empty">Aktyvių klientų chatų nėra.</div>';subscribeAdminChat();}
-async function openAdminChat(sid){adminChatSessionId=sid;adminUnreadChats.delete(sid);refreshAdminChatUsers();const session=window.adminChatSessions?.[sid];const title=document.getElementById("adminChatTitle");if(title)title.innerHTML=`💬 ${escapeHtml(session?.user_email||"Klientas")} <button class="admin-secondary" style="float:right;margin-left:6px" onclick="solveAdminChat('${sid}')">✓ Uždaryti ir įvertinti</button><button class="admin-danger" style="float:right" onclick="deleteAdminChat('${sid}')">🗑️ Ištrinti chatą</button>`;const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",sid).order("created_at",{ascending:true});if(error){console.error(error);return}const body=document.getElementById("adminChatBody");body.innerHTML=(data||[]).map(m=>`<div class="admin-chat-bubble ${m.sender==="admin"?"admin":""}">${escapeHtml(m.message)}<span class="admin-chat-time">${m.sender==="admin"?"Administratorius":"Klientas"} • ${formatDate(m.created_at)}</span></div>`).join("")||'<div class="admin-empty">Žinučių nėra.</div>';body.scrollTop=body.scrollHeight}
-async function solveAdminChat(sid){if(!isAdmin||!sid)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("thread_id",sid).eq("status","open");if(r.error)return alert("Nepavyko uždaryti pokalbio.");await loadAdminChats();const title=document.getElementById("adminChatTitle");if(title)title.innerHTML="💬 Pokalbis uždarytas — klientui parodytas įvertinimas.";const body=document.getElementById("adminChatBody");if(body)body.insertAdjacentHTML("beforeend",'<div class="admin-note" style="margin-top:10px">✓ Pokalbis uždarytas. Klientui dabar rodomas 1–5 ⭐ įvertinimas.</div>')}
+async function loadAdminChats(){if(!isAdmin)return;const {data,error}=await supabaseClient.from("chat_sessions").select("*").order("created_at",{ascending:false});if(error){console.error(error);return}window.adminChatSessions=Object.fromEntries((data||[]).map(x=>[x.thread_id,x]));const active=(data||[]).filter(x=>x.status==="open");const users=document.getElementById("adminChatUsers");if(!users)return;users.innerHTML=active.length?active.map(x=>`<div class="admin-chat-user ${x.thread_id===adminChatSessionId?"active":""} ${adminUnreadChats.has(x.thread_id)?"unread":""}" onclick="openAdminChat('${x.thread_id}')"><b>${escapeHtml(x.user_email||x.user_id.slice(0,8)+"…")}</b>${adminUnreadChats.has(x.thread_id)?'<span class="unread-dot">●</span>':''}<small>${x.status.toUpperCase()} • ${formatDate(x.last_activity||x.created_at)}</small></div>`).join(""):'<div class="admin-empty">Aktyvių klientų chatų nėra.</div>';subscribeAdminChat()}
+async function openAdminChat(sid){adminChatSessionId=sid;adminUnreadChats.delete(sid);const session=window.adminChatSessions?.[sid];const title=document.getElementById("adminChatTitle");if(title)title.innerHTML=`💬 ${escapeHtml(session?.user_email||"Klientas")} <button class="admin-secondary" style="float:right;margin-left:6px" onclick="solveAdminChat('${sid}')">✓ Uždaryti chatą</button><button class="admin-danger" style="float:right" onclick="deleteAdminChat('${sid}')">🗑️ Ištrinti chatą</button>`;const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",sid).order("created_at",{ascending:true});if(error){console.error(error);return}const body=document.getElementById("adminChatBody");body.innerHTML=(data||[]).map(m=>`<div class="admin-chat-bubble ${m.sender==="admin"?"admin":""}">${escapeHtml(m.message)}<span class="admin-chat-time">${m.sender==="admin"?"Administratorius":"Klientas"} • ${formatDate(m.created_at)}</span></div>`).join("")||'<div class="admin-empty">Žinučių nėra.</div>';body.scrollTop=body.scrollHeight;loadAdminChats()}
+async function solveAdminChat(sid){if(!isAdmin||!sid)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("thread_id",sid).eq("status","open");if(r.error)return alert("Nepavyko uždaryti pokalbio.");adminChatSessionId=null;await loadAdminChats();const title=document.getElementById("adminChatTitle");if(title)title.textContent="💬 Pokalbis uždarytas — klientui parodytas įvertinimas.";const body=document.getElementById("adminChatBody");if(body)body.innerHTML='<div class="admin-note">✓ Pokalbis uždarytas. Klientui parodytas įvertinimas. Jis gali pradėti naują pokalbį po įvertinimo.</div>'}
 function refreshAdminChatUsers(){loadAdminChats()}
-function subscribeAdminChat(){if(adminChatChannel||!isAdmin)return;adminChatChannel=supabaseClient.channel("admin-live-chat-v2").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},async p=>{if(p.new?.sender!=="customer")return;showAdminNotification(p.new);if(adminChatSessionId===p.new.session_id)openAdminChat(p.new.session_id);else loadAdminChats()}).subscribe(()=>{});if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().catch(()=>{})}
-async function sendAdminChat(){if(!isAdmin||!adminChatSessionId)return alert("Pasirink klientą.");const input=document.getElementById("adminChatInput"),message=input.value.trim();if(!message)return;const {error}=await supabaseClient.from("messages").insert({session_id:adminChatSessionId,sender:"admin",message});if(error)return alert("Nepavyko išsiųsti atsakymo. Patikrink RLS SQL.");input.value="";await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("thread_id",adminChatSessionId);await openAdminChat(adminChatSessionId)}
-async function deleteAdminChat(sid){if(!isAdmin||!confirm("Ištrinti šį chatą visam laikui?"))return;const r=await supabaseClient.from("messages").delete().eq("session_id",sid);if(r.error)return alert("Nepavyko ištrinti žinučių.");const s=await supabaseClient.from("chat_sessions").delete().eq("thread_id",sid);if(s.error)return alert("Nepavyko ištrinti chat sesijos.");adminChatSessionId=null;await loadAdminChats();document.getElementById("adminChatTitle").textContent="💬 Pasirink klientą";document.getElementById("adminChatBody").innerHTML='<div class="admin-empty">Chat ištrintas.</div>'}
-
-function updateLines(text){return String(text||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean)}
-function renderUpdateBlock(title, text, cls){const lines=updateLines(text);if(!lines.length)return "";return `<div class="updates-block ${cls}"><h4>${title}</h4><ul>${lines.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul></div>`}
-function renderStoreUpdate(u){return `<article class="updates-item"><div class="updates-item-head"><div class="updates-item-title">${escapeHtml(u.title||"Parduotuvės atnaujinimas")}</div><div class="updates-item-date">${formatDate(u.published_at||u.created_at)}</div></div>${renderUpdateBlock("➕ PRIDĖTA",u.added,"added")}${renderUpdateBlock("➖ IŠIMTA",u.removed,"removed")}${renderUpdateBlock("✏️ PAKEISTA",u.changed,"changed")}</article>`}
-async function loadStoreUpdates(){
-  const {data,error}=await supabaseClient.from("store_updates").select("id,title,added,removed,changed,published_at,created_at").order("published_at",{ascending:false}).limit(50);
-  if(error){console.error("Nepavyko įkelti atnaujinimų",error);return}
-  const list=data||[];const body=document.getElementById("updatesBody");if(body)body.innerHTML=list.length?list.map(renderStoreUpdate).join(""):'<div class="updates-empty">Kol kas nėra paskelbtų atnaujinimų.</div>';
-  const badge=document.getElementById("updatesBadge");if(badge){badge.textContent=list.length>99?"99+":String(list.length);badge.style.display=list.length?"inline-grid":"none"}
-}
-async function openUpdates(){document.getElementById("updatesModal").classList.add("open");await loadStoreUpdates()}
-function closeUpdates(){document.getElementById("updatesModal").classList.remove("open")}
-function clearUpdateForm(){document.getElementById("updateEditId").value="";document.getElementById("updateTitle").value="";document.getElementById("updateAdded").value="";document.getElementById("updateRemoved").value="";document.getElementById("updateChanged").value=""}
-function editStoreUpdate(id){const u=(window.adminStoreUpdates||[]).find(x=>x.id===id);if(!u)return;document.getElementById("updateEditId").value=u.id;document.getElementById("updateTitle").value=u.title||"";document.getElementById("updateAdded").value=u.added||"";document.getElementById("updateRemoved").value=u.removed||"";document.getElementById("updateChanged").value=u.changed||"";document.getElementById("admin-updates").scrollIntoView({behavior:"smooth"});}
-async function publishStoreUpdate(){
-  if(!isAdmin)return alert("Neturite administratoriaus teisių.");
-  const id=document.getElementById("updateEditId").value||null,title=document.getElementById("updateTitle").value.trim(),added=document.getElementById("updateAdded").value.trim(),removed=document.getElementById("updateRemoved").value.trim(),changed=document.getElementById("updateChanged").value.trim();
-  if(!title)return alert("Įrašyk atnaujinimo pavadinimą.");
-  if(!added&&!removed&&!changed)return alert("Įrašyk bent vieną pakeitimą: pridėta, išimta arba pakeista.");
-  const u=await supabaseClient.auth.getUser();if(!u.data.user)return alert("Reikia būti prisijungus.");
-  const payload={title,added:added||null,removed:removed||null,changed:changed||null,published_at:new Date().toISOString()};
-  const result=id?await supabaseClient.from("store_updates").update(payload).eq("id",id):await supabaseClient.from("store_updates").insert({...payload,created_by:u.data.user.id});
-  if(result.error){console.error(result.error);return alert("Nepavyko paskelbti atnaujinimo. Patikrink Supabase SQL.")}
-  clearUpdateForm();await loadAdminUpdates();await loadStoreUpdates();toast(id?"✓ Atnaujinimas pakeistas":"✓ Atnaujinimas paskelbtas");
-}
-async function loadAdminUpdates(){
-  if(!isAdmin)return;
-  const list=document.getElementById("adminUpdateList");if(!list)return;
-  const {data,error}=await supabaseClient.from("store_updates").select("*").order("published_at",{ascending:false}).limit(100);
-  if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti atnaujinimų.</div>';return}
-  window.adminStoreUpdates=data||[];
-  if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas nėra paskelbtų atnaujinimų.</div>';return}
-  list.innerHTML=data.map(u=>`<div class="admin-update-card"><b>${escapeHtml(u.title||"Parduotuvės atnaujinimas")}</b><small>${formatDate(u.published_at||u.created_at)}</small><div class="admin-update-preview">${escapeHtml([u.added&&"➕ "+u.added,u.removed&&"➖ "+u.removed,u.changed&&"✏️ "+u.changed].filter(Boolean).join("\n"))}</div><div class="admin-update-actions" style="margin-top:9px"><button class="admin-secondary" onclick="editStoreUpdate('${u.id}')">✏️ Koreguoti</button><button class="admin-danger" onclick="deleteStoreUpdate('${u.id}')">🗑️ Ištrinti</button></div></div>`).join("");
-}
-async function deleteStoreUpdate(id){if(!isAdmin||!confirm("Ar tikrai ištrinti šį atnaujinimą?"))return;const {error}=await supabaseClient.from("store_updates").delete().eq("id",id);if(error)return alert("Nepavyko ištrinti atnaujinimo.");await loadAdminUpdates();await loadStoreUpdates();toast("✓ Atnaujinimas ištrintas")}
+function subscribeAdminChat(){if(adminChatChannel||!isAdmin)return;adminChatChannel=supabaseClient.channel("admin-live-chat-v3").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},async p=>{if(p.new?.sender!=="customer")return;showAdminNotification(p.new);await loadAdminChats();if(adminChatSessionId===p.new.session_id)await openAdminChat(p.new.session_id)}).subscribe(()=>{});if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().catch(()=>{})}
+async function sendAdminChat(){if(!isAdmin||!adminChatSessionId)return alert("Pasirink klientą.");const session=window.adminChatSessions?.[adminChatSessionId];if(!session||session.status!=="open")return alert("Šis pokalbis jau uždarytas.");const input=document.getElementById("adminChatInput"),message=input.value.trim();if(!message)return;const {error}=await supabaseClient.from("messages").insert({session_id:adminChatSessionId,sender:"admin",message});if(error)return alert("Nepavyko išsiųsti atsakymo. Patikrink RLS SQL.");input.value="";await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("thread_id",adminChatSessionId);await openAdminChat(adminChatSessionId)}
+async function deleteAdminChat(sid){if(!isAdmin||!confirm("Ištrinti šį chatą visam laikui?"))return;const r=await supabaseClient.from("messages").delete().eq("session_id",sid);if(r.error)return alert("Nepavyko ištrinti žinučių.");const ss=await supabaseClient.from("chat_sessions").delete().eq("thread_id",sid);if(ss.error)return alert("Nepavyko ištrinti chat sesijos.");adminChatSessionId=null;await loadAdminChats();document.getElementById("adminChatTitle").textContent="💬 Pasirink klientą";document.getElementById("adminChatBody").innerHTML='<div class="admin-empty">Chat ištrintas.</div>'}
 
 async function loadAdminCoupons(){
   const list=document.getElementById("adminCouponList");if(!list)return;list.innerHTML='<div class="admin-empty">Kraunama...</div>';
@@ -1013,12 +1208,20 @@ async function cancelMyOrder(orderId){
   if(!confirm("Ar tikrai nori atšaukti šį užsakymą?")) return;
   const {data,error}=await supabaseClient.from("orders").select("id,status").eq("id",orderId).maybeSingle();
   if(error||!data)return alert("Nepavyko rasti užsakymo.");
-  // Klientas gali atšaukti tik neapmokėtą užsakymą.
   if(data.status!=="pending")return alert("Šio užsakymo atšaukti nebegalima, nes jis jau apmokėtas arba pradėtas vykdyti.");
-  const result=await supabaseClient.from("orders").update({status:"cancelled"}).eq("id",orderId).eq("status","pending");
+  const result=await supabaseClient.from("orders").update({status:"cancelled",updated_at:new Date().toISOString()}).eq("id",orderId).eq("status","pending");
   if(result.error)return alert("Nepavyko atšaukti užsakymo.");
   await loadMyOrders();
-  toast("✓ Užsakymas atšauktas");
+  toast("✓ Užsakymas pažymėtas kaip atšauktas");
+}
+async function deleteMyOrder(orderId){
+  if(!confirm("Pašalinti šį atšauktą užsakymą iš užsakymų istorijos?"))return;
+  const {data,error}=await supabaseClient.from("orders").select("id,status").eq("id",orderId).maybeSingle();
+  if(error||!data)return alert("Nepavyko rasti užsakymo.");
+  if(data.status!=="cancelled")return alert("Pašalinti galima tik atšauktą užsakymą.");
+  const r=await supabaseClient.from("orders").delete().eq("id",orderId).eq("status","cancelled");
+  if(r.error)return alert("Nepavyko pašalinti užsakymo. Paleisk užsakymų RLS SQL, kad klientas galėtų šalinti tik savo atšauktus užsakymus.");
+  await loadMyOrders();toast("✓ Atšauktas užsakymas pašalintas");
 }
 
 let myOrdersChannel=null;
@@ -1053,7 +1256,7 @@ async function loadMyOrders(){
     <div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div>
     ${o.tracking_number?`<div class="tracking-box">📦 <b>Siuntimo numeris:</b> <span>${escapeHtml(o.tracking_number)}</span><button onclick="copyTracking('${escapeHtml(o.tracking_number)}');event.stopPropagation()">📋 Kopijuoti</button></div>`:""}
     <div class="order-actions" onclick="event.stopPropagation()">
-      ${o.status==="pending"?`<button class="order-pay-btn" disabled title="Paysera dar neprijungta">💳 Apmokėti užsakymą</button><button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button><div class="pay-note">Apmokėjimas bus aktyvuotas, kai bus prijungta Paysera.</div>`:""}
+      ${o.status==="pending"?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Apmokėti užsakymą</button><button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button><div class="pay-note">Apmokėk bankiniu pavedimu pagal pateiktus rekvizitus. Mokėjimo paskirtis bus sugeneruota atskirai šiam užsakymui.</div>`:o.status==="cancelled"?`<button class="order-cancel-btn" onclick="deleteMyOrder('${o.id}')">🗑️ Pašalinti užsakymą</button>`:""}
     </div>
     <div class="order-detail" id="order-detail-${o.id}" style="display:none">
       <div class="order-items">${(o.order_items||[]).map(x=>`<div class="order-item-row"><span>${escapeHtml(x.product_name)} × ${x.quantity}</span><b>${money(Number(x.unit_price)*Number(x.quantity))}</b></div>`).join("")}</div>
@@ -1069,24 +1272,66 @@ async function loadMyOrders(){
 }
 function toggleOrderDetail(id){const el=document.getElementById("order-detail-"+id);if(el)el.style.display=el.style.display==="none"?"block":"none"}
 
+function cartSubtotal(){return cart.reduce((a,b)=>a+Number(b.price||0)*Number(b.qty||0),0)}
+function freeShippingProgress(){
+  const threshold=30;
+  const subtotal=cartSubtotal();
+  const percent=Math.min(100,Math.max(0,(subtotal/threshold)*100));
+  const remaining=Math.max(0,threshold-subtotal);
+  return {threshold,subtotal,percent,remaining,free:subtotal>=threshold};
+}
+function renderFreeShipping(){
+  const box=document.getElementById("freeShippingBox");
+  if(!box)return;
+  const x=freeShippingProgress();
+  const title=document.getElementById("freeShippingTitle");
+  const sub=document.getElementById("freeShippingSub");
+  const pct=document.getElementById("freeShippingPercent");
+  const fill=document.getElementById("freeShippingFill");
+  if(x.free){
+    box.classList.add("free");
+    if(title)title.textContent="🎉 Jūs gavote nemokamą pristatymą!";
+    if(sub)sub.textContent="Užsakymo prekių suma siekia 30,00 € arba daugiau.";
+    if(pct)pct.textContent="100%";
+    if(fill)fill.style.width="100%";
+  }else{
+    box.classList.remove("free");
+    if(title)title.textContent=`Jūs esate ${money(x.remaining)} nuo nemokamo pristatymo.`;
+    if(sub)sub.textContent="Nemokamas pristatymas nuo 30,00 €";
+    if(pct)pct.textContent=Math.round(x.percent)+"%";
+    if(fill)fill.style.width=x.percent+"%";
+  }
+}
 function selectedShipping(){
   const el=document.querySelector('input[name="shipping"]:checked');
-  return {method:el?.value||"LP EXPRESS",price:Number(el?.dataset.price||2.40)};
+  const base=Number(el?.dataset.price||2.40);
+  return {method:el?.value||"LP EXPRESS",price:freeShippingProgress().free?0:base};
+}
+function clearCheckoutFields(){
+  ["coFirstName","coLastName","coPhone","coAddress","coCity","coPostal"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+}
+async function handleCheckoutSaveToggle(checked){
+  if(checked)return;
+  localStorage.removeItem("ltparduotuve_checkout");
+  const {data}=await supabaseClient.auth.getUser();
+  if(data?.user?.id){
+    await supabaseClient.from("profiles").update({first_name:null,last_name:null,phone:null,address:null,city:null,postal_code:null,updated_at:new Date().toISOString()}).eq("user_id",data.user.id);
+  }
+  clearCheckoutFields();
+  if(data?.user?.email)document.getElementById("coEmail").value=data.user.email;
 }
 function openCheckout(){
   if(!cart.length)return alert("Krepšelis tuščias.");
   document.getElementById("cartBg").style.display="none";
   document.getElementById("checkoutError").textContent="";
   document.getElementById("checkoutModal").classList.add("open");
+  clearCheckoutFields();
   const saved=JSON.parse(localStorage.getItem("ltparduotuve_checkout")||"null");
   document.getElementById("saveCheckoutData").checked=!!saved;
   supabaseClient.auth.getUser().then(async ({data})=>{
     if(data.user?.email)document.getElementById("coEmail").value=data.user.email;
     if(saved){
       document.getElementById("coFirstName").value=saved.first_name||"";document.getElementById("coLastName").value=saved.last_name||"";document.getElementById("coPhone").value=saved.phone||"";document.getElementById("coAddress").value=saved.address||"";document.getElementById("coCity").value=saved.city||"";document.getElementById("coPostal").value=saved.postal_code||"";
-    } else if(data.user?.id){
-      const {data:profile}=await supabaseClient.from("profiles").select("first_name,last_name,phone,address,city,postal_code").eq("user_id",data.user.id).maybeSingle();
-      if(profile){document.getElementById("coFirstName").value=profile.first_name||"";document.getElementById("coLastName").value=profile.last_name||"";document.getElementById("coPhone").value=profile.phone||"";document.getElementById("coAddress").value=profile.address||"";document.getElementById("coCity").value=profile.city||"";document.getElementById("coPostal").value=profile.postal_code||"";}
     }
   });
   renderCheckoutSummary();
@@ -1094,13 +1339,18 @@ function openCheckout(){
 function closeCheckout(){document.getElementById("checkoutModal").classList.remove("open")}
 function renderCheckoutSummary(){
   const subtotal=cart.reduce((a,b)=>a+b.price*b.qty,0);
+  const free=freeShippingProgress().free;
+  document.querySelectorAll('.shipping-option').forEach(opt=>{const input=opt.querySelector('input');const price=Number(input?.dataset.price||0);const b=opt.querySelector('b');if(b)b.textContent=free?'NEMOKAMAI':money(price)});
   const pct=activeCoupon?Number(activeCoupon.discount_percent||0):0;
-  const discount=subtotal*pct/100;
+  const couponDiscount=subtotal*pct/100;
+  const bulk=getBulkDiscountInfo();
   const shipping=selectedShipping().price;
-  const total=subtotal-discount+shipping;
+  const total=Math.max(0,subtotal-couponDiscount-bulk.amount+shipping);
   document.getElementById("checkoutSummaryList").innerHTML=cart.map(x=>`<div class="checkout-summary-item"><span>${escapeHtml(x.name)} × ${x.qty}</span><b>${money(x.price*x.qty)}</b></div>`).join("");
   document.getElementById("coSubtotal").textContent=money(subtotal);
-  document.getElementById("coDiscount").textContent="− "+money(discount);
+  document.getElementById("coDiscount").textContent="− "+money(couponDiscount);
+  const br=document.getElementById("coBulkDiscountRow"),bt=document.getElementById("coBulkDiscount"),bl=document.getElementById("coBulkDiscountLabel");
+  if(br){br.style.display=bulk.amount>0?"flex":"none";if(bt)bt.textContent="− "+money(bulk.amount);if(bl)bl.textContent=bulk.rule?`Kiekio akcija (${bulk.count}+ prekės, −${bulk.pct}%)`:"Kiekio akcija"}
   document.getElementById("coShipping").textContent=money(shipping);
   document.getElementById("coTotal").textContent=money(total);
 }
@@ -1122,6 +1372,7 @@ async function submitOrder(){
   });
   if(error){console.error(error);errorEl.textContent=error.message||"Nepavyko sukurti užsakymo.";return}
   const order=data?.[0]||data;
+  if(order?.id) order.payment_reference=await ensurePaymentReference(order.id);
   cart=[];activeCoupon=null;renderCart();closeCheckout();
   subscribeMyOrderUpdates();
   await loadMyOrders();
@@ -1149,17 +1400,21 @@ function changeQty(i,delta){
 function removeItem(i){cart.splice(i,1);renderCart()}
 function removeCoupon(){activeCoupon=null;const input=document.getElementById("couponInput");if(input)input.value="";setCouponMessage("Nuolaidos kodas panaikintas.",true);renderCart();toast("✓ Nuolaidos kodas panaikintas")}
 function renderCart(){
+  renderFreeShipping();
   const subtotal=cart.reduce((a,b)=>a+b.price*b.qty,0);
   const pct=activeCoupon?Number(activeCoupon.discount_percent||0):0;
-  const discount=subtotal*pct/100;
-  const total=subtotal-discount;
+  const couponDiscount=subtotal*pct/100;
+  const bulk=getBulkDiscountInfo();
+  const total=Math.max(0,subtotal-couponDiscount-bulk.amount);
   const count=cart.reduce((a,b)=>a+b.qty,0);
   document.getElementById("count").textContent=count;
   document.getElementById("items").innerHTML=cart.length?cart.map((x,i)=>`<div class="cart-item"><div><div class="cart-item-name">${escapeHtml(x.name)}</div><div class="cart-item-price">${money(x.price)} / vnt.</div><div class="cart-controls"><button onclick="changeQty(${i},-1)">−</button><span>${x.qty}</span><button onclick="changeQty(${i},1)">+</button><button class="cart-remove" onclick="removeItem(${i})">🗑️ Pašalinti</button></div></div><b>${money(x.price*x.qty)}</b></div>`).join(""):"<p style='color:#718096;margin-top:20px;text-align:center'>🛒 Krepšelis tuščias.</p>";
   document.getElementById("subtotal").textContent=money(subtotal);
-  document.getElementById("discountTotal").textContent="− "+money(discount);
+  document.getElementById("discountTotal").textContent="− "+money(couponDiscount);
+  const br=document.getElementById("bulkDiscountRow"),bt=document.getElementById("bulkDiscountTotal"),bl=document.getElementById("bulkDiscountLabel");
+  if(br){br.style.display=bulk.amount>0?"flex":"none";if(bt)bt.textContent="− "+money(bulk.amount);if(bl)bl.textContent=bulk.rule?`Kiekio akcija (${bulk.count}+ prekės, −${bulk.pct}%)`:"Kiekio akcija"}
   document.getElementById("total").textContent=money(total);
-  const a=document.getElementById("couponApplied");if(a)a.innerHTML=activeCoupon?`<div class="coupon-applied-row"><span>✓ ${escapeHtml(activeCoupon.code)} −${pct}% • sutaupai ${money(discount)}</span><button class="coupon-remove" onclick="removeCoupon()">✕ Panaikinti nuolaidą</button></div>`:"";
+  const a=document.getElementById("couponApplied");if(a)a.innerHTML=activeCoupon?`<div class="coupon-applied-row"><span>✓ ${escapeHtml(activeCoupon.code)} −${pct}% • sutaupai ${money(couponDiscount)}</span><button class="coupon-remove" onclick="removeCoupon()">✕ Panaikinti nuolaidą</button></div>`:"";
   if(document.getElementById("checkoutModal")?.classList.contains("open")) renderCheckoutSummary();
 }
 function openCart(){document.getElementById("cartBg").style.display="block";renderCart()}
@@ -1185,7 +1440,6 @@ function changeModalQty(delta){modalQty=Math.max(1,modalQty+delta);document.getE
 function addModalToCart(){if(!modalProduct)return;add(modalProduct.name,salePrice(modalProduct),modalQty,modalProduct);closeProductModal()}
 function closeProductModal(){document.getElementById("productModal").classList.remove("open");modalProduct=null}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeProductModal()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeUpdates()});
 
 function toast(t){let x=document.getElementById("toast");x.textContent=t;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),1800)}
 function like(b){b.classList.toggle("liked");b.textContent=b.classList.contains("liked")?"♥":"♡"}
@@ -1208,10 +1462,6 @@ function bubble(t,who){
   let b=document.getElementById("chatBody");
   b.appendChild(d);
   b.scrollTop=b.scrollHeight;
-}
-
-function quick(t){
-  sendChatMessage(t);
 }
 
 async function send(){
