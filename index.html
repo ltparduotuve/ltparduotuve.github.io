@@ -198,7 +198,8 @@ body.auth-locked{overflow:hidden}
 
 .admin-chat-notification{display:none;position:fixed;right:20px;top:84px;z-index:2500;width:min(370px,calc(100% - 40px));background:#0b1421;border:1px solid #4c8cff;border-radius:13px;padding:12px;box-shadow:0 18px 55px #000c;cursor:pointer;align-items:center;gap:10px;animation:chatNoticeIn .25s ease}.admin-chat-notification.show{display:flex}.admin-chat-notification-icon{width:36px;height:36px;border-radius:10px;background:#173661;display:grid;place-items:center;font-size:18px;flex:0 0 auto}.admin-chat-notification b{display:block;font-size:10px}.admin-chat-notification small{display:block;color:#8b9bb2;font-size:8px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:245px}.admin-chat-notification button{margin-left:auto;border:0;background:#111d2d;color:#fff;border-radius:6px;padding:4px 7px;cursor:pointer}.admin-chat-user.unread{border-color:#20e5a0;box-shadow:0 0 0 1px #20e5a033}.admin-chat-user .unread-dot{float:right;color:#20e5a0;font-size:9px}@keyframes chatNoticeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 .admin-chat-layout{display:grid;grid-template-columns:280px 1fr;gap:12px;min-height:420px}.admin-chat-users,.admin-chat-window{background:#0b1421;border:1px solid #263950;border-radius:12px;overflow:hidden}.admin-chat-users{padding:10px}.admin-chat-user{padding:10px;border:1px solid #22354e;background:#08111d;border-radius:9px;cursor:pointer;margin-bottom:7px}.admin-chat-user:hover,.admin-chat-user.active{border-color:#4c8cff;background:#102754}.admin-chat-user b{font-size:10px}.admin-chat-user small{display:block;color:#718096;font-size:8px;margin-top:4px}.admin-chat-title{padding:13px;border-bottom:1px solid #263950;font-size:11px;font-weight:800}.admin-chat-body{height:340px;overflow:auto;padding:12px}.admin-chat-bubble{max-width:80%;padding:8px 10px;border-radius:10px;background:#101c2d;border:1px solid #263b58;margin:6px 0;font-size:9px;line-height:1.5}.admin-chat-bubble.admin{margin-left:auto;background:#173661}.admin-chat-time{display:block;color:#68788e;font-size:7px;margin-top:4px}.admin-chat-reply{display:flex;gap:7px;padding:9px;border-top:1px solid #263950}.admin-chat-reply input{flex:1;background:#08111d;border:1px solid #2b3e5a;color:#fff;border-radius:8px;padding:9px;font-size:9px;outline:none}@media(max-width:700px){.admin-chat-layout{grid-template-columns:1fr}.admin-chat-users{max-height:220px}.admin-chat-body{height:300px}}
-.order-cancel-btn{border:1px solid #a64b5d;background:#24101a;color:#ff9aad;border-radius:8px;padding:8px 11px;font-size:10px;cursor:pointer;margin-top:8px}.order-cancel-btn:hover{background:#351521}.pay-disabled{opacity:.45!important;cursor:not-allowed!important}.pay-note{font-size:9px;color:#71819a;margin-top:6px;line-height:1.4}.order-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:10px}.order-pay-btn{border:1px solid #5579ad;background:#16243a;color:#fff;border-radius:8px;padding:8px 11px;font-size:10px;opacity:.45;cursor:not-allowed}.order-cancel-btn{border:1px solid #a64b5d;background:#24101a;color:#ff9aad;border-radius:8px;padding:8px 11px;font-size:10px;cursor:pointer}.order-cancel-btn:hover{background:#351521}.pay-note{width:100%;font-size:9px;color:#71819a;line-height:1.4}.save-check{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px;border:1px solid #263950;background:#08111d;border-radius:9px;color:#9aa9bf;font-size:9px;cursor:pointer}.save-check input{accent-color:#4389ff}.admin-order-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}.admin-order-stat{background:#0b1421;border:1px solid #263950;border-radius:10px;padding:11px}.admin-order-stat b{display:block;font-size:17px}.admin-order-stat small{color:#718096;font-size:8px}
+.order-cancel-btn{border:1px solid #a64b5d;background:#24101a;color:#ff9aad;border-radius:8px;padding:8px 11px;font-size:10px;cursor:pointer;margin-top:8px}.order-cancel-btn:hover{background:#351521}.pay-disabled{opacity:.45!important;cursor:not-allowed!important}.pay-note{font-size:9px;color:#71819a;margin-top:6px;line-height:1.4}
+.bank-pay-modal{display:none;position:fixed;inset:0;background:#000b;z-index:2400;align-items:center;justify-content:center;padding:18px}.bank-pay-modal.open{display:flex}.bank-pay-card{width:min(560px,100%);max-height:90vh;overflow:auto;background:#0b1421;border:1px solid #31557e;border-radius:16px;box-shadow:0 25px 80px #000c}.bank-pay-head{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid #263950}.bank-pay-head h2{font-size:19px}.bank-pay-head small{display:block;color:#8290a8;margin-top:4px}.bank-pay-body{padding:22px}.bank-pay-amount{background:#101f33;border:1px solid #31557e;border-radius:12px;padding:15px;margin-bottom:12px}.bank-pay-amount span{display:block;color:#8290a8;font-size:10px}.bank-pay-amount b{display:block;font-size:28px;color:#22e5a0;margin-top:4px}.bank-pay-grid{display:grid;gap:9px}.bank-pay-row{display:flex;justify-content:space-between;gap:15px;padding:12px;background:#08111d;border:1px solid #22354e;border-radius:9px}.bank-pay-row span{color:#8290a8;font-size:10px}.bank-pay-row b{font-size:11px;text-align:right;word-break:break-all}.bank-pay-ref{color:#7fb0ff!important;font-family:monospace;font-size:13px!important}.bank-pay-copy{border:1px solid #31557e;background:#101f33;color:#fff;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:9px}.bank-pay-note{margin-top:13px;padding:12px;background:#0d2b24;border:1px solid #247a61;border-radius:10px;color:#b9f5dd;font-size:10px;line-height:1.55}.bank-pay-actions{display:flex;gap:8px;margin-top:15px}.bank-pay-actions button{flex:1;min-height:43px}.admin-payment-box{margin-top:12px}.admin-payment-help{color:#718096;font-size:9px;line-height:1.5;margin-top:8px}.order-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:10px}.order-pay-btn{border:1px solid #5579ad;background:#16243a;color:#fff;border-radius:8px;padding:8px 11px;font-size:10px;opacity:.45;cursor:not-allowed}.order-cancel-btn{border:1px solid #a64b5d;background:#24101a;color:#ff9aad;border-radius:8px;padding:8px 11px;font-size:10px;cursor:pointer}.order-cancel-btn:hover{background:#351521}.pay-note{width:100%;font-size:9px;color:#71819a;line-height:1.4}.save-check{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px;border:1px solid #263950;background:#08111d;border-radius:9px;color:#9aa9bf;font-size:9px;cursor:pointer}.save-check input{accent-color:#4389ff}.admin-order-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}.admin-order-stat{background:#0b1421;border:1px solid #263950;border-radius:10px;padding:11px}.admin-order-stat b{display:block;font-size:17px}.admin-order-stat small{color:#718096;font-size:8px}
 /* Didesni langai ir patogesnis skaitymas */
 .drawer h2{font-size:24px}.drawer{padding:28px}.cart-item{font-size:13px;padding:17px 0}.cart-item-name{font-size:15px}.cart-item-price{font-size:12px}.cart-controls button,.coupon-remove{font-size:12px}.checkout{font-size:13px;padding:15px}.coupon-box{font-size:13px}.coupon-row input{height:44px;font-size:13px}.coupon-row button{min-height:44px}
 .orders-card,.checkout-card{font-size:13px}.orders-head,.checkout-head{padding:24px 28px}.orders-head h2,.checkout-head h2{font-size:24px}.orders-body,.checkout-body{padding:28px}.order-card{padding:20px}.order-number{font-size:15px}.order-date{font-size:11px}.order-status{font-size:11px;padding:8px 12px}.order-item-row,.order-info-box{font-size:12px}.checkout-section{padding:22px}.checkout-section h3{font-size:14px}.checkout-field label{font-size:10px}.checkout-field input{height:48px;font-size:13px}.shipping-option{padding:14px}.shipping-option span,.shipping-option b{font-size:12px}.checkout-summary-list{max-height:360px}.checkout-summary-item{font-size:12px}.checkout-total{font-size:14px}.checkout-total b{font-size:25px}.checkout-submit{height:52px;font-size:13px}
@@ -353,6 +354,7 @@ body.auth-locked{overflow:hidden}
    <button class="admin-tab" onclick="adminTab('coupons',this)">🎟️ Kuponai</button>
    <button class="admin-tab" onclick="adminTab('bulk',this)">🛍️ Kiekio akcijos</button>
     <button class="admin-tab" onclick="adminTab('orders',this)">🧾 Užsakymai</button>
+   <button class="admin-tab" onclick="adminTab('payments',this)">🏦 Apmokėjimai</button>
    <button class="admin-tab" onclick="adminTab('chat',this)">💬 Klientų chat</button>
   </div>
   <section class="admin-section active" id="admin-dashboard">
@@ -428,6 +430,18 @@ body.auth-locked{overflow:hidden}
    <div class="admin-actions" style="margin-bottom:10px"><button class="admin-secondary" onclick="loadAdminOrders()">↻ Atnaujinti užsakymus</button></div>
    <div class="admin-list" id="adminOrderList"><div class="admin-empty">Kraunama...</div></div>
   </section>
+  <section class="admin-section" id="admin-payments">
+   <div class="admin-note"><b>🏦 Bankinio pavedimo apmokėjimai</b><br>Čia nustatai duomenis, kuriuos klientas matys pasirinkęs apmokėjimą bankiniu pavedimu. Šie duomenys bus rodomi klientams, todėl įrašyk tik tuos duomenis, kuriuos teisėtai naudoji mokėjimams priimti.</div>
+   <div class="admin-form">
+    <div class="admin-field"><label>BANKAS</label><input id="payBankName" placeholder="Pvz. Revolut / SEB / Swedbank"></div>
+    <div class="admin-field"><label>BANKO SĄSKAITA (IBAN)</label><input id="payAccountNumber" placeholder="LT00 0000 0000 0000 0000"></div>
+    <div class="admin-field full"><label>GAVĖJO VARDAS / PAVADINIMAS</label><input id="payBeneficiary" placeholder="LT PARDUOTUVĖ"></div>
+    <div class="admin-field full"><label>PAPILDOMA INFORMACIJA KLIENTUI</label><textarea id="payInstructions" placeholder="Po apmokėjimo palaukite, kol mokėjimas bus patikrintas."></textarea></div>
+    <div class="admin-field"><label>RODYTI BANKINĮ APMOKĖJIMĄ</label><select id="payEnabled"><option value="true">Taip</option><option value="false">Ne</option></select></div>
+    <div class="admin-actions full"><button class="admin-primary" onclick="savePaymentSettings()">💾 Išsaugoti apmokėjimo duomenis</button><button class="admin-secondary" onclick="loadPaymentSettings()">↻ Atkurti</button></div>
+   </div>
+   <div class="admin-payment-help">Mokėjimo paskirtis kiekvienam užsakymui sugeneruojama atskirai, pvz. <b>LT-2026-A7F3K9Q2</b>. Klientas turi naudoti būtent savo užsakymo kodą.</div>
+  </section>
   <section class="admin-section" id="admin-chat">
    <div class="admin-note"><b>💬 Tiesioginis klientų chat</b><br>Žinutės atkeliauja realiu laiku. Kai klientas parašo, gausi pranešimą ir vienu paspaudimu galėsi atsidaryti pokalbį.</div>
    <div class="admin-chat-layout">
@@ -480,6 +494,24 @@ body.auth-locked{overflow:hidden}
  <div class="orders-card" onclick="event.stopPropagation()">
   <div class="orders-head"><div><h2>📦 Mano užsakymai</h2><small>Visi tavo pirkimai vienoje vietoje</small></div><button class="close" onclick="closeOrders()">✕</button></div>
   <div class="orders-body"><div id="ordersList" class="order-list"><div class="admin-empty">Kraunama...</div></div></div>
+ </div>
+</div>
+
+<div id="bankPaymentModal" class="bank-pay-modal" onclick="closeBankPayment()">
+ <div class="bank-pay-card" onclick="event.stopPropagation()">
+  <div class="bank-pay-head"><div><h2>💳 Apmokėti užsakymą</h2><small id="bankPayOrderTitle">Bankinis pavedimas</small></div><button class="close" onclick="closeBankPayment()">✕</button></div>
+  <div class="bank-pay-body">
+   <div class="bank-pay-amount"><span>APMOKĖTI SUMĄ</span><b id="bankPayAmount">0,00 €</b></div>
+   <div class="bank-pay-grid">
+    <div class="bank-pay-row"><span>BANKAS</span><b id="bankPayBank">—</b></div>
+    <div class="bank-pay-row"><span>BANKO SĄSKAITA</span><div><b id="bankPayAccount">—</b> <button class="bank-pay-copy" onclick="copyBankPaymentField('account')">📋</button></div></div>
+    <div class="bank-pay-row"><span>GAVĖJAS</span><b id="bankPayBeneficiary">—</b></div>
+    <div class="bank-pay-row"><span>MOKĖJIMO PASKIRTIS</span><div><b id="bankPayReference" class="bank-pay-ref">—</b> <button class="bank-pay-copy" onclick="copyBankPaymentField('reference')">📋</button></div></div>
+   </div>
+   <div class="bank-pay-note">Po apmokėjimo palaukite, kol mokėjimas bus gautas ir patikrintas. Įprastai mokėjimo gavimas gali užtrukti iki 1–2 darbo dienų. Užsakymas bus pradėtas vykdyti tik patvirtinus apmokėjimą.</div>
+   <div id="bankPayInstructions" class="pay-note"></div>
+   <div class="bank-pay-actions"><button class="admin-secondary" onclick="copyBankPaymentAll()">📋 Kopijuoti duomenis</button><button class="admin-primary" onclick="closeBankPayment()">✓ Supratau</button></div>
+  </div>
  </div>
 </div>
 
@@ -741,17 +773,17 @@ async function checkAdmin(user){
   if(btn) btn.style.display=isAdmin?"block":"none";
   return isAdmin;
 }
-async function initAdmin(user){await checkAdmin(user);await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();if(isAdmin)subscribeAdminChat();}
+async function initAdmin(user){await checkAdmin(user);await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();await loadPaymentSettings();if(isAdmin)subscribeAdminChat();}
 async function openAdmin(){
   if(!isAdmin)return alert("Neturite administratoriaus teisių.");
   document.getElementById("adminPanel").classList.add("open");
-  await loadAdminStats();await loadCategories();await loadAdminProducts();await loadAdminCoupons();await loadAdminBulkDiscounts();await loadAdminOrders();subscribeAdminOrders();await loadAdminChats();
+  await loadAdminStats();await loadCategories();await loadAdminProducts();await loadAdminCoupons();await loadAdminBulkDiscounts();await loadAdminOrders();await loadPaymentSettings();subscribeAdminOrders();await loadAdminChats();
 }
 function closeAdmin(){document.getElementById("adminPanel").classList.remove("open")}
 function adminTab(name,btn){
   document.querySelectorAll(".admin-tab").forEach(x=>x.classList.remove("active"));
   document.querySelectorAll(".admin-section").forEach(x=>x.classList.remove("active"));
-  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="bulk")loadAdminBulkDiscounts();
+  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="bulk")loadAdminBulkDiscounts();if(name==="payments")loadPaymentSettings();
 }
 async function loadAdminStats(){
   const p=await supabaseClient.from("products").select("id",{count:"exact",head:true});
@@ -917,6 +949,56 @@ function statusClass(status){
 }
 function formatDate(v){return v?new Date(v).toLocaleString("lt-LT"):"—"}
 
+async function loadPaymentSettings(){
+  const {data,error}=await supabaseClient.from("store_payment_settings").select("*").eq("id",1).maybeSingle();
+  if(error){console.warn("Payment settings SQL not installed:",error);return null}
+  if(data){
+    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v??""};
+    set("payBankName",data.bank_name);set("payAccountNumber",data.account_number);set("payBeneficiary",data.beneficiary);set("payInstructions",data.instructions);set("payEnabled",String(data.enabled!==false));
+  }
+  return data;
+}
+async function savePaymentSettings(){
+  if(!isAdmin)return alert("Neturite administratoriaus teisių.");
+  const payload={id:1,bank_name:document.getElementById("payBankName")?.value.trim()||"",account_number:document.getElementById("payAccountNumber")?.value.trim()||"",beneficiary:document.getElementById("payBeneficiary")?.value.trim()||"",instructions:document.getElementById("payInstructions")?.value.trim()||"",enabled:document.getElementById("payEnabled")?.value!=="false",updated_at:new Date().toISOString()};
+  if(!payload.account_number||!payload.beneficiary)return alert("Įrašyk banko sąskaitą ir gavėją.");
+  const {error}=await supabaseClient.from("store_payment_settings").upsert(payload,{onConflict:"id"});
+  if(error){console.error(error);return alert("Nepavyko išsaugoti. Paleisk mokėjimų SQL.")}
+  toast("✓ Apmokėjimo duomenys išsaugoti");
+}
+function randomPaymentReference(){
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let out="";
+  if(window.crypto?.getRandomValues){const a=new Uint32Array(8);crypto.getRandomValues(a);for(let i=0;i<a.length;i++)out+=chars[a[i]%chars.length]}
+  else for(let i=0;i<8;i++)out+=chars[Math.floor(Math.random()*chars.length)];
+  return `LT-${new Date().getFullYear()}-${out}`;
+}
+async function ensurePaymentReference(orderId){
+  const {data,error}=await supabaseClient.rpc("assign_order_payment_reference",{p_order_id:orderId});
+  if(error){console.error(error);return null}
+  return data||null;
+}
+let activeBankPayment={};
+async function openPaymentModal(order){
+  if(!order||order.status!=="pending")return alert("Šio užsakymo apmokėti nebegalima pagal dabartinę būseną.");
+  const settings=await loadPaymentSettings();
+  if(!settings?.enabled)return alert("Šiuo metu bankinis apmokėjimas neaktyvus.");
+  if(!settings.account_number||!settings.beneficiary)return alert("Apmokėjimo duomenys dar nesukonfigūruoti.");
+  let ref=order.payment_reference||await ensurePaymentReference(order.id);
+  if(!ref)return alert("Nepavyko sugeneruoti mokėjimo paskirties kodo. Paleisk mokėjimų SQL.");
+  activeBankPayment={order,settings,reference:ref};
+  document.getElementById("bankPayOrderTitle").textContent=`Užsakymas #${order.order_number}`;
+  document.getElementById("bankPayAmount").textContent=money(order.total_amount);
+  document.getElementById("bankPayBank").textContent=settings.bank_name||"—";
+  document.getElementById("bankPayAccount").textContent=settings.account_number;
+  document.getElementById("bankPayBeneficiary").textContent=settings.beneficiary;
+  document.getElementById("bankPayReference").textContent=ref;
+  document.getElementById("bankPayInstructions").textContent=settings.instructions||"";
+  document.getElementById("bankPaymentModal").classList.add("open");
+}
+function closeBankPayment(){document.getElementById("bankPaymentModal")?.classList.remove("open")}
+async function copyBankPaymentField(type){const v=type==="account"?activeBankPayment.settings?.account_number:activeBankPayment.reference;if(!v)return;try{await navigator.clipboard.writeText(v);toast("✓ Nukopijuota")}catch(e){toast(v)}}
+async function copyBankPaymentAll(){const s=activeBankPayment.settings||{};const text=`Apmokėti: ${money(activeBankPayment.order?.total_amount||0)}\nBankas: ${s.bank_name||""}\nBanko sąskaita: ${s.account_number||""}\nGavėjas: ${s.beneficiary||""}\nMokėjimo paskirtis: ${activeBankPayment.reference||""}`;try{await navigator.clipboard.writeText(text);toast("✓ Mokėjimo duomenys nukopijuoti")}catch(e){alert(text)}}
+
 async function loadAdminOrderStats(){
   const box=document.getElementById("adminOrderStats");if(!box||!isAdmin)return;
   const {data,error}=await supabaseClient.from("orders").select("status,total_amount");
@@ -930,7 +1012,7 @@ async function loadAdminOrders(){
   const {data,error}=await supabaseClient.from("orders").select("*, order_items(*)").order("created_at",{ascending:false});
   if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti užsakymų. Patikrink RLS/SQL.</div>';return}
   if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas užsakymų nėra.</div>';await loadAdminOrderStats();return}
-  list.innerHTML=data.map(o=>`<div class="admin-order"><div class="admin-order-info"><b>#${escapeHtml(o.order_number)}</b><small>${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")} • ${formatDate(o.created_at)}<br>${escapeHtml(o.phone||"")} • ${escapeHtml(o.address||"")}, ${escapeHtml(o.city||"")} ${escapeHtml(o.postal_code||"")}<br>${escapeHtml(o.shipping_method||"")} • <strong>${statusLabel(o.status)}</strong> • ${money(o.total_amount)}</small></div><div class="admin-order-actions"><select onchange="updateOrderStatus('${o.id}',this.value)">${["pending","paid","processing","shipped","completed","cancelled"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${statusLabel(s)}</option>`).join("")}</select><input id="tracking-${o.id}" value="${escapeHtml(o.tracking_number||"")}" placeholder="Siuntimo nr." title="Siuntimo numeris"><button class="admin-primary" onclick="saveTracking('${o.id}')">💾</button><button class="admin-secondary" onclick='showOrderDetails(${JSON.stringify(o).replace(/'/g,"&#39;")})'>👁️</button><button class="admin-danger" onclick="deleteAdminOrder('${o.id}')">🗑️</button></div></div>`).join("");
+  list.innerHTML=data.map(o=>`<div class="admin-order"><div class="admin-order-info"><b>#${escapeHtml(o.order_number)}</b><small>${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")} • ${formatDate(o.created_at)}<br>${escapeHtml(o.phone||"")} • ${escapeHtml(o.address||"")}, ${escapeHtml(o.city||"")} ${escapeHtml(o.postal_code||"")}<br>${escapeHtml(o.shipping_method||"")} • <strong>${statusLabel(o.status)}</strong> • ${money(o.total_amount)}<br>💳 Mokėjimo paskirtis: <strong>${escapeHtml(o.payment_reference||"Dar nesugeneruota")}</strong></small></div><div class="admin-order-actions"><select onchange="updateOrderStatus('${o.id}',this.value)">${["pending","paid","processing","shipped","completed","cancelled"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${statusLabel(s)}</option>`).join("")}</select><input id="tracking-${o.id}" value="${escapeHtml(o.tracking_number||"")}" placeholder="Siuntimo nr." title="Siuntimo numeris"><button class="admin-primary" onclick="saveTracking('${o.id}')">💾</button><button class="admin-secondary" onclick='showOrderDetails(${JSON.stringify(o).replace(/'/g,"&#39;")})'>👁️</button><button class="admin-danger" onclick="deleteAdminOrder('${o.id}')">🗑️</button></div></div>`).join("");
   await loadAdminOrderStats();
 }
 async function updateOrderStatus(id,status){
@@ -1074,7 +1156,7 @@ async function loadMyOrders(){
     <div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div>
     ${o.tracking_number?`<div class="tracking-box">📦 <b>Siuntimo numeris:</b> <span>${escapeHtml(o.tracking_number)}</span><button onclick="copyTracking('${escapeHtml(o.tracking_number)}');event.stopPropagation()">📋 Kopijuoti</button></div>`:""}
     <div class="order-actions" onclick="event.stopPropagation()">
-      ${o.status==="pending"?`<button class="order-pay-btn" disabled title="Mokėjimo sistema dar neprijungta">💳 Apmokėti užsakymą</button><button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button><div class="pay-note">Apmokėjimas bus aktyvuotas, kai bus prijungta mokėjimo sistema.</div>`:o.status==="cancelled"?`<button class="order-cancel-btn" onclick="deleteMyOrder('${o.id}')">🗑️ Pašalinti užsakymą</button>`:""}
+      ${o.status==="pending"?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Apmokėti užsakymą</button><button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button><div class="pay-note">Apmokėk bankiniu pavedimu pagal pateiktus rekvizitus. Mokėjimo paskirtis bus sugeneruota atskirai šiam užsakymui.</div>`:o.status==="cancelled"?`<button class="order-cancel-btn" onclick="deleteMyOrder('${o.id}')">🗑️ Pašalinti užsakymą</button>`:""}
     </div>
     <div class="order-detail" id="order-detail-${o.id}" style="display:none">
       <div class="order-items">${(o.order_items||[]).map(x=>`<div class="order-item-row"><span>${escapeHtml(x.product_name)} × ${x.quantity}</span><b>${money(Number(x.unit_price)*Number(x.quantity))}</b></div>`).join("")}</div>
@@ -1190,6 +1272,7 @@ async function submitOrder(){
   });
   if(error){console.error(error);errorEl.textContent=error.message||"Nepavyko sukurti užsakymo.";return}
   const order=data?.[0]||data;
+  if(order?.id) order.payment_reference=await ensurePaymentReference(order.id);
   cart=[];activeCoupon=null;renderCart();closeCheckout();
   subscribeMyOrderUpdates();
   await loadMyOrders();
