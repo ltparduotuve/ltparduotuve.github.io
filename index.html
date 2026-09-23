@@ -256,11 +256,23 @@ body.auth-locked{overflow:hidden}
 
 <style id="checkout-hard-fix">
 #checkoutModal{display:none!important;position:fixed!important;inset:0!important;z-index:9999!important;align-items:center!important;justify-content:center!important}
-#checkoutModal.open{display:flex!important}
+#checkoutModal.open{display:flex!important;visibility:visible!important;opacity:1!important}
 #checkoutModal .checkout-card{display:block!important;visibility:visible!important;opacity:1!important}
 #cartBg{z-index:600!important}
 </style>
-</head>
+<style id="unified-order-flow">
+.order-view-btn{border:1px solid #438dff;background:#122747;color:#fff;border-radius:8px;padding:8px 12px;font-size:10px;cursor:pointer}
+.order-view-btn:hover{background:#18345d;border-color:#62a3ff}
+.order-sent-note{width:100%;font-size:9px;color:#55d8a5;line-height:1.4;margin-top:2px}
+.bank-pay-screen.payment-sent-state .payment-timer-card{display:none!important}
+.bank-pay-screen.payment-sent-state .payment-top-grid{grid-template-columns:1fr!important}
+</style>
+<style id="order-status-view-style">
+.bank-order-status-view{margin-top:14px;padding:18px;border:1px solid #263c55;border-radius:12px;background:#09121d}
+.bank-order-status-title{font-size:16px;font-weight:900;color:#fff;margin-bottom:5px}.bank-order-status-sub{font-size:10px;color:#7f91a8;margin-bottom:14px}
+.bank-order-status-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bank-order-status-grid>div{padding:11px;border:1px solid #1e3045;border-radius:9px;background:#07101a}.bank-order-status-grid span{display:block;color:#718198;font-size:8px;font-weight:800;margin-bottom:5px}.bank-order-status-grid b{font-size:11px;color:#fff;word-break:break-word}
+.bank-order-items-title{margin:15px 0 8px;font-size:10px;color:#aab8ca;font-weight:800}.bank-order-items{display:grid;gap:6px}.bank-order-item{display:flex;justify-content:space-between;gap:10px;padding:9px 10px;background:#07101a;border:1px solid #1e3045;border-radius:8px;font-size:10px}.bank-order-item small{color:#718198}.bank-order-code{margin-top:10px;padding:10px;border-radius:8px;background:#0e1a29;color:#8fb9ff;font:11px monospace;word-break:break-all}
+</style></head>
 <body class="auth-locked">
 
 <div id="authGate">
@@ -611,13 +623,35 @@ body.auth-locked{overflow:hidden}
      <button id="bankPaySentBtn" class="admin-primary payment-sent-btn" onclick="markPaymentSent()">✓ Pinigai išsiųsti</button>
      <button class="admin-secondary" onclick="copyBankPaymentAll()">📋 Kopijuoti duomenis</button>
    </div>
-   <div class="payment-bottom-note">Atlikęs pavedimą paspausk „Pinigai išsiųsti“. Tai nepatvirtina apmokėjimo automatiškai — mokėjimą dar patikrins administratorius.</div>
+   <div id="bankOrderStatusView" class="bank-order-status-view" style="display:none">
+     <div class="bank-order-status-title" id="bankOrderStatusTitle">Užsakymas ruošiamas</div>
+     <div class="bank-order-status-sub" id="bankOrderStatusSub">Mokėjimas patvirtintas.</div>
+     <div class="bank-order-status-grid">
+       <div><span>UŽSAKYMAS</span><b id="viewOrderNumber">—</b></div>
+       <div><span>BŪSENA</span><b id="viewOrderStatus">—</b></div>
+       <div><span>SUMA</span><b id="viewOrderTotal">—</b></div>
+       <div><span>SIUNTIMO NUMERIS</span><b id="viewOrderTracking">Dar nepriskirtas</b></div>
+     </div>
+     <div class="bank-order-items-title">🛒 Tavo užsakytos prekės</div>
+     <div id="viewOrderItems" class="bank-order-items"></div>
+     <div class="bank-order-code" id="viewOrderCode">Mokėjimo kodas: —</div>
+   </div>
+
+   <div class="payment-bottom-note" id="bankPaymentBottomNote">Atlikęs pavedimą paspausk „Pinigai išsiųsti“. Tai nepatvirtina apmokėjimo automatiškai — mokėjimą dar patikrins administratorius.</div>
   </div>
  </div>
+</div>
 <div id="checkoutModal" class="checkout-modal" onclick="closeCheckout()">
  <div class="checkout-card" onclick="event.stopPropagation()">
   <div class="checkout-head"><div><h2>🧾 Užsakymo pateikimas</h2><small>Užpildyk pristatymo informaciją</small></div><button class="close" onclick="closeCheckout()">✕</button></div>
   <div class="checkout-body">
+   <div class="payment-progress checkout-progress">
+    <div class="payment-progress-step done"><span>✓</span><b>Krepšelis</b></div><i></i>
+    <div class="payment-progress-step active"><span>2</span><b>Duomenys</b></div><i></i>
+    <div class="payment-progress-step"><span>3</span><b>Patvirtinimas</b></div><i></i>
+    <div class="payment-progress-step"><span>4</span><b>Ruošiama</b></div><i></i>
+    <div class="payment-progress-step"><span>5</span><b>Įvykdyta</b></div>
+   </div>
    <div class="checkout-layout">
     <div>
      <div class="checkout-section">
@@ -1123,34 +1157,38 @@ async function expirePaymentIfNeeded(){
 async function tickBankPaymentTimer(){
   const timer=document.getElementById("bankPayTimer");
   const text=document.getElementById("bankPayTimerText");
-  const sent=activeBankPayment.paymentSent;
-  if(!timer)return;
+  if(!timer||!activeBankPayment.order?.id||activeBankPayment.paymentSent)return;
   const remaining=paymentDeadline(activeBankPayment.order)-Date.now();
   if(remaining<=0){
-    clearInterval(bankPaymentTimer); bankPaymentTimer=null;
-    timer.textContent="00:00";
-    timer.style.color="#ff7f8f";
-    if(text)text.textContent=sent ? "Laikas baigėsi, bet pavedimas pažymėtas kaip išsiųstas ir laukia patikrinimo." : "Mokėjimo laikas baigėsi.";
-    document.getElementById("bankPayExpired").style.display=sent?"none":"block";
+    clearInterval(bankPaymentTimer);bankPaymentTimer=null;
+    timer.textContent="00:00";timer.style.color="#ff7f8f";
+    if(text)text.textContent="Mokėjimo laikas baigėsi.";
+    document.getElementById("bankPayExpired").style.display="block";
     document.getElementById("bankPaySentBtn").disabled=true;
     document.getElementById("bankPaySentBtn").style.opacity=".45";
-    if(!sent) await expirePaymentIfNeeded();
+    await expirePaymentIfNeeded();
     return;
   }
   timer.textContent=formatCountdown(remaining);
 }
 async function openPaymentModal(order){
-  if(!order||order.status!=="pending")return alert("Šio užsakymo apmokėti nebegalima pagal dabartinę būseną.");
-  const remaining=paymentDeadline(order)-Date.now();
-  if(remaining<=0){
-    await expirePaymentIfNeeded();
-    return alert("Šio užsakymo apmokėjimo laikas jau baigėsi. Prašome iš naujo susidėti prekes ir pateikti naują užsakymą.");
-  }
+  if(!order?.id)return alert("Užsakymas nerastas.");
+  const freshRes=await supabaseClient.from("orders").select("*, order_items(*)").eq("id",order.id).maybeSingle();
+  if(freshRes.error||!freshRes.data)return alert("Nepavyko įkelti užsakymo.");
+  order=freshRes.data;
+  if(order.status!=="pending")return openOrderStatusView(order);
+
   const settings=await loadPaymentSettings();
   if(!settings?.enabled)return alert("Šiuo metu bankinis apmokėjimas neaktyvus.");
   if(!settings.account_number||!settings.beneficiary)return alert("Apmokėjimo duomenys dar nesukonfigūruoti.");
+  const remaining=paymentDeadline(order)-Date.now();
+  if(remaining<=0 && !order.payment_sent_at){
+    activeBankPayment={order,paymentSent:false};
+    await expirePaymentIfNeeded();
+    return alert("Šio užsakymo apmokėjimo laikas jau baigėsi. Prašome iš naujo susidėti prekes ir pateikti naują užsakymą.");
+  }
   let ref=order.payment_reference||await ensurePaymentReference(order.id);
-  if(!ref)return alert("Nepavyko sugeneruoti mokėjimo paskirties kodo. Paleisk mokėjimų SQL.");
+  if(!ref)return;
   activeBankPayment={order,settings,reference:ref,paymentSent:!!order.payment_sent_at};
   document.getElementById("bankPayOrderTitle").textContent=`Užsakymas #${order.order_number}`;
   document.getElementById("bankPayAmount").textContent=money(order.total_amount);
@@ -1162,14 +1200,19 @@ async function openPaymentModal(order){
   document.getElementById("bankPayInstructions").textContent=settings.instructions||"";
   document.getElementById("bankPayExpired").style.display="none";
   document.getElementById("bankPaySentNotice").style.display=activeBankPayment.paymentSent?"block":"none";
+  document.getElementById("bankOrderStatusView").style.display="none";
+  document.getElementById("bankPaymentBottomNote").style.display="block";
+  [".payment-top-grid",".bank-pay-grid",".payment-reference-warning","#bankPayInstructions",".bank-pay-actions"].forEach(sel=>{const el=document.querySelector("#bankPaymentModal "+sel);if(el)el.style.display=""});
   const btn=document.getElementById("bankPaySentBtn");
-  btn.disabled=activeBankPayment.paymentSent;
-  btn.style.opacity=activeBankPayment.paymentSent?".5":"1";
-  btn.textContent=activeBankPayment.paymentSent?"✓ Pavedimas jau pažymėtas":"✓ Pinigai išsiųsti";
+  btn.disabled=activeBankPayment.paymentSent;btn.style.opacity=activeBankPayment.paymentSent?".5":"1";btn.textContent=activeBankPayment.paymentSent?"✓ Pavedimas jau pažymėtas":"✓ Pinigai išsiųsti";
   document.getElementById("bankPaymentModal").classList.add("open");
-  clearInterval(bankPaymentTimer);
-  await tickBankPaymentTimer();
-  bankPaymentTimer=setInterval(tickBankPaymentTimer,1000);
+  clearInterval(bankPaymentTimer);bankPaymentTimer=null;
+  const timerCard=document.querySelector("#bankPaymentModal .payment-timer-card");
+  if(timerCard)timerCard.style.display=activeBankPayment.paymentSent?"none":"block";
+  if(!activeBankPayment.paymentSent){
+    await tickBankPaymentTimer();
+    bankPaymentTimer=window.setInterval(()=>{tickBankPaymentTimer();},1000);
+  }
 }
 function closeBankPayment(){
   clearInterval(bankPaymentTimer); bankPaymentTimer=null;
@@ -1189,9 +1232,19 @@ async function markPaymentSent(){
     return alert("Nepavyko pažymėti pavedimo: "+(error.message||"Nežinoma klaida"));
   }
   activeBankPayment.paymentSent=true;
+  clearInterval(bankPaymentTimer);
+  bankPaymentTimer=null;
+  const screen=document.querySelector("#bankPaymentModal .bank-pay-screen");
+  if(screen)screen.classList.add("payment-sent-state");
+  const timerCard=document.querySelector("#bankPaymentModal .payment-timer-card");
+  if(timerCard)timerCard.style.display="none";
+  const timer=document.getElementById("bankPayTimer");
+  if(timer)timer.textContent="";
   document.getElementById("bankPaySentNotice").style.display="block";
   const btn=document.getElementById("bankPaySentBtn");
-  btn.disabled=true;btn.style.opacity=".5";btn.textContent="✓ Pavedimas jau pažymėtas";
+  btn.disabled=true;
+  btn.style.opacity=".5";
+  btn.textContent="✓ Pavedimas jau pažymėtas";
   toast("✓ Pavedimas pažymėtas kaip išsiųstas");
   await loadMyOrders();
 }
@@ -1233,6 +1286,7 @@ async function updateOrderStatus(id,status){
   const {error}=await supabaseClient.from("orders").update(patch).eq("id",id);
   if(error)return alert("Nepavyko pakeisti užsakymo būsenos. Jei updated_at stulpelio nėra, paleisk naują SQL.");
   if(before?.status!==status) toast(`✓ Užsakymas #${before?.order_number||""}: ${statusLabel(status)}`);
+  if(status==="paid") toast(`💰 Užsakymas #${before?.order_number||""}: mokėjimas patvirtintas — klientui rodoma „Ruošiama“.`);
   await loadAdminOrders();await loadAdminStats();
 }
 async function saveTracking(id){
@@ -1244,7 +1298,7 @@ async function saveTracking(id){
   await loadAdminOrders();
   toast(tracking?"✓ Siuntimo numeris išsaugotas":"✓ Siuntimo numeris pašalintas");
 }
-async function deleteAdminOrder(id){if(!isAdmin)return alert("Neturite administratoriaus teisių.");if(!confirm("Ar tikrai visam laikui ištrinti šį užsakymą? Jis nebebus rodomas sistemoje."))return;const {error}=await supabaseClient.from("orders").delete().eq("id",id);if(error){console.error(error);return alert("Nepavyko ištrinti užsakymo. Patikrink RLS SQL.")}await loadAdminOrders();await loadAdminStats();toast("✓ Užsakymas ištrintas iš sistemos")}
+async function deleteAdminOrder(id){if(!isAdmin)return alert("Neturite administratoriaus teisių.");if(!confirm("Ar tikrai visam laikui ištrinti šį užsakymą? Jis nebebus rodomas sistemoje."))return;const {error}=await supabaseClient.from("orders").delete().eq("id",id);if(error){console.error(error);return alert("Nepavyko ištrinti užsakymo. Paleisk administratoriaus užsakymų DELETE RLS SQL, kurį pridėjau prie šio atnaujinimo.")}await loadAdminOrders();await loadAdminStats();toast("✓ Užsakymas ištrintas iš sistemos")}
 
 function showOrderDetails(o){
   const items=(o.order_items||[]).map(x=>`${x.product_name} × ${x.quantity} — ${money(x.unit_price* x.quantity)}`).join("\\n");
@@ -1319,7 +1373,7 @@ async function cancelMyOrder(orderId){
   if(!confirm("Ar tikrai nori atšaukti šį užsakymą?")) return;
   const {data,error}=await supabaseClient.from("orders").select("id,status").eq("id",orderId).maybeSingle();
   if(error||!data)return alert("Nepavyko rasti užsakymo.");
-  if(data.status!=="pending")return alert("Šio užsakymo atšaukti nebegalima, nes jis jau apmokėtas arba pradėtas vykdyti.");
+  if(data.status!=="pending" || data.payment_sent_at)return alert("Šio užsakymo atšaukti nebegalima.");
   const result=await supabaseClient.from("orders").update({status:"cancelled",updated_at:new Date().toISOString()}).eq("id",orderId).eq("status","pending");
   if(result.error)return alert("Nepavyko atšaukti užsakymo.");
   await loadMyOrders();
@@ -1345,12 +1399,49 @@ function subscribeMyOrderUpdates(){
         const o=payload.new||{};
         const old=payload.old||{};
         if(o.status!==old.status){toast(`📦 Užsakymas #${o.order_number||""}: ${statusLabel(o.status)}`);}
+        if(o.payment_sent_at && !old.payment_sent_at){toast(`💸 Užsakymas #${o.order_number||""}: pavedimas pažymėtas kaip išsiųstas.`);}
         if(o.tracking_number!==old.tracking_number && o.tracking_number){toast(`📦 Siuntimo numeris: ${o.tracking_number}`);}
         loadMyOrders();
       }).subscribe();
   });
 }
 async function copyTracking(v){try{await navigator.clipboard.writeText(v);toast("✓ Siuntimo numeris nukopijuotas")}catch(e){toast(v)}}
+
+async function openOrderStatusView(order){
+  clearInterval(bankPaymentTimer);bankPaymentTimer=null;
+  activeBankPayment={order,settings:null,reference:order.payment_reference||"",paymentSent:!!order.payment_sent_at};
+  const modal=document.getElementById("bankPaymentModal");
+  const title=document.getElementById("bankPayOrderTitle");
+  if(title)title.textContent=`Užsakymas #${order.order_number||"—"}`;
+  const status=order.status||"pending";
+  let stage=status==="completed"?5:(status==="paid"||status==="processing"||status==="shipped"?4:3);
+  const steps=document.querySelectorAll("#bankPaymentModal .payment-progress-step");
+  steps.forEach((el,i)=>{el.classList.remove("active","done");const n=i+1;if(n<stage)el.classList.add("done");if(n===stage)el.classList.add("active");});
+  steps.forEach((el,i)=>{const sp=el.querySelector("span");if(sp)sp.textContent=i+1<stage?"✓":String(i+1);});
+  const labels={paid:"Ruošiama",processing:"Ruošiama",shipped:"Ruošiama",completed:"Įvykdyta",cancelled:"Mokėjimo laikas baigėsi"};
+  document.getElementById("bankOrderStatusTitle").textContent=labels[status]||"Užsakymo būsena";
+  document.getElementById("bankOrderStatusSub").textContent=status==="completed"?"Užsakymas įvykdytas.":status==="cancelled"?"Užsakymas atšauktas.":"Mokėjimas patvirtintas. Užsakymas ruošiamas siuntimui.";
+  document.getElementById("viewOrderNumber").textContent="#"+(order.order_number||"—");
+  document.getElementById("viewOrderStatus").textContent=labels[status]||statusLabel(status);
+  document.getElementById("viewOrderTotal").textContent=money(order.total_amount);
+  document.getElementById("viewOrderTracking").textContent=order.tracking_number||"Dar nepriskirtas";
+  document.getElementById("viewOrderCode").textContent="Mokėjimo kodas: "+(order.payment_reference||"—");
+  document.getElementById("viewOrderItems").innerHTML=(order.order_items||[]).map(x=>`<div class="bank-order-item"><span>${escapeHtml(x.product_name)} <small>× ${x.quantity}</small></span><b>${money(Number(x.unit_price)*Number(x.quantity))}</b></div>`).join("")||"<div class='bank-order-item'>Prekių informacija nerasta.</div>";
+  [".payment-top-grid",".bank-pay-grid",".payment-reference-warning","#bankPayInstructions",".bank-pay-actions"].forEach(sel=>{const el=document.querySelector("#bankPaymentModal "+sel);if(el)el.style.display="none"});
+  document.getElementById("bankPayExpired").style.display="none";
+  document.getElementById("bankPaySentNotice").style.display=order.payment_sent_at?"block":"none";
+  document.getElementById("bankOrderStatusView").style.display="block";
+  document.getElementById("bankPaymentBottomNote").style.display="none";
+  modal.classList.add("open");
+}
+
+async function viewMyOrder(orderId){
+  const res=await supabaseClient.from("orders").select("*, order_items(*)").eq("id",orderId).maybeSingle();
+  if(res.error||!res.data)return alert("Nepavyko įkelti užsakymo.");
+  closeOrders();closeCheckout();closeCart();
+  if(res.data.status==="pending") await openPaymentModal(res.data);
+  else await openOrderStatusView(res.data);
+}
 
 async function loadMyOrders(){
   const list=document.getElementById("ordersList");
@@ -1367,7 +1458,7 @@ async function loadMyOrders(){
     <div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div>
     ${o.tracking_number?`<div class="tracking-box">📦 <b>Siuntimo numeris:</b> <span>${escapeHtml(o.tracking_number)}</span><button onclick="copyTracking('${escapeHtml(o.tracking_number)}');event.stopPropagation()">📋 Kopijuoti</button></div>`:""}
     <div class="order-actions" onclick="event.stopPropagation()">
-      ${o.status==="pending"?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Apmokėti užsakymą</button><button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button><div class="pay-note">Apmokėk bankiniu pavedimu pagal pateiktus rekvizitus. Mokėjimo paskirtis bus sugeneruota atskirai šiam užsakymui.</div>`:o.status==="cancelled"?`<button class="order-cancel-btn" onclick="deleteMyOrder('${o.id}')">🗑️ Pašalinti užsakymą</button>`:""}
+      ${(o.status==="pending" && !o.payment_sent_at)?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Apmokėti užsakymą</button><button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button><div class="pay-note">Apmokėk bankiniu pavedimu pagal pateiktus rekvizitus. Mokėjimo paskirtis sugeneruota atskirai šiam užsakymui.</div>`:`<button class="order-view-btn" onclick="viewMyOrder('${o.id}')">👁️ Peržiūrėti užsakymą</button>${o.payment_sent_at&&o.status==="pending"?`<div class="order-sent-note">✓ Pavedimas pažymėtas kaip išsiųstas. Laukiama administratoriaus patvirtinimo.</div>`:""}`}
     </div>
     <div class="order-detail" id="order-detail-${o.id}" style="display:none">
       <div class="order-items">${(o.order_items||[]).map(x=>`<div class="order-item-row"><span>${escapeHtml(x.product_name)} × ${x.quantity}</span><b>${money(Number(x.unit_price)*Number(x.quantity))}</b></div>`).join("")}</div>
@@ -1376,7 +1467,7 @@ async function loadMyOrders(){
        <div class="order-info-box"><small>ADRESAS</small><b>${escapeHtml(o.address||"—")}, ${escapeHtml(o.city||"")}</b></div>
        <div class="order-info-box"><small>EL. PAŠTAS</small><b>${escapeHtml(o.email||"—")}</b></div>
        <div class="order-info-box"><small>TELEFONAS</small><b>${escapeHtml(o.phone||"—")}</b></div>
-       <div class="order-info-box"><small>SIUNTIMO NUMERIS</small><b>${escapeHtml(o.tracking_number||"Dar nepriskirtas")}</b></div><div class="order-info-box"><small>APMOKĖJIMAS</small><b>${o.payment_sent_at?"Pavedimas pažymėtas kaip išsiųstas":"Laukia pavedimo"}</b></div>
+       <div class="order-info-box"><small>SIUNTIMO NUMERIS</small><b>${escapeHtml(o.tracking_number||"Dar nepriskirtas")}</b></div><div class="order-info-box"><small>APMOKĖJIMAS</small><b>${o.payment_sent_at?"Pavedimas išsiųstas • laukia patvirtinimo":(o.status==="cancelled"?"Mokėjimo laikas baigėsi":"Laukia pavedimo")}</b></div>
       </div>
     </div>
    </div>`).join("");
