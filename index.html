@@ -336,7 +336,7 @@ body.auth-locked{overflow:hidden}
 <div class="bubble">Sveiki! 👋 Kaip galime padėti?</div>
 <div class="bubble">Pasirinkite dažną klausimą arba parašykite savo klausimą. Žinutė bus išsaugota ir matoma administratoriui.</div>
 </div>
-<div class="quick"><button onclick="quick('Kur mano užsakymas?')">📦 Kur mano užsakymas?</button><button onclick="quick('Kokia tai prekė?')">🛍️ Kokia tai prekė?</button><button onclick="quick('Kiek kainuoja pristatymas?')">🚚 Pristatymas</button><button onclick="quick('Kaip galiu apmokėti užsakymą?')">💳 Apmokėjimas</button><button onclick="quick('Kaip panaudoti nuolaidos kuponą?')">🎟️ Kuponas</button><button onclick="quick('Noriu susisiekti su administratoriumi.')">👤 Administratorius</button></div>
+
 <div class="chat-input"><input id="msg" placeholder="Parašykite žinutę..."><button onclick="send()">Siųsti</button></div></div>
 
 
@@ -348,6 +348,7 @@ body.auth-locked{overflow:hidden}
    <button class="admin-tab" onclick="adminTab('products',this)">📦 Prekės</button>
    <button class="admin-tab" onclick="adminTab('categories',this)">🏷️ Kategorijos</button>
    <button class="admin-tab" onclick="adminTab('coupons',this)">🎟️ Kuponai</button>
+   <button class="admin-tab" onclick="adminTab('bulk',this)">🛍️ Kiekio akcijos</button>
     <button class="admin-tab" onclick="adminTab('orders',this)">🧾 Užsakymai</button>
    <button class="admin-tab" onclick="adminTab('chat',this)">💬 Klientų chat</button>
   </div>
@@ -407,6 +408,18 @@ body.auth-locked{overflow:hidden}
    <div class="admin-actions" style="margin:12px 0 10px"><button class="admin-secondary" onclick="loadAdminCoupons()">↻ Atnaujinti</button></div>
    <div class="admin-list" id="adminCouponList"><div class="admin-empty">Kraunama...</div></div>
   </section>
+  <section class="admin-section" id="admin-bulk">
+   <div class="admin-note"><b>🛍️ Kiekio akcijos</b><br>Čia nustatai automatinę nuolaidą pagal bendrą prekių kiekį krepšelyje. Pvz. 2+ prekės → 5 %, 3+ → 10 %, 5+ → 15 %.</div>
+   <div class="admin-form">
+    <input type="hidden" id="bulkEditId">
+    <div class="admin-field"><label>NUO KIEK PREKIŲ</label><input id="bulkMinItems" type="number" min="1" step="1" placeholder="2"></div>
+    <div class="admin-field"><label>NUOLAIDA (%)</label><input id="bulkDiscount" type="number" min="0" max="100" step="0.1" placeholder="5"></div>
+    <div class="admin-field"><label>AKTYVI</label><select id="bulkActive"><option value="true">Taip</option><option value="false">Ne</option></select></div>
+    <div class="admin-actions full"><button class="admin-primary" onclick="saveBulkDiscount()">💾 Išsaugoti akciją</button><button class="admin-secondary" onclick="clearBulkDiscountForm()">Išvalyti</button></div>
+   </div>
+   <div class="admin-actions" style="margin-bottom:10px"><button class="admin-secondary" onclick="loadAdminBulkDiscounts()">↻ Atnaujinti</button></div>
+   <div class="admin-list" id="adminBulkList"><div class="admin-empty">Kraunama...</div></div>
+  </section>
   <section class="admin-section" id="admin-orders">
    <div class="admin-order-stats" id="adminOrderStats"></div>
    <div class="admin-actions" style="margin-bottom:10px"><button class="admin-secondary" onclick="loadAdminOrders()">↻ Atnaujinti užsakymus</button></div>
@@ -435,7 +448,7 @@ body.auth-locked{overflow:hidden}
 <div class="drawer-head"><div><h2>🛒 Krepšelis</h2><small style="color:#718096;font-size:9px">Tavo pasirinktos prekės</small></div><button class="close" onclick="closeCart()">✕</button></div>
 <div id="items"></div>
 <div class="coupon-box"><label class="coupon-toggle"><input id="couponToggle" type="checkbox" onchange="toggleCouponBox()"><span>Turiu nuolaidos kodą</span></label><div id="couponForm" class="coupon-hidden"><div class="coupon-row"><input id="couponInput" placeholder="Įrašyk nuolaidos kodą"><button class="admin-primary" onclick="applyCoupon()">Pritaikyti</button></div><div class="coupon-message" id="couponMessage"></div></div></div>
-<div class="cart-summary"><div class="cart-summary-row"><span>Tarpinė suma</span><strong id="subtotal">0.00 €</strong></div><div class="cart-summary-row"><span>Nuolaida</span><strong id="discountTotal">− 0.00 €</strong></div><div class="cart-summary-total"><span>Iš viso</span><b id="total">0.00 €</b></div><div id="couponApplied"></div></div>
+<div class="cart-summary"><div class="cart-summary-row"><span>Tarpinė suma</span><strong id="subtotal">0.00 €</strong></div><div class="cart-summary-row"><span>Kupono nuolaida</span><strong id="discountTotal">− 0.00 €</strong></div><div class="cart-summary-row" id="bulkDiscountRow" style="display:none"><span id="bulkDiscountLabel">Kiekio akcija</span><strong id="bulkDiscountTotal">− 0.00 €</strong></div><div class="cart-summary-total"><span>Iš viso</span><b id="total">0.00 €</b></div><div id="couponApplied"></div></div>
 <button class="checkout" style="margin-top:14px" onclick="openCheckout()">TĘSTI Į UŽSAKYMO FORMĄ →</button>
 </aside></div>
 
@@ -491,7 +504,7 @@ body.auth-locked{overflow:hidden}
      <h3>🛒 Užsakymo santrauka</h3>
      <div id="checkoutSummaryList" class="checkout-summary-list"></div>
      <div class="cart-summary-row"><span>Prekės</span><strong id="coSubtotal">0.00 €</strong></div>
-     <div class="cart-summary-row"><span>Nuolaida</span><strong id="coDiscount">− 0.00 €</strong></div>
+     <div class="cart-summary-row"><span>Kupono nuolaida</span><strong id="coDiscount">− 0.00 €</strong></div><div class="cart-summary-row" id="coBulkDiscountRow" style="display:none"><span id="coBulkDiscountLabel">Kiekio akcija</span><strong id="coBulkDiscount">− 0.00 €</strong></div>
      <div class="cart-summary-row"><span>Pristatymas</span><strong id="coShipping">2.40 €</strong></div>
      <div class="checkout-total"><span>Iš viso</span><b id="coTotal">0.00 €</b></div>
      <div id="checkoutError" class="checkout-error"></div>
@@ -516,14 +529,14 @@ const supabaseClient = window.supabase.createClient(
 let chatUser=null,chatThread=null,chatChannel=null,chatReady=false;const renderedMessageIds=new Set();
 async function ensureChatUser(){if(chatUser)return chatUser;const {data,error}=await supabaseClient.auth.getSession();if(error)throw error;if(!data.session?.user)throw new Error("Reikia prisijungti prie paskyros.");chatUser=data.session.user;return chatUser}
 function setChatStatus(text,online=false){const s=document.querySelector(".chat-head small");if(s){s.textContent="● "+text;s.style.color=online?"#20e5a0":"#f0b44d"}}
-async function ensureChatThread(){const user=await ensureChatUser();const {data,error}=await supabaseClient.from("chat_sessions").select("*").eq("user_id",user.id).order("created_at",{ascending:false}).limit(1).maybeSingle();if(error)throw error;const expired=data&&data.status==="open"&&data.last_activity&&Date.now()-new Date(data.last_activity).getTime()>86400000;if(data&&data.status==="open"&&!expired){chatThread=data;return data}if(data&&data.status==="solved"&&!data.rating&&data.solved_at&&Date.now()-new Date(data.solved_at).getTime()<=86400000){chatThread=data;return data}if(data&&(data.status==="open"||data.status==="solved")&&(expired||(data.status==="solved"&&data.solved_at&&Date.now()-new Date(data.solved_at).getTime()>86400000)))await supabaseClient.from("chat_sessions").update({status:"closed",closed_at:new Date().toISOString()}).eq("id",data.id);const thread={user_id:user.id,user_email:user.email||"",thread_id:crypto.randomUUID(),status:"open"};const ins=await supabaseClient.from("chat_sessions").insert(thread).select("*").single();if(ins.error)throw ins.error;chatThread=ins.data;return ins.data}
-async function loadChatMessages(){await ensureChatThread();const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",chatThread.thread_id).order("created_at",{ascending:true});if(error)throw error;const body=document.getElementById("chatBody");body.innerHTML="";(data||[]).forEach(renderChatMessage);if(chatThread.status==="solved"&&!chatThread.rating){showChatRating();return}if(!data?.length){bubble("Sveiki! 👋 Kaip galime padėti?");bubble("Parašykite savo klausimą — žinutė bus perduota administratoriui.")} }
+async function ensureChatThread(){const user=await ensureChatUser();const {data,error}=await supabaseClient.from("chat_sessions").select("*").eq("user_id",user.id).order("created_at",{ascending:false}).limit(1).maybeSingle();if(error)throw error;const expired=data&&data.status==="open"&&data.last_activity&&Date.now()-new Date(data.last_activity).getTime()>86400000;if(data&&data.status==="open"&&!expired){chatThread=data;return data}if(data&&data.status==="solved"&&!data.rating){chatThread=data;return data}if(data&&(data.status==="open"||data.status==="solved")&&(expired||(data.status==="solved"&&data.solved_at&&Date.now()-new Date(data.solved_at).getTime()>86400000)))await supabaseClient.from("chat_sessions").update({status:"closed",closed_at:new Date().toISOString()}).eq("id",data.id);const thread={user_id:user.id,user_email:user.email||"",thread_id:crypto.randomUUID(),status:"open",last_activity:new Date().toISOString()};const ins=await supabaseClient.from("chat_sessions").insert(thread).select("*").single();if(ins.error)throw ins.error;chatThread=ins.data;return ins.data}
+async function loadChatMessages(){await ensureChatThread();const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",chatThread.thread_id).order("created_at",{ascending:true});if(error)throw error;const body=document.getElementById("chatBody");body.innerHTML="";renderedMessageIds.clear();(data||[]).forEach(renderChatMessage);if(chatThread.status==="solved"&&!chatThread.rating){showChatRating();return}if(!data?.length){bubble("Sveiki! 👋 Kaip galime padėti?");bubble("Parašykite savo klausimą — žinutė bus perduota administratoriui.")}}
 function renderChatMessage(row){if(!row||renderedMessageIds.has(row.id))return;renderedMessageIds.add(row.id);bubble(row.message,row.sender==="customer"?"user":"")}
-function subscribeToChat(){if(chatChannel||!chatThread)return;chatChannel=supabaseClient.channel("customer-live-"+chatThread.thread_id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"session_id=eq."+chatThread.thread_id},p=>renderChatMessage(p.new)).on("postgres_changes",{event:"UPDATE",schema:"public",table:"chat_sessions",filter:"id=eq."+chatThread.id},async p=>{chatThread=p.new;if(p.new.status==="solved"&&!p.new.rating){showChatRating()}else if(p.new.status==="open"){await loadChatMessages()}}).subscribe(st=>{if(st==="SUBSCRIBED"){chatReady=true;setChatStatus("Administratorius prisijungęs • LIVE",true)}})}
+function subscribeToChat(){if(chatChannel||!chatThread)return;chatChannel=supabaseClient.channel("customer-live-"+chatThread.thread_id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"session_id=eq."+chatThread.thread_id},p=>renderChatMessage(p.new)).on("postgres_changes",{event:"UPDATE",schema:"public",table:"chat_sessions",filter:"id=eq."+chatThread.id},p=>{chatThread=p.new;if(p.new.status==="solved"&&!p.new.rating)showChatRating()}).subscribe(st=>{if(st==="SUBSCRIBED"){chatReady=true;setChatStatus("Administratorius prisijungęs • LIVE",true)}})}
 async function initChat(){if(chatReady)return;setChatStatus("Jungiamasi...");try{await ensureChatUser();await ensureChatThread();await loadChatMessages();subscribeToChat()}catch(e){console.error(e);setChatStatus("Nepavyko prisijungti");bubble("Nepavyko prisijungti prie pokalbio. Pabandykite perkrauti puslapį.")}}
-async function sendChatMessage(text){const message=String(text||"").trim();if(!message)return;try{await initChat();if(!chatThread)return;if(chatThread.status==="solved"){const reopened=await supabaseClient.from("chat_sessions").update({status:"open",solved_at:null,last_activity:new Date().toISOString()}).eq("id",chatThread.id).select("*").single();if(reopened.error)throw reopened.error;chatThread=reopened.data;document.getElementById("chatBody").innerHTML=""}const {error}=await supabaseClient.from("messages").insert({session_id:chatThread.thread_id,sender:"customer",message});if(error)throw error;await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("id",chatThread.id)}catch(e){console.error(e);bubble("Žinutės išsiųsti nepavyko. Pabandykite dar kartą.")}}
-async function solveChat(){if(!chatThread)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("id",chatThread.id);if(r.error)return alert("Nepavyko uždaryti pokalbio.");showChatRating()}
-function showChatRating(){const body=document.getElementById("chatBody");body.innerHTML=`<div class="chat-solved"><b>✓ Pokalbis uždarytas</b><p>Jeigu nori, dabar gali įvertinti administratoriaus pagalbą nuo 1 iki 5 ⭐</p><div class="rating-stars">${[1,2,3,4,5].map(n=>`<button id="ratingStar${n}" onclick="selectChatRating(${n})">☆</button>`).join("")}</div><input id="ratingText" placeholder="Komentaras (nebūtina)"><button class="chat-rate-submit" onclick="rateChat()">⭐ Pateikti įvertinimą</button><button class="chat-rate-submit" style="margin-top:6px;border-color:#33465f;background:#0d1726" onclick="closeChatWithoutRating()">Įvertinsiu vėliau</button></div>`;window.selectedChatRating=0}
+async function sendChatMessage(text){const message=String(text||"").trim();if(!message)return;try{await initChat();if(!chatThread)return;if(chatThread.status==="solved"){showChatRating();return}const {error}=await supabaseClient.from("messages").insert({session_id:chatThread.thread_id,sender:"customer",message});if(error)throw error;await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("id",chatThread.id)}catch(e){console.error(e);bubble("Žinutės išsiųsti nepavyko. Pabandykite dar kartą.")}}
+async function solveChat(){if(!chatThread)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("id",chatThread.id).eq("status","open");if(r.error)return alert("Nepavyko uždaryti pokalbio.");chatThread={...chatThread,status:"solved"};showChatRating()}
+function showChatRating(){const body=document.getElementById("chatBody");body.innerHTML=`<div class="chat-solved"><b>✓ Pokalbis uždarytas</b><p>Jeigu nori, gali įvertinti administratoriaus pagalbą nuo 1 iki 5 ⭐</p><div class="rating-stars">${[1,2,3,4,5].map(n=>`<button id="ratingStar${n}" onclick="selectChatRating(${n})">☆</button>`).join("")}</div><input id="ratingText" placeholder="Komentaras (nebūtina)"><button class="chat-rate-submit" onclick="rateChat()">⭐ Pateikti įvertinimą</button><button class="chat-rate-submit" style="margin-top:6px;border-color:#33465f;background:#0d1726" onclick="closeChatWithoutRating()">Uždaryti</button></div>`;window.selectedChatRating=0}
 function selectChatRating(star){window.selectedChatRating=star;for(let i=1;i<=5;i++){const b=document.getElementById("ratingStar"+i);if(b)b.textContent=i<=star?"★":"☆"}}
 function closeChatWithoutRating(){document.getElementById("chat").classList.remove("open")}
 async function rateChat(){const star=Number(window.selectedChatRating||0);if(!chatThread)return;if(!star)return alert("Pirmiausia pasirink 1–5 žvaigždutes.");const comment=document.getElementById("ratingText")?.value.trim()||null;const {error}=await supabaseClient.from("chat_sessions").update({rating:star,rating_comment:comment,rated_at:new Date().toISOString(),status:"rated",closed_at:new Date().toISOString()}).eq("id",chatThread.id);if(error)return alert("Nepavyko išsaugoti įvertinimo.");if(chatChannel){supabaseClient.removeChannel(chatChannel);chatChannel=null}chatReady=false;chatThread=null;renderedMessageIds.clear();window.selectedChatRating=0;document.getElementById("chat").classList.remove("open");toast("✓ Ačiū už įvertinimą!")}
@@ -675,17 +688,17 @@ async function checkAdmin(user){
   if(btn) btn.style.display=isAdmin?"block":"none";
   return isAdmin;
 }
-async function initAdmin(user){await checkAdmin(user);await loadCategories();await loadStoreProducts();if(isAdmin)subscribeAdminChat();}
+async function initAdmin(user){await checkAdmin(user);await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();if(isAdmin)subscribeAdminChat();}
 async function openAdmin(){
   if(!isAdmin)return alert("Neturite administratoriaus teisių.");
   document.getElementById("adminPanel").classList.add("open");
-  await loadAdminStats();await loadCategories();await loadAdminProducts();await loadAdminCoupons();await loadAdminOrders();subscribeAdminOrders();await loadAdminChats();
+  await loadAdminStats();await loadCategories();await loadAdminProducts();await loadAdminCoupons();await loadAdminBulkDiscounts();await loadAdminOrders();subscribeAdminOrders();await loadAdminChats();
 }
 function closeAdmin(){document.getElementById("adminPanel").classList.remove("open")}
 function adminTab(name,btn){
   document.querySelectorAll(".admin-tab").forEach(x=>x.classList.remove("active"));
   document.querySelectorAll(".admin-section").forEach(x=>x.classList.remove("active"));
-  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();
+  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="bulk")loadAdminBulkDiscounts();
 }
 async function loadAdminStats(){
   const p=await supabaseClient.from("products").select("id",{count:"exact",head:true});
@@ -699,6 +712,41 @@ async function loadAdminStats(){
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 function money(v){return Number(v||0).toFixed(2)+" €"}
 function salePrice(p){const d=Math.min(100,Math.max(0,Number(p.discount_percent||0)));return Number(p.price||0)*(1-d/100)}
+let bulkDiscountRules=[];
+async function loadBulkDiscountRules(){
+  const {data,error}=await supabaseClient.from("bulk_discounts").select("*").eq("active",true).order("min_items",{ascending:true});
+  if(error){console.error("Bulk discounts:",error);bulkDiscountRules=[];return}
+  bulkDiscountRules=data||[];
+}
+function getBulkDiscountInfo(){
+  const count=cart.reduce((n,x)=>n+Number(x.qty||0),0);
+  let rule=null;
+  for(const r of bulkDiscountRules){if(Number(r.min_items)<=count && (!rule||Number(r.min_items)>Number(rule.min_items)))rule=r}
+  const subtotal=cart.reduce((a,b)=>a+b.price*b.qty,0);
+  const pct=rule?Number(rule.discount_percent||0):0;
+  return {count,rule,pct,amount:subtotal*pct/100};
+}
+async function loadAdminBulkDiscounts(){
+  const list=document.getElementById("adminBulkList");if(!list||!isAdmin)return;
+  const {data,error}=await supabaseClient.from("bulk_discounts").select("*").order("min_items",{ascending:true});
+  if(error){list.innerHTML='<div class="admin-empty">Nepavyko įkelti kiekio akcijų. Paleisk bulk akcijų SQL.</div>';return}
+  list.innerHTML=data?.length?data.map(r=>`<div class="admin-product"><div class="admin-product-info"><b>${Number(r.min_items)}+ prekės → −${Number(r.discount_percent)}%</b><small>${r.active?"🟢 Aktyvi":"🔴 Išjungta"}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editBulkDiscount(${JSON.stringify(r).replace(/'/g,"&#39;")})'>✏️ Koreguoti</button><button class="admin-secondary ${r.active?"orange":"green"}" onclick="toggleBulkDiscount('${r.id}',${!r.active})">${r.active?"🔴 Išjungti":"🟢 Įjungti"}</button><button class="admin-danger" onclick="deleteBulkDiscount('${r.id}')">🗑️ Ištrinti</button></div></div>`).join(""):'<div class="admin-empty">Dar nėra kiekio akcijų.</div>';
+}
+function editBulkDiscount(r){document.getElementById("bulkEditId").value=r.id||"";document.getElementById("bulkMinItems").value=r.min_items??"";document.getElementById("bulkDiscount").value=r.discount_percent??"";document.getElementById("bulkActive").value=String(r.active!==false)}
+function clearBulkDiscountForm(){document.getElementById("bulkEditId").value="";document.getElementById("bulkMinItems").value="";document.getElementById("bulkDiscount").value="";document.getElementById("bulkActive").value="true"}
+async function saveBulkDiscount(){
+  if(!isAdmin)return alert("Neturite administratoriaus teisių.");
+  const id=document.getElementById("bulkEditId").value;const min=Math.floor(Number(document.getElementById("bulkMinItems").value));const pct=Number(document.getElementById("bulkDiscount").value);const active=document.getElementById("bulkActive").value==="true";
+  if(!Number.isInteger(min)||min<1)return alert("Nuo kiek prekių turi būti bent 1.");
+  if(!Number.isFinite(pct)||pct<0||pct>100)return alert("Nuolaida turi būti nuo 0 iki 100%.");
+  const payload={min_items:min,discount_percent:pct,active};
+  const result=id?await supabaseClient.from("bulk_discounts").update(payload).eq("id",id):await supabaseClient.from("bulk_discounts").insert(payload);
+  if(result.error)return alert("Nepavyko išsaugoti kiekio akcijos. Patikrink bulk akcijų SQL.");
+  clearBulkDiscountForm();await loadAdminBulkDiscounts();await loadBulkDiscountRules();renderCart();toast("✓ Kiekio akcija išsaugota");
+}
+async function toggleBulkDiscount(id,active){if(!isAdmin)return;const {error}=await supabaseClient.from("bulk_discounts").update({active}).eq("id",id);if(error)return alert("Nepavyko pakeisti akcijos.");await loadAdminBulkDiscounts();await loadBulkDiscountRules();renderCart()}
+async function deleteBulkDiscount(id){if(!isAdmin||!confirm("Ar tikrai ištrinti šią kiekio akciją?"))return;const {error}=await supabaseClient.from("bulk_discounts").delete().eq("id",id);if(error)return alert("Nepavyko ištrinti akcijos.");await loadAdminBulkDiscounts();await loadBulkDiscountRules();renderCart()}
+
 async function loadCategories(){
   const {data,error}=await supabaseClient.from("categories").select("*").eq("active",true).order("sort_order",{ascending:true}).order("name",{ascending:true});
   if(error){console.error(error);return}
@@ -861,13 +909,13 @@ let adminChatSessionId=null,adminChatRows=[],adminChatChannel=null,adminChatNoti
 function showAdminNotification(row){if(!isAdmin||row?.sender!=="customer")return;adminChatNotificationSession=row.session_id;const n=document.getElementById("adminChatNotification");document.getElementById("adminChatNotificationTitle")?.replaceChildren(document.createTextNode("💬 Nauja kliento žinutė"));const x=document.getElementById("adminChatNotificationText");if(x)x.textContent=(row.message||"").slice(0,90);n?.classList.add("show");adminUnreadChats.add(row.session_id);refreshAdminChatUsers();if("Notification"in window&&Notification.permission==="granted")new Notification("LT Parduotuvė — nauja žinutė",{body:row.message||"Klientas parašė."})}
 function hideAdminNotification(){document.getElementById("adminChatNotification")?.classList.remove("show")}
 function openAdminFromNotification(){const sid=adminChatNotificationSession;hideAdminNotification();document.getElementById("adminPanel")?.classList.add("open");const tab=[...document.querySelectorAll(".admin-tab")].find(x=>x.textContent.includes("Klientų chat"));if(tab)adminTab("chat",tab);if(sid)openAdminChat(sid)}
-async function loadAdminChats(){if(!isAdmin)return;const {data,error}=await supabaseClient.from("chat_sessions").select("*").order("created_at",{ascending:false});if(error){console.error(error);return}window.adminChatSessions=Object.fromEntries((data||[]).map(x=>[x.thread_id,x]));const active=(data||[]).filter(x=>x.status==="open");const users=document.getElementById("adminChatUsers");if(!users)return;users.innerHTML=active.length?active.map(x=>`<div class="admin-chat-user ${x.thread_id===adminChatSessionId?"active":""}" onclick="openAdminChat('${x.thread_id}')"><b>${escapeHtml(x.user_email||x.user_id.slice(0,8)+"…")}</b><small>${x.status.toUpperCase()} • ${formatDate(x.last_activity||x.created_at)}</small></div>`).join(""):'<div class="admin-empty">Aktyvių klientų chatų nėra.</div>';subscribeAdminChat();}
-async function openAdminChat(sid){adminChatSessionId=sid;adminUnreadChats.delete(sid);refreshAdminChatUsers();const session=window.adminChatSessions?.[sid];const title=document.getElementById("adminChatTitle");if(title)title.innerHTML=`💬 ${escapeHtml(session?.user_email||"Klientas")} <button class="admin-secondary" style="float:right;margin-left:6px" onclick="solveAdminChat('${sid}')">✓ Uždaryti ir įvertinti</button><button class="admin-danger" style="float:right" onclick="deleteAdminChat('${sid}')">🗑️ Ištrinti chatą</button>`;const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",sid).order("created_at",{ascending:true});if(error){console.error(error);return}const body=document.getElementById("adminChatBody");body.innerHTML=(data||[]).map(m=>`<div class="admin-chat-bubble ${m.sender==="admin"?"admin":""}">${escapeHtml(m.message)}<span class="admin-chat-time">${m.sender==="admin"?"Administratorius":"Klientas"} • ${formatDate(m.created_at)}</span></div>`).join("")||'<div class="admin-empty">Žinučių nėra.</div>';body.scrollTop=body.scrollHeight}
-async function solveAdminChat(sid){if(!isAdmin||!sid)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("thread_id",sid).eq("status","open");if(r.error)return alert("Nepavyko uždaryti pokalbio.");await loadAdminChats();const title=document.getElementById("adminChatTitle");if(title)title.innerHTML="💬 Pokalbis uždarytas — klientui parodytas įvertinimas.";const body=document.getElementById("adminChatBody");if(body)body.insertAdjacentHTML("beforeend",'<div class="admin-note" style="margin-top:10px">✓ Pokalbis uždarytas. Klientui dabar rodomas 1–5 ⭐ įvertinimas.</div>')}
+async function loadAdminChats(){if(!isAdmin)return;const {data,error}=await supabaseClient.from("chat_sessions").select("*").order("created_at",{ascending:false});if(error){console.error(error);return}window.adminChatSessions=Object.fromEntries((data||[]).map(x=>[x.thread_id,x]));const active=(data||[]).filter(x=>x.status==="open");const users=document.getElementById("adminChatUsers");if(!users)return;users.innerHTML=active.length?active.map(x=>`<div class="admin-chat-user ${x.thread_id===adminChatSessionId?"active":""} ${adminUnreadChats.has(x.thread_id)?"unread":""}" onclick="openAdminChat('${x.thread_id}')"><b>${escapeHtml(x.user_email||x.user_id.slice(0,8)+"…")}</b>${adminUnreadChats.has(x.thread_id)?'<span class="unread-dot">●</span>':''}<small>${x.status.toUpperCase()} • ${formatDate(x.last_activity||x.created_at)}</small></div>`).join(""):'<div class="admin-empty">Aktyvių klientų chatų nėra.</div>';subscribeAdminChat()}
+async function openAdminChat(sid){adminChatSessionId=sid;adminUnreadChats.delete(sid);const session=window.adminChatSessions?.[sid];const title=document.getElementById("adminChatTitle");if(title)title.innerHTML=`💬 ${escapeHtml(session?.user_email||"Klientas")} <button class="admin-secondary" style="float:right;margin-left:6px" onclick="solveAdminChat('${sid}')">✓ Uždaryti chatą</button><button class="admin-danger" style="float:right" onclick="deleteAdminChat('${sid}')">🗑️ Ištrinti chatą</button>`;const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",sid).order("created_at",{ascending:true});if(error){console.error(error);return}const body=document.getElementById("adminChatBody");body.innerHTML=(data||[]).map(m=>`<div class="admin-chat-bubble ${m.sender==="admin"?"admin":""}">${escapeHtml(m.message)}<span class="admin-chat-time">${m.sender==="admin"?"Administratorius":"Klientas"} • ${formatDate(m.created_at)}</span></div>`).join("")||'<div class="admin-empty">Žinučių nėra.</div>';body.scrollTop=body.scrollHeight;loadAdminChats()}
+async function solveAdminChat(sid){if(!isAdmin||!sid)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("thread_id",sid).eq("status","open");if(r.error)return alert("Nepavyko uždaryti pokalbio.");adminChatSessionId=null;await loadAdminChats();const title=document.getElementById("adminChatTitle");if(title)title.textContent="💬 Pokalbis uždarytas — klientui parodytas įvertinimas.";const body=document.getElementById("adminChatBody");if(body)body.innerHTML='<div class="admin-note">✓ Pokalbis uždarytas. Klientui parodytas įvertinimas. Jis gali pradėti naują pokalbį po įvertinimo.</div>'}
 function refreshAdminChatUsers(){loadAdminChats()}
-function subscribeAdminChat(){if(adminChatChannel||!isAdmin)return;adminChatChannel=supabaseClient.channel("admin-live-chat-v2").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},async p=>{if(p.new?.sender!=="customer")return;showAdminNotification(p.new);if(adminChatSessionId===p.new.session_id)openAdminChat(p.new.session_id);else loadAdminChats()}).subscribe(()=>{});if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().catch(()=>{})}
-async function sendAdminChat(){if(!isAdmin||!adminChatSessionId)return alert("Pasirink klientą.");const input=document.getElementById("adminChatInput"),message=input.value.trim();if(!message)return;const {error}=await supabaseClient.from("messages").insert({session_id:adminChatSessionId,sender:"admin",message});if(error)return alert("Nepavyko išsiųsti atsakymo. Patikrink RLS SQL.");input.value="";await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("thread_id",adminChatSessionId);await openAdminChat(adminChatSessionId)}
-async function deleteAdminChat(sid){if(!isAdmin||!confirm("Ištrinti šį chatą visam laikui?"))return;const r=await supabaseClient.from("messages").delete().eq("session_id",sid);if(r.error)return alert("Nepavyko ištrinti žinučių.");const s=await supabaseClient.from("chat_sessions").delete().eq("thread_id",sid);if(s.error)return alert("Nepavyko ištrinti chat sesijos.");adminChatSessionId=null;await loadAdminChats();document.getElementById("adminChatTitle").textContent="💬 Pasirink klientą";document.getElementById("adminChatBody").innerHTML='<div class="admin-empty">Chat ištrintas.</div>'}
+function subscribeAdminChat(){if(adminChatChannel||!isAdmin)return;adminChatChannel=supabaseClient.channel("admin-live-chat-v3").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},async p=>{if(p.new?.sender!=="customer")return;showAdminNotification(p.new);await loadAdminChats();if(adminChatSessionId===p.new.session_id)await openAdminChat(p.new.session_id)}).subscribe(()=>{});if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().catch(()=>{})}
+async function sendAdminChat(){if(!isAdmin||!adminChatSessionId)return alert("Pasirink klientą.");const session=window.adminChatSessions?.[adminChatSessionId];if(!session||session.status!=="open")return alert("Šis pokalbis jau uždarytas.");const input=document.getElementById("adminChatInput"),message=input.value.trim();if(!message)return;const {error}=await supabaseClient.from("messages").insert({session_id:adminChatSessionId,sender:"admin",message});if(error)return alert("Nepavyko išsiųsti atsakymo. Patikrink RLS SQL.");input.value="";await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("thread_id",adminChatSessionId);await openAdminChat(adminChatSessionId)}
+async function deleteAdminChat(sid){if(!isAdmin||!confirm("Ištrinti šį chatą visam laikui?"))return;const r=await supabaseClient.from("messages").delete().eq("session_id",sid);if(r.error)return alert("Nepavyko ištrinti žinučių.");const ss=await supabaseClient.from("chat_sessions").delete().eq("thread_id",sid);if(ss.error)return alert("Nepavyko ištrinti chat sesijos.");adminChatSessionId=null;await loadAdminChats();document.getElementById("adminChatTitle").textContent="💬 Pasirink klientą";document.getElementById("adminChatBody").innerHTML='<div class="admin-empty">Chat ištrintas.</div>'}
 
 async function loadAdminCoupons(){
   const list=document.getElementById("adminCouponList");if(!list)return;list.innerHTML='<div class="admin-empty">Kraunama...</div>';
@@ -925,12 +973,20 @@ async function cancelMyOrder(orderId){
   if(!confirm("Ar tikrai nori atšaukti šį užsakymą?")) return;
   const {data,error}=await supabaseClient.from("orders").select("id,status").eq("id",orderId).maybeSingle();
   if(error||!data)return alert("Nepavyko rasti užsakymo.");
-  // Klientas gali atšaukti tik neapmokėtą užsakymą.
   if(data.status!=="pending")return alert("Šio užsakymo atšaukti nebegalima, nes jis jau apmokėtas arba pradėtas vykdyti.");
-  const result=await supabaseClient.from("orders").update({status:"cancelled"}).eq("id",orderId).eq("status","pending");
+  const result=await supabaseClient.from("orders").update({status:"cancelled",updated_at:new Date().toISOString()}).eq("id",orderId).eq("status","pending");
   if(result.error)return alert("Nepavyko atšaukti užsakymo.");
   await loadMyOrders();
-  toast("✓ Užsakymas atšauktas");
+  toast("✓ Užsakymas pažymėtas kaip atšauktas");
+}
+async function deleteMyOrder(orderId){
+  if(!confirm("Pašalinti šį atšauktą užsakymą iš užsakymų istorijos?"))return;
+  const {data,error}=await supabaseClient.from("orders").select("id,status").eq("id",orderId).maybeSingle();
+  if(error||!data)return alert("Nepavyko rasti užsakymo.");
+  if(data.status!=="cancelled")return alert("Pašalinti galima tik atšauktą užsakymą.");
+  const r=await supabaseClient.from("orders").delete().eq("id",orderId).eq("status","cancelled");
+  if(r.error)return alert("Nepavyko pašalinti užsakymo. Paleisk užsakymų RLS SQL, kad klientas galėtų šalinti tik savo atšauktus užsakymus.");
+  await loadMyOrders();toast("✓ Atšauktas užsakymas pašalintas");
 }
 
 let myOrdersChannel=null;
@@ -965,7 +1021,7 @@ async function loadMyOrders(){
     <div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div>
     ${o.tracking_number?`<div class="tracking-box">📦 <b>Siuntimo numeris:</b> <span>${escapeHtml(o.tracking_number)}</span><button onclick="copyTracking('${escapeHtml(o.tracking_number)}');event.stopPropagation()">📋 Kopijuoti</button></div>`:""}
     <div class="order-actions" onclick="event.stopPropagation()">
-      ${o.status==="pending"?`<button class="order-pay-btn" disabled title="Paysera dar neprijungta">💳 Apmokėti užsakymą</button><button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button><div class="pay-note">Apmokėjimas bus aktyvuotas, kai bus prijungta Paysera.</div>`:""}
+      ${o.status==="pending"?`<button class="order-pay-btn" disabled title="Mokėjimo sistema dar neprijungta">💳 Apmokėti užsakymą</button><button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button><div class="pay-note">Apmokėjimas bus aktyvuotas, kai bus prijungta mokėjimo sistema.</div>`:o.status==="cancelled"?`<button class="order-cancel-btn" onclick="deleteMyOrder('${o.id}')">🗑️ Pašalinti užsakymą</button>`:""}
     </div>
     <div class="order-detail" id="order-detail-${o.id}" style="display:none">
       <div class="order-items">${(o.order_items||[]).map(x=>`<div class="order-item-row"><span>${escapeHtml(x.product_name)} × ${x.quantity}</span><b>${money(Number(x.unit_price)*Number(x.quantity))}</b></div>`).join("")}</div>
@@ -1007,12 +1063,15 @@ function closeCheckout(){document.getElementById("checkoutModal").classList.remo
 function renderCheckoutSummary(){
   const subtotal=cart.reduce((a,b)=>a+b.price*b.qty,0);
   const pct=activeCoupon?Number(activeCoupon.discount_percent||0):0;
-  const discount=subtotal*pct/100;
+  const couponDiscount=subtotal*pct/100;
+  const bulk=getBulkDiscountInfo();
   const shipping=selectedShipping().price;
-  const total=subtotal-discount+shipping;
+  const total=Math.max(0,subtotal-couponDiscount-bulk.amount+shipping);
   document.getElementById("checkoutSummaryList").innerHTML=cart.map(x=>`<div class="checkout-summary-item"><span>${escapeHtml(x.name)} × ${x.qty}</span><b>${money(x.price*x.qty)}</b></div>`).join("");
   document.getElementById("coSubtotal").textContent=money(subtotal);
-  document.getElementById("coDiscount").textContent="− "+money(discount);
+  document.getElementById("coDiscount").textContent="− "+money(couponDiscount);
+  const br=document.getElementById("coBulkDiscountRow"),bt=document.getElementById("coBulkDiscount"),bl=document.getElementById("coBulkDiscountLabel");
+  if(br){br.style.display=bulk.amount>0?"flex":"none";if(bt)bt.textContent="− "+money(bulk.amount);if(bl)bl.textContent=bulk.rule?`Kiekio akcija (${bulk.count}+ prekės, −${bulk.pct}%)`:"Kiekio akcija"}
   document.getElementById("coShipping").textContent=money(shipping);
   document.getElementById("coTotal").textContent=money(total);
 }
@@ -1063,15 +1122,18 @@ function removeCoupon(){activeCoupon=null;const input=document.getElementById("c
 function renderCart(){
   const subtotal=cart.reduce((a,b)=>a+b.price*b.qty,0);
   const pct=activeCoupon?Number(activeCoupon.discount_percent||0):0;
-  const discount=subtotal*pct/100;
-  const total=subtotal-discount;
+  const couponDiscount=subtotal*pct/100;
+  const bulk=getBulkDiscountInfo();
+  const total=Math.max(0,subtotal-couponDiscount-bulk.amount);
   const count=cart.reduce((a,b)=>a+b.qty,0);
   document.getElementById("count").textContent=count;
   document.getElementById("items").innerHTML=cart.length?cart.map((x,i)=>`<div class="cart-item"><div><div class="cart-item-name">${escapeHtml(x.name)}</div><div class="cart-item-price">${money(x.price)} / vnt.</div><div class="cart-controls"><button onclick="changeQty(${i},-1)">−</button><span>${x.qty}</span><button onclick="changeQty(${i},1)">+</button><button class="cart-remove" onclick="removeItem(${i})">🗑️ Pašalinti</button></div></div><b>${money(x.price*x.qty)}</b></div>`).join(""):"<p style='color:#718096;margin-top:20px;text-align:center'>🛒 Krepšelis tuščias.</p>";
   document.getElementById("subtotal").textContent=money(subtotal);
-  document.getElementById("discountTotal").textContent="− "+money(discount);
+  document.getElementById("discountTotal").textContent="− "+money(couponDiscount);
+  const br=document.getElementById("bulkDiscountRow"),bt=document.getElementById("bulkDiscountTotal"),bl=document.getElementById("bulkDiscountLabel");
+  if(br){br.style.display=bulk.amount>0?"flex":"none";if(bt)bt.textContent="− "+money(bulk.amount);if(bl)bl.textContent=bulk.rule?`Kiekio akcija (${bulk.count}+ prekės, −${bulk.pct}%)`:"Kiekio akcija"}
   document.getElementById("total").textContent=money(total);
-  const a=document.getElementById("couponApplied");if(a)a.innerHTML=activeCoupon?`<div class="coupon-applied-row"><span>✓ ${escapeHtml(activeCoupon.code)} −${pct}% • sutaupai ${money(discount)}</span><button class="coupon-remove" onclick="removeCoupon()">✕ Panaikinti nuolaidą</button></div>`:"";
+  const a=document.getElementById("couponApplied");if(a)a.innerHTML=activeCoupon?`<div class="coupon-applied-row"><span>✓ ${escapeHtml(activeCoupon.code)} −${pct}% • sutaupai ${money(couponDiscount)}</span><button class="coupon-remove" onclick="removeCoupon()">✕ Panaikinti nuolaidą</button></div>`:"";
   if(document.getElementById("checkoutModal")?.classList.contains("open")) renderCheckoutSummary();
 }
 function openCart(){document.getElementById("cartBg").style.display="block";renderCart()}
@@ -1119,10 +1181,6 @@ function bubble(t,who){
   let b=document.getElementById("chatBody");
   b.appendChild(d);
   b.scrollTop=b.scrollHeight;
-}
-
-function quick(t){
-  sendChatMessage(t);
 }
 
 async function send(){
