@@ -183,6 +183,9 @@ body.auth-locked{overflow:hidden}
 .checkout-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}.checkout-section{background:#0b1421;border:1px solid #263950;border-radius:13px;padding:16px}.checkout-section h3{font-size:12px;margin-bottom:13px}.checkout-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.checkout-field label{display:block;color:#9eabc0;font-size:9px;margin-bottom:5px}.checkout-field input{width:100%;height:40px;background:#08111d;border:1px solid #2b3e5a;color:#fff;border-radius:8px;padding:0 11px;outline:none;font-size:10px}.checkout-field input:focus{border-color:#4c8cff}.checkout-field.full{grid-column:1/-1}.shipping-options{display:grid;gap:8px}.shipping-option{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #293d58;background:#08111d;border-radius:9px;cursor:pointer}.shipping-option:has(input:checked){border-color:#4c8cff;background:#102754}.shipping-option input{accent-color:#4389ff}.shipping-option span{font-size:10px}.shipping-option b{margin-left:auto;font-size:10px;color:#22e5a0}.checkout-summary{position:sticky;top:0}.checkout-summary-list{display:grid;gap:7px;max-height:260px;overflow:auto}.checkout-summary-item{display:flex;justify-content:space-between;gap:8px;font-size:10px;padding:7px 0;border-bottom:1px solid #17263a}.checkout-total{display:flex;justify-content:space-between;padding-top:12px;margin-top:10px;border-top:1px solid #30445f;font-size:12px}.checkout-total b{font-size:21px;color:#22e5a0}.checkout-note{color:#718096;font-size:9px;line-height:1.5;margin-top:12px}.checkout-error{min-height:15px;color:#ff7373;font-size:9px;margin:8px 0}.checkout-submit{width:100%;height:44px;border:1px solid #74a4ff;border-radius:10px;background:linear-gradient(135deg,#3b83ff,#6a4cff);color:#fff;font-weight:800;cursor:pointer}
 .admin-order{display:grid;grid-template-columns:1fr auto;gap:12px;background:#0b1421;border:1px solid #263950;border-radius:11px;padding:13px}.admin-order-info b{font-size:11px}.admin-order-info small{display:block;color:#7d8ca3;font-size:9px;margin-top:4px;line-height:1.5}.admin-order-actions{display:flex;align-items:center;gap:7px}.admin-order-actions select{background:#08111d;color:#fff;border:1px solid #30445f;border-radius:8px;padding:8px;font-size:9px}
 
+
+.free-shipping-box{margin:14px 0 16px;padding:15px 16px;border-radius:15px;background:linear-gradient(135deg,#35d477,#20c968);color:#fff;box-shadow:0 10px 28px #20c96835}.free-shipping-top{display:flex;align-items:center;gap:12px}.free-shipping-icon{font-size:28px;line-height:1}.free-shipping-title{font-size:13px;font-weight:900;line-height:1.25}.free-shipping-sub{font-size:10px;opacity:.95;margin-top:3px}.free-shipping-percent{margin-left:auto;font-size:11px;font-weight:900}.free-shipping-track{height:9px;margin-top:12px;border-radius:999px;background:#ffffff45;overflow:hidden;border:1px solid #ffffff55}.free-shipping-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#ffca28,#ffd95c);box-shadow:0 0 8px #ffe26a99;transition:width .3s ease}.free-shipping-free{font-size:11px;font-weight:900;margin-top:7px}.free-shipping-box.free{background:linear-gradient(135deg,#24c96b,#16b95c)}
+
 /* Didesni langai ir patogesnis skaitymas */
 .drawer h2{font-size:24px}.drawer{padding:28px}.cart-item{font-size:13px;padding:17px 0}.cart-item-name{font-size:15px}.cart-item-price{font-size:12px}.cart-controls button,.coupon-remove{font-size:12px}.checkout{font-size:13px;padding:15px}.coupon-box{font-size:13px}.coupon-row input{height:44px;font-size:13px}.coupon-row button{min-height:44px}
 .orders-card,.checkout-card{font-size:13px}.orders-head,.checkout-head{padding:24px 28px}.orders-head h2,.checkout-head h2{font-size:24px}.orders-body,.checkout-body{padding:28px}.order-card{padding:20px}.order-number{font-size:15px}.order-date{font-size:11px}.order-status{font-size:11px;padding:8px 12px}.order-item-row,.order-info-box{font-size:12px}.checkout-section{padding:22px}.checkout-section h3{font-size:14px}.checkout-field label{font-size:10px}.checkout-field input{height:48px;font-size:13px}.shipping-option{padding:14px}.shipping-option span,.shipping-option b{font-size:12px}.checkout-summary-list{max-height:360px}.checkout-summary-item{font-size:12px}.checkout-total{font-size:14px}.checkout-total b{font-size:25px}.checkout-submit{height:52px;font-size:13px}
@@ -447,6 +450,14 @@ body.auth-locked{overflow:hidden}
 <div id="cartBg" onclick="closeCart()"><aside class="drawer" onclick="event.stopPropagation()">
 <div class="drawer-head"><div><h2>🛒 Krepšelis</h2><small style="color:#718096;font-size:9px">Tavo pasirinktos prekės</small></div><button class="close" onclick="closeCart()">✕</button></div>
 <div id="items"></div>
+<div id="freeShippingBox" class="free-shipping-box">
+ <div class="free-shipping-top">
+  <div class="free-shipping-icon">🚚</div>
+  <div><div id="freeShippingTitle" class="free-shipping-title">Pridėk prekių iki nemokamo pristatymo</div><div id="freeShippingSub" class="free-shipping-sub">Nemokamas pristatymas nuo 30,00 €</div></div>
+  <div id="freeShippingPercent" class="free-shipping-percent">0%</div>
+ </div>
+ <div class="free-shipping-track"><div id="freeShippingFill" class="free-shipping-fill" style="width:0%"></div></div>
+</div>
 <div class="coupon-box"><label class="coupon-toggle"><input id="couponToggle" type="checkbox" onchange="toggleCouponBox()"><span>Turiu nuolaidos kodą</span></label><div id="couponForm" class="coupon-hidden"><div class="coupon-row"><input id="couponInput" placeholder="Įrašyk nuolaidos kodą"><button class="admin-primary" onclick="applyCoupon()">Pritaikyti</button></div><div class="coupon-message" id="couponMessage"></div></div></div>
 <div class="cart-summary"><div class="cart-summary-row"><span>Tarpinė suma</span><strong id="subtotal">0.00 €</strong></div><div class="cart-summary-row"><span>Kupono nuolaida</span><strong id="discountTotal">− 0.00 €</strong></div><div class="cart-summary-row" id="bulkDiscountRow" style="display:none"><span id="bulkDiscountLabel">Kiekio akcija</span><strong id="bulkDiscountTotal">− 0.00 €</strong></div><div class="cart-summary-total"><span>Iš viso</span><b id="total">0.00 €</b></div><div id="couponApplied"></div></div>
 <button class="checkout" style="margin-top:14px" onclick="openCheckout()">TĘSTI Į UŽSAKYMO FORMĄ →</button>
@@ -1037,9 +1048,40 @@ async function loadMyOrders(){
 }
 function toggleOrderDetail(id){const el=document.getElementById("order-detail-"+id);if(el)el.style.display=el.style.display==="none"?"block":"none"}
 
+function cartSubtotal(){return cart.reduce((a,b)=>a+Number(b.price||0)*Number(b.qty||0),0)}
+function freeShippingProgress(){
+  const threshold=30;
+  const subtotal=cartSubtotal();
+  const percent=Math.min(100,Math.max(0,(subtotal/threshold)*100));
+  const remaining=Math.max(0,threshold-subtotal);
+  return {threshold,subtotal,percent,remaining,free:subtotal>=threshold};
+}
+function renderFreeShipping(){
+  const box=document.getElementById("freeShippingBox");
+  if(!box)return;
+  const x=freeShippingProgress();
+  const title=document.getElementById("freeShippingTitle");
+  const sub=document.getElementById("freeShippingSub");
+  const pct=document.getElementById("freeShippingPercent");
+  const fill=document.getElementById("freeShippingFill");
+  if(x.free){
+    box.classList.add("free");
+    if(title)title.textContent="🎉 Jūs gavote nemokamą pristatymą!";
+    if(sub)sub.textContent="Užsakymo prekių suma siekia 30,00 € arba daugiau.";
+    if(pct)pct.textContent="100%";
+    if(fill)fill.style.width="100%";
+  }else{
+    box.classList.remove("free");
+    if(title)title.textContent=`Jūs esate ${money(x.remaining)} nuo nemokamo pristatymo.`;
+    if(sub)sub.textContent="Nemokamas pristatymas nuo 30,00 €";
+    if(pct)pct.textContent=Math.round(x.percent)+"%";
+    if(fill)fill.style.width=x.percent+"%";
+  }
+}
 function selectedShipping(){
   const el=document.querySelector('input[name="shipping"]:checked');
-  return {method:el?.value||"LP EXPRESS",price:Number(el?.dataset.price||2.40)};
+  const base=Number(el?.dataset.price||2.40);
+  return {method:el?.value||"LP EXPRESS",price:freeShippingProgress().free?0:base};
 }
 function openCheckout(){
   if(!cart.length)return alert("Krepšelis tuščias.");
@@ -1062,6 +1104,8 @@ function openCheckout(){
 function closeCheckout(){document.getElementById("checkoutModal").classList.remove("open")}
 function renderCheckoutSummary(){
   const subtotal=cart.reduce((a,b)=>a+b.price*b.qty,0);
+  const free=freeShippingProgress().free;
+  document.querySelectorAll('.shipping-option').forEach(opt=>{const input=opt.querySelector('input');const price=Number(input?.dataset.price||0);const b=opt.querySelector('b');if(b)b.textContent=free?'NEMOKAMAI':money(price)});
   const pct=activeCoupon?Number(activeCoupon.discount_percent||0):0;
   const couponDiscount=subtotal*pct/100;
   const bulk=getBulkDiscountInfo();
@@ -1120,6 +1164,7 @@ function changeQty(i,delta){
 function removeItem(i){cart.splice(i,1);renderCart()}
 function removeCoupon(){activeCoupon=null;const input=document.getElementById("couponInput");if(input)input.value="";setCouponMessage("Nuolaidos kodas panaikintas.",true);renderCart();toast("✓ Nuolaidos kodas panaikintas")}
 function renderCart(){
+  renderFreeShipping();
   const subtotal=cart.reduce((a,b)=>a+b.price*b.qty,0);
   const pct=activeCoupon?Number(activeCoupon.discount_percent||0):0;
   const couponDiscount=subtotal*pct/100;
