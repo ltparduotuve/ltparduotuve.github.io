@@ -500,7 +500,7 @@ body.auth-locked{overflow:hidden}
        <div class="checkout-field"><label>MIESTAS</label><input id="coCity" autocomplete="address-level2"></div>
        <div class="checkout-field"><label>PAŠTO KODAS</label><input id="coPostal" autocomplete="postal-code"></div>
       </div>
-      <label class="save-check"><input id="saveCheckoutData" type="checkbox" onchange="if(!this.checked)localStorage.removeItem('ltparduotuve_checkout')"> <span>💾 Išsaugoti mano duomenis kitam užsakymui</span></label>
+      <label class="save-check"><input id="saveCheckoutData" type="checkbox" onchange="handleCheckoutSaveToggle(this.checked)"> <span>💾 Išsaugoti mano duomenis kitam užsakymui</span></label>
      </div>
      <div class="checkout-section" style="margin-top:12px">
       <h3>🚚 Pristatymas Lietuvoje</h3>
@@ -655,31 +655,73 @@ function toggleUserMenu(){
 }
 
 async function logoutUser(){
-  await supabaseClient.auth.signOut();
-  document.getElementById("userDropdown").classList.remove("open");
+  await logoutAndLock("Atsijungta.");
+}
+
+const AUTH_SESSION_VERSION="2026-09-23-force-logout-1";
+const AUTH_SESSION_MAX_MS=60*60*1000;
+let authExpiryTimer=null;
+let authResetInProgress=false;
+
+function clearAuthExpiry(){
+  if(authExpiryTimer){clearTimeout(authExpiryTimer);authExpiryTimer=null;}
+  localStorage.removeItem("ltparduotuve_auth_started_at");
+}
+
+async function logoutAndLock(message="Sesija baigėsi. Prisijunkite iš naujo."){
+  clearAuthExpiry();
+  chatUser=null;chatThread=null;chatReady=false;
+  if(chatChannel){try{supabaseClient.removeChannel(chatChannel)}catch(e){} chatChannel=null;}
+  try{await supabaseClient.auth.signOut({scope:"local"});}catch(e){console.error(e)}
+  document.getElementById("userDropdown")?.classList.remove("open");
+  document.getElementById("adminPanel")?.classList.remove("open");
   document.getElementById("authGate").style.display="flex";
   document.body.classList.add("auth-locked");
   showAuth("login");
-  document.getElementById("loginMsg").textContent="Atsijungta.";
+  const msg=document.getElementById("loginMsg");if(msg)msg.textContent=message;
+}
+
+function startAuthExpiry(){
+  clearTimeout(authExpiryTimer);
+  let started=Number(localStorage.getItem("ltparduotuve_auth_started_at")||0);
+  if(!started){started=Date.now();localStorage.setItem("ltparduotuve_auth_started_at",String(started));}
+  const left=AUTH_SESSION_MAX_MS-(Date.now()-started);
+  if(left<=0){logoutAndLock();return;}
+  authExpiryTimer=setTimeout(()=>logoutAndLock("Sesija baigėsi po 1 valandos. Prisijunkite iš naujo."),left);
+}
+
+async function forceLogoutOldSessions(){
+  if(authResetInProgress)return false;
+  const seen=localStorage.getItem("ltparduotuve_auth_reset_version");
+  if(seen===AUTH_SESSION_VERSION)return false;
+  authResetInProgress=true;
+  localStorage.setItem("ltparduotuve_auth_reset_version",AUTH_SESSION_VERSION);
+  try{await supabaseClient.auth.signOut({scope:"local"});}catch(e){console.error(e)}
+  clearAuthExpiry();
+  authResetInProgress=false;
+  return true;
 }
 
 async function initAuth(){
+  await forceLogoutOldSessions();
   const {data,error}=await supabaseClient.auth.getSession();
-
-  if(error){
-    console.error("Auth error:",error);
-    return;
-  }
-
+  if(error){console.error("Auth error:",error);return;}
   if(data.session?.user){
     enterStore(data.session.user);
+    startAuthExpiry();
   }else{
     document.getElementById("authGate").style.display="flex";
     document.body.classList.add("auth-locked");
   }
-
   supabaseClient.auth.onAuthStateChange((_event,session)=>{
-    if(session?.user) enterStore(session.user);
+    if(session?.user){
+      enterStore(session.user);
+      startAuthExpiry();
+    }else{
+      clearAuthExpiry();
+      document.getElementById("authGate").style.display="flex";
+      document.body.classList.add("auth-locked");
+    }
   });
 }
 
@@ -1083,20 +1125,31 @@ function selectedShipping(){
   const base=Number(el?.dataset.price||2.40);
   return {method:el?.value||"LP EXPRESS",price:freeShippingProgress().free?0:base};
 }
+function clearCheckoutFields(){
+  ["coFirstName","coLastName","coPhone","coAddress","coCity","coPostal"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+}
+async function handleCheckoutSaveToggle(checked){
+  if(checked)return;
+  localStorage.removeItem("ltparduotuve_checkout");
+  const {data}=await supabaseClient.auth.getUser();
+  if(data?.user?.id){
+    await supabaseClient.from("profiles").update({first_name:null,last_name:null,phone:null,address:null,city:null,postal_code:null,updated_at:new Date().toISOString()}).eq("user_id",data.user.id);
+  }
+  clearCheckoutFields();
+  if(data?.user?.email)document.getElementById("coEmail").value=data.user.email;
+}
 function openCheckout(){
   if(!cart.length)return alert("Krepšelis tuščias.");
   document.getElementById("cartBg").style.display="none";
   document.getElementById("checkoutError").textContent="";
   document.getElementById("checkoutModal").classList.add("open");
+  clearCheckoutFields();
   const saved=JSON.parse(localStorage.getItem("ltparduotuve_checkout")||"null");
   document.getElementById("saveCheckoutData").checked=!!saved;
   supabaseClient.auth.getUser().then(async ({data})=>{
     if(data.user?.email)document.getElementById("coEmail").value=data.user.email;
     if(saved){
       document.getElementById("coFirstName").value=saved.first_name||"";document.getElementById("coLastName").value=saved.last_name||"";document.getElementById("coPhone").value=saved.phone||"";document.getElementById("coAddress").value=saved.address||"";document.getElementById("coCity").value=saved.city||"";document.getElementById("coPostal").value=saved.postal_code||"";
-    } else if(data.user?.id){
-      const {data:profile}=await supabaseClient.from("profiles").select("first_name,last_name,phone,address,city,postal_code").eq("user_id",data.user.id).maybeSingle();
-      if(profile){document.getElementById("coFirstName").value=profile.first_name||"";document.getElementById("coLastName").value=profile.last_name||"";document.getElementById("coPhone").value=profile.phone||"";document.getElementById("coAddress").value=profile.address||"";document.getElementById("coCity").value=profile.city||"";document.getElementById("coPostal").value=profile.postal_code||"";}
     }
   });
   renderCheckoutSummary();
