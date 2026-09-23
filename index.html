@@ -233,6 +233,26 @@ body.auth-locked{overflow:hidden}
 @media(max-width:620px){.payment-top-grid{grid-template-columns:1fr}.bank-pay-screen .bank-pay-body{padding:16px}.bank-pay-actions{flex-direction:column}}
 </style>
 
+
+<style id="payment-progress-fix">
+.payment-progress{display:flex;align-items:center;gap:9px;margin:0 0 20px;padding:0 2px}
+.payment-progress i{height:1px;background:#253346;flex:1;min-width:12px}
+.payment-progress-step{display:flex;align-items:center;gap:7px;color:#56657a;white-space:nowrap}
+.payment-progress-step span{width:21px;height:21px;border-radius:50%;display:grid;place-items:center;background:#0b1420;border:1px solid #26374d;color:#62738a;font-size:9px;font-weight:900}
+.payment-progress-step b{font-size:9px;text-transform:uppercase;letter-spacing:.15px}
+.payment-progress-step.done{color:#39df9a}
+.payment-progress-step.done span{background:#0d3b2b;border-color:#29a976;color:#39df9a}
+.payment-progress-step.active{color:#fff}
+.payment-progress-step.active span{background:#2587ff;border-color:#58a1ff;color:#fff;box-shadow:0 0 18px #2587ff55}
+@media(max-width:700px){
+ .payment-progress{gap:4px}
+ .payment-progress i{min-width:5px}
+ .payment-progress-step{gap:4px}
+ .payment-progress-step b{font-size:7px}
+ .payment-progress-step span{width:18px;height:18px;font-size:8px}
+}
+</style>
+
 </head>
 <body class="auth-locked">
 
@@ -533,6 +553,18 @@ body.auth-locked{overflow:hidden}
    <button class="close" onclick="closeBankPayment()">✕</button>
   </div>
   <div class="bank-pay-body">
+   <div class="payment-progress">
+    <div class="payment-progress-step done"><span>✓</span><b>Krepšelis</b></div>
+    <i></i>
+    <div class="payment-progress-step done"><span>✓</span><b>Duomenys</b></div>
+    <i></i>
+    <div class="payment-progress-step active"><span>3</span><b>Patvirtinimas</b></div>
+    <i></i>
+    <div class="payment-progress-step"><span>4</span><b>Ruošiama</b></div>
+    <i></i>
+    <div class="payment-progress-step"><span>5</span><b>Įvykdyta</b></div>
+   </div>
+
    <div class="payment-top-grid">
     <div class="bank-pay-amount"><span>APMOKĖTI SUMĄ</span><b id="bankPayAmount">0,00 €</b></div>
     <div class="payment-timer-card">
@@ -575,15 +607,6 @@ body.auth-locked{overflow:hidden}
    <div class="payment-bottom-note">Atlikęs pavedimą paspausk „Pinigai išsiųsti“. Tai nepatvirtina apmokėjimo automatiškai — mokėjimą dar patikrins administratorius.</div>
   </div>
  </div>
-</div>
-
-   <div class="bank-pay-note">Po apmokėjimo palaukite, kol mokėjimas bus gautas ir patikrintas. Įprastai mokėjimo gavimas gali užtrukti iki 1–2 darbo dienų. Užsakymas bus pradėtas vykdyti tik patvirtinus apmokėjimą.</div>
-   <div id="bankPayInstructions" class="pay-note"></div>
-   <div class="bank-pay-actions"><button class="admin-secondary" onclick="copyBankPaymentAll()">📋 Kopijuoti duomenis</button><button class="admin-primary" onclick="closeBankPayment()">✓ Supratau</button></div>
-  </div>
- </div>
-</div>
-
 <div id="checkoutModal" class="checkout-modal" onclick="closeCheckout()">
  <div class="checkout-card" onclick="event.stopPropagation()">
   <div class="checkout-head"><div><h2>🧾 Užsakymo pateikimas</h2><small>Užpildyk pristatymo informaciją</small></div><button class="close" onclick="closeCheckout()">✕</button></div>
