@@ -261,7 +261,7 @@ body.auth-locked{overflow:hidden}
 #cartBg{z-index:600!important}
 </style>
 <style id="unified-order-flow">
-.order-view-btn{border:1px solid #438dff;background:#122747;color:#fff;border-radius:8px;padding:8px 12px;font-size:10px;cursor:pointer}
+.order-view-btn{border:1px solid #438dff;background:#122747;color:#fff;border-radius:8px;padding:8px 12px;font-size:10px;cursor:pointer}.order-received-btn{border:1px solid #2c956f;background:#0b2b21;color:#74f1bf;border-radius:8px;padding:8px 12px;font-size:10px;cursor:pointer;font-weight:800}.order-received-btn:hover{background:#103c2e;border-color:#49d39e}
 .order-view-btn:hover{background:#18345d;border-color:#62a3ff}
 .order-sent-note{width:100%;font-size:9px;color:#55d8a5;line-height:1.4;margin-top:2px}
 .bank-pay-screen.payment-sent-state .payment-timer-card{display:none!important}
@@ -420,7 +420,8 @@ body.auth-locked{overflow:hidden}
    <button class="admin-tab" onclick="adminTab('categories',this)">🏷️ Kategorijos</button>
    <button class="admin-tab" onclick="adminTab('coupons',this)">🎟️ Kuponai</button>
    <button class="admin-tab" onclick="adminTab('bulk',this)">🛍️ Kiekio akcijos</button>
-    <button class="admin-tab" onclick="adminTab('orders',this)">🧾 Užsakymai</button>
+   <button class="admin-tab" onclick="adminTab('updates',this)">📰 Atnaujinimai</button>
+   <button class="admin-tab" onclick="adminTab('orders',this)">🧾 Užsakymai</button>
    <button class="admin-tab" onclick="adminTab('payments',this)">🏦 Apmokėjimai</button>
    <button class="admin-tab" onclick="adminTab('chat',this)">💬 Klientų chat</button>
   </div>
@@ -491,6 +492,18 @@ body.auth-locked{overflow:hidden}
    </div>
    <div class="admin-actions" style="margin-bottom:10px"><button class="admin-secondary" onclick="loadAdminBulkDiscounts()">↻ Atnaujinti</button></div>
    <div class="admin-list" id="adminBulkList"><div class="admin-empty">Kraunama...</div></div>
+  </section>
+  <section class="admin-section" id="admin-updates">
+   <div class="admin-note"><b>📰 Parduotuvės atnaujinimai</b><br>Čia gali skelbti, kas buvo pridėta, pašalinta ar pakeista parduotuvėje.</div>
+   <div class="admin-form">
+    <input type="hidden" id="updateEditId">
+    <div class="admin-field"><label>TIPAS</label><select id="updateKind"><option value="added">➕ Pridėta</option><option value="removed">➖ Pašalinta</option><option value="changed">✏️ Pakeista</option></select></div>
+    <div class="admin-field"><label>PAVADINIMAS</label><input id="updateTitle" placeholder="Pvz. Naujos prekės"></div>
+    <div class="admin-field full"><label>APRAŠYMAS</label><textarea id="updateContent" placeholder="Kas buvo pridėta, pašalinta ar pakeista..."></textarea></div>
+    <div class="admin-actions full"><button class="admin-primary" onclick="publishStoreUpdate()">💾 Paskelbti atnaujinimą</button><button class="admin-secondary" onclick="clearUpdateForm()">Išvalyti</button><button class="admin-secondary" onclick="loadAdminUpdates()">↻ Atnaujinti</button></div>
+   </div>
+   <div class="admin-list-title">📋 Paskutiniai atnaujinimai</div>
+   <div class="admin-list" id="adminUpdateList"><div class="admin-empty">Kraunama...</div></div>
   </section>
   <section class="admin-section" id="admin-orders">
    <div class="admin-order-stats" id="adminOrderStats"></div>
@@ -935,7 +948,7 @@ function closeAdmin(){document.getElementById("adminPanel").classList.remove("op
 function adminTab(name,btn){
   document.querySelectorAll(".admin-tab").forEach(x=>x.classList.remove("active"));
   document.querySelectorAll(".admin-section").forEach(x=>x.classList.remove("active"));
-  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="bulk")loadAdminBulkDiscounts();if(name==="payments")loadPaymentSettings();
+  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="updates")loadAdminUpdates();if(name==="bulk")loadAdminBulkDiscounts();if(name==="payments")loadPaymentSettings();
 }
 async function loadAdminStats(){
   const p=await supabaseClient.from("products").select("id",{count:"exact",head:true});
@@ -1086,11 +1099,18 @@ async function loadStoreProducts(){
 }
 
 
+const updateKindLabel={added:"➕ Pridėta",removed:"➖ Pašalinta",changed:"✏️ Pakeista"};
+function clearUpdateForm(){["updateEditId","updateTitle","updateContent"].forEach(id=>{const e=document.getElementById(id);if(e)e.value=""});const k=document.getElementById("updateKind");if(k)k.value="added";}
+function editStoreUpdate(u){document.getElementById("updateEditId").value=u.id||"";document.getElementById("updateKind").value=u.kind||"added";document.getElementById("updateTitle").value=u.title||"";document.getElementById("updateContent").value=u.content||"";}
+async function publishStoreUpdate(){if(!isAdmin)return alert("Neturite administratoriaus teisių.");const id=document.getElementById("updateEditId")?.value.trim();const payload={kind:document.getElementById("updateKind")?.value||"added",title:document.getElementById("updateTitle")?.value.trim()||"",content:document.getElementById("updateContent")?.value.trim()||"",active:true};if(!payload.title||!payload.content)return alert("Įrašyk pavadinimą ir aprašymą.");const r=id?await supabaseClient.from("store_updates").update(payload).eq("id",id):await supabaseClient.from("store_updates").insert(payload);if(r.error){console.error(r.error);return alert("Nepavyko išsaugoti atnaujinimo. Paleisk store_updates SQL.");}clearUpdateForm();await loadAdminUpdates();toast(id?"✓ Atnaujinimas pakeistas":"✓ Atnaujinimas paskelbtas");}
+async function loadAdminUpdates(){if(!isAdmin)return;const list=document.getElementById("adminUpdateList");if(!list)return;list.innerHTML='<div class="admin-empty">Kraunama...</div>';const {data,error}=await supabaseClient.from("store_updates").select("*").order("created_at",{ascending:false});if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti atnaujinimų. Paleisk store_updates SQL.</div>';return}if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas atnaujinimų nėra.</div>';return}list.innerHTML=data.map(u=>`<div class="admin-product"><div class="admin-product-info"><b>${escapeHtml(updateKindLabel[u.kind]||u.kind||"Atnaujinimas")} • ${escapeHtml(u.title||"")}</b><small>${escapeHtml(u.content||"")} • ${formatDate(u.created_at)}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editStoreUpdate(${JSON.stringify(u).replace(/'/g,"&#39;")})'>✏️ Koreguoti</button><button class="admin-danger" onclick="deleteStoreUpdate('${u.id}')">🗑️ Ištrinti</button></div></div>`).join("");}
+async function deleteStoreUpdate(id){if(!isAdmin||!confirm("Ar tikrai ištrinti šį atnaujinimą?"))return;const {error}=await supabaseClient.from("store_updates").delete().eq("id",id);if(error){console.error(error);return alert("Nepavyko ištrinti atnaujinimo. Patikrink RLS SQL.");}await loadAdminUpdates();toast("✓ Atnaujinimas ištrintas");}
+
 let adminOrdersChannel=null;
 function subscribeAdminOrders(){if(adminOrdersChannel||!isAdmin)return;adminOrdersChannel=supabaseClient.channel("admin-live-orders").on("postgres_changes",{event:"*",schema:"public",table:"orders"},()=>{loadAdminOrders();loadAdminStats()}).subscribe()}
 
 function statusLabel(status){
-  const map={"pending":"Laukia apmokėjimo","paid":"Apmokėtas","processing":"Vykdomas","shipped":"Išsiųstas","completed":"Užbaigtas","cancelled":"Atšauktas"};
+  const map={"pending":"Laukia apmokėjimo","paid":"Apmokėtas","processing":"Ruošiama","shipped":"Išsiųstas","completed":"Užbaigtas","cancelled":"Atšauktas"};
   return map[status]||status||"Nežinoma";
 }
 function statusClass(status){
@@ -1276,7 +1296,7 @@ async function loadAdminOrders(){
   const {data,error}=await supabaseClient.from("orders").select("*, order_items(*)").order("created_at",{ascending:false});
   if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti užsakymų. Patikrink RLS/SQL.</div>';return}
   if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas užsakymų nėra.</div>';await loadAdminOrderStats();return}
-  list.innerHTML=data.map(o=>`<div class="admin-order"><div class="admin-order-info"><b>#${escapeHtml(o.order_number)}</b><small>${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")} • ${formatDate(o.created_at)}<br>${escapeHtml(o.phone||"")} • ${escapeHtml(o.address||"")}, ${escapeHtml(o.city||"")} ${escapeHtml(o.postal_code||"")}<br>${escapeHtml(o.shipping_method||"")} • <strong>${statusLabel(o.status)}</strong> • ${money(o.total_amount)}<br>💳 Mokėjimo paskirtis: <strong>${escapeHtml(o.payment_reference||"Dar nesugeneruota")}</strong>${o.payment_sent_at?`<br>✅ Klientas pažymėjo: <strong>PAVEDIMAS IŠSIŲSTAS</strong> • ${formatDate(o.payment_sent_at)}`:""}</small></div><div class="admin-order-actions"><select onchange="updateOrderStatus('${o.id}',this.value)">${["pending","paid","processing","shipped","completed","cancelled"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${statusLabel(s)}</option>`).join("")}</select><input id="tracking-${o.id}" value="${escapeHtml(o.tracking_number||"")}" placeholder="Siuntimo nr." title="Siuntimo numeris"><button class="admin-primary" onclick="saveTracking('${o.id}')">💾</button><button class="admin-secondary" onclick='showOrderDetails(${JSON.stringify(o).replace(/'/g,"&#39;")})'>👁️</button><button class="admin-danger" onclick="deleteAdminOrder('${o.id}')">🗑️</button></div></div>`).join("");
+  list.innerHTML=data.map(o=>`<div class="admin-order"><div class="admin-order-info"><b>#${escapeHtml(o.order_number)}</b><small>${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")} • ${formatDate(o.created_at)}<br>${escapeHtml(o.phone||"")} • ${escapeHtml(o.address||"")}, ${escapeHtml(o.city||"")} ${escapeHtml(o.postal_code||"")}<br>${escapeHtml(o.shipping_method||"")} • <strong>${statusLabel(o.status)}</strong> • ${money(o.total_amount)}<br>💳 Mokėjimo paskirtis: <strong>${escapeHtml(o.payment_reference||"Dar nesugeneruota")}</strong>${o.payment_sent_at?`<br>✅ Klientas pažymėjo: <strong>PAVEDIMAS IŠSIŲSTAS</strong> • ${formatDate(o.payment_sent_at)}`:""}</small></div><div class="admin-order-actions"><select onchange="updateOrderStatus('${o.id}',this.value)">${["pending","paid","processing","completed","cancelled"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${statusLabel(s)}</option>`).join("")}</select><input id="tracking-${o.id}" value="${escapeHtml(o.tracking_number||"")}" placeholder="Siuntimo nr." title="Siuntimo numeris"><button class="admin-primary" onclick="saveTracking('${o.id}')">💾</button>${o.status!=="shipped"&&o.status!=="completed"&&o.status!=="cancelled"?`<button class="admin-secondary green" onclick="markOrderShipped('${o.id}')">📦 Išsiųsti</button>`:""}<button class="admin-secondary" onclick='showOrderDetails(${JSON.stringify(o).replace(/'/g,"&#39;")})'>👁️</button><button class="admin-danger" onclick="deleteAdminOrder('${o.id}')">🗑️</button></div></div>`).join("");
   await loadAdminOrderStats();
 }
 async function updateOrderStatus(id,status){
@@ -1288,6 +1308,16 @@ async function updateOrderStatus(id,status){
   if(before?.status!==status) toast(`✓ Užsakymas #${before?.order_number||""}: ${statusLabel(status)}`);
   if(status==="paid") toast(`💰 Užsakymas #${before?.order_number||""}: mokėjimas patvirtintas — klientui rodoma „Ruošiama“.`);
   await loadAdminOrders();await loadAdminStats();
+}
+async function markOrderShipped(id){
+  if(!isAdmin)return;
+  const input=document.getElementById("tracking-"+id);
+  const tracking=input?.value.trim()||"";
+  if(!tracking)return alert("Pirmiausia įrašyk siuntimo numerį.");
+  const {error}=await supabaseClient.from("orders").update({status:"shipped",tracking_number:tracking,updated_at:new Date().toISOString()}).eq("id",id);
+  if(error){console.error(error);return alert("Nepavyko pažymėti užsakymo kaip išsiųsto.");}
+  await loadAdminOrders();await loadAdminStats();
+  toast("✓ Užsakymas pažymėtas kaip išsiųstas");
 }
 async function saveTracking(id){
   if(!isAdmin)return;
@@ -1443,6 +1473,8 @@ async function viewMyOrder(orderId){
   else await openOrderStatusView(res.data);
 }
 
+async function confirmOrderReceived(orderId){if(!confirm("Patvirtinti, kad gavai šį užsakymą?"))return;const {data,error}=await supabaseClient.rpc("confirm_order_received",{p_order_id:orderId});if(error){console.error(error);return alert("Nepavyko patvirtinti gavimo. Paleisk užsakymų gavimo SQL.");}if(data!==true)return alert("Šio užsakymo gavimo patvirtinti dabar negalima.");await loadMyOrders();toast("✓ Užsakymas pažymėtas kaip gautas");}
+
 async function loadMyOrders(){
   const list=document.getElementById("ordersList");
   list.innerHTML='<div class="admin-empty">Kraunama...</div>';
@@ -1458,7 +1490,7 @@ async function loadMyOrders(){
     <div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div>
     ${o.tracking_number?`<div class="tracking-box">📦 <b>Siuntimo numeris:</b> <span>${escapeHtml(o.tracking_number)}</span><button onclick="copyTracking('${escapeHtml(o.tracking_number)}');event.stopPropagation()">📋 Kopijuoti</button></div>`:""}
     <div class="order-actions" onclick="event.stopPropagation()">
-      ${(o.status==="pending" && !o.payment_sent_at)?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Apmokėti užsakymą</button><button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button><div class="pay-note">Apmokėk bankiniu pavedimu pagal pateiktus rekvizitus. Mokėjimo paskirtis sugeneruota atskirai šiam užsakymui.</div>`:`<button class="order-view-btn" onclick="viewMyOrder('${o.id}')">👁️ Peržiūrėti užsakymą</button>${o.payment_sent_at&&o.status==="pending"?`<div class="order-sent-note">✓ Pavedimas pažymėtas kaip išsiųstas. Laukiama administratoriaus patvirtinimo.</div>`:""}`}
+      ${(o.status==="pending" && !o.payment_sent_at)?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Apmokėti užsakymą</button><button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button><div class="pay-note">Apmokėk bankiniu pavedimu pagal pateiktus rekvizitus. Mokėjimo paskirtis sugeneruota atskirai šiam užsakymui.</div>`:`<button class="order-view-btn" onclick="viewMyOrder('${o.id}')">👁️ Peržiūrėti užsakymą</button>${o.status==="shipped"?`<button class="order-received-btn" onclick="confirmOrderReceived('${o.id}')">✓ Gavau užsakymą</button>`:""}${o.payment_sent_at&&o.status==="pending"?`<div class="order-sent-note">✓ Pavedimas pažymėtas kaip išsiųstas. Laukiama administratoriaus patvirtinimo.</div>`:""}`}
     </div>
     <div class="order-detail" id="order-detail-${o.id}" style="display:none">
       <div class="order-items">${(o.order_items||[]).map(x=>`<div class="order-item-row"><span>${escapeHtml(x.product_name)} × ${x.quantity}</span><b>${money(Number(x.unit_price)*Number(x.quantity))}</b></div>`).join("")}</div>
