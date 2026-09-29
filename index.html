@@ -403,7 +403,6 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <div class="main-floaters" aria-hidden="true"><span class="main-floater">€</span><span class="main-floater">✦</span><span class="main-floater">📦</span><span class="main-floater">€</span><span class="main-floater">◆</span><span class="main-floater">✧</span></div>
 <div class="categories" id="categoryCards"></div>
 
-<div style="display:flex;justify-content:center;margin:18px 0 8px"><button class="update-open-btn" onclick="openUpdatesModal()">📰 Peržiūrėti parduotuvės atnaujinimus</button></div>
 <div class="updates-modal" id="updatesModal" onclick="if(event.target===this)closeUpdatesModal()"><div class="updates-modal-card"><div class="updates-modal-head"><div><h2>📰 Parduotuvės atnaujinimai</h2><p>Naujausi parduotuvės pakeitimai</p></div><button class="updates-close" onclick="closeUpdatesModal()">✕</button></div><div class="updates-modal-body"><div class="update-public-list" id="publicUpdateList"><div class="admin-empty">Kraunama...</div></div></div></div></div>
 
 <div class="products-head" id="prekes"><div><h2>🔥 Populiariausios prekės</h2><p>Peržiūrėk mūsų prekes</p></div>
@@ -651,7 +650,6 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
        <div><span>UŽSAKYMAS</span><b id="viewOrderNumber">—</b></div>
        <div><span>BŪSENA</span><b id="viewOrderStatus">—</b></div>
        <div><span>SUMA</span><b id="viewOrderTotal">—</b></div>
-       <div><span>SIUNTIMO NUMERIS</span><b id="viewOrderTracking">Dar nepriskirtas</b></div>
      </div>
      <div class="bank-order-items-title">🛒 Tavo užsakytos prekės</div>
      <div id="viewOrderItems" class="bank-order-items"></div>
@@ -873,10 +871,9 @@ async function logoutUser(){
   await logoutAndLock("Atsijungta.");
 }
 
-const AUTH_SESSION_VERSION="2026-09-29-build-3";
+const AUTH_SESSION_VERSION="2026-09-29-build-4";
 const AUTH_SESSION_MAX_MS=24*60*60*1000;
 let authExpiryTimer=null;
-let authResetInProgress=false;
 
 function clearAuthExpiry(){
   if(authExpiryTimer){clearTimeout(authExpiryTimer);authExpiryTimer=null;}
@@ -897,40 +894,42 @@ async function logoutAndLock(message="Sesija baigėsi. Prisijunkite iš naujo.")
 }
 
 function startAuthExpiry(){
-  clearTimeout(authExpiryTimer);
+  if(authExpiryTimer)clearTimeout(authExpiryTimer);
   let started=Number(localStorage.getItem("ltparduotuve_auth_started_at")||0);
-  if(!started){started=Date.now();localStorage.setItem("ltparduotuve_auth_started_at",String(started));}
+  if(!started){
+    started=Date.now();
+    localStorage.setItem("ltparduotuve_auth_started_at",String(started));
+  }
   const left=AUTH_SESSION_MAX_MS-(Date.now()-started);
   if(left<=0){logoutAndLock();return;}
   authExpiryTimer=setTimeout(()=>logoutAndLock("Sesija baigėsi po 24 valandų. Prisijunkite iš naujo."),left);
 }
 
-async function forceLogoutOldSessions(){
-  if(authResetInProgress)return false;
-  const seen=localStorage.getItem("ltparduotuve_auth_reset_version");
-  if(seen===AUTH_SESSION_VERSION)return false;
-  authResetInProgress=true;
-  localStorage.setItem("ltparduotuve_auth_reset_version",AUTH_SESSION_VERSION);
-  try{await supabaseClient.auth.signOut({scope:"local"});}catch(e){console.error(e)}
-  clearAuthExpiry();
-  authResetInProgress=false;
-  return true;
-}
-
 async function initAuth(){
-  await forceLogoutOldSessions();
   const {data,error}=await supabaseClient.auth.getSession();
   if(error){console.error("Auth error:",error);return;}
-  if(data.session?.user){
-    enterStore(data.session.user);
-    startAuthExpiry();
+  let session=data.session;
+  if(session?.user){
+    // Refresh nekeičia sesijos. Logout įvyksta tik tada, kai įkeliamas kitas HTML build.
+    const previousBuild=localStorage.getItem("ltparduotuve_html_build");
+    if(previousBuild && previousBuild!==AUTH_SESSION_VERSION){
+      try{await supabaseClient.auth.signOut({scope:"local"});}catch(e){console.error(e)}
+      localStorage.setItem("ltparduotuve_html_build",AUTH_SESSION_VERSION);
+      localStorage.removeItem("ltparduotuve_auth_started_at");
+      session=null;
+    }else{
+      localStorage.setItem("ltparduotuve_html_build",AUTH_SESSION_VERSION);
+      enterStore(session.user);
+      startAuthExpiry();
+    }
   }else{
+    localStorage.removeItem("ltparduotuve_auth_started_at");
     document.getElementById("authGate").style.display="flex";
     document.body.classList.add("auth-locked");
   }
-  supabaseClient.auth.onAuthStateChange((_event,session)=>{
-    if(session?.user){
-      enterStore(session.user);
+  supabaseClient.auth.onAuthStateChange((_event,nextSession)=>{
+    if(nextSession?.user){
+      enterStore(nextSession.user);
       startAuthExpiry();
     }else{
       clearAuthExpiry();
@@ -939,7 +938,6 @@ async function initAuth(){
     }
   });
 }
-
 
 
 const ADMIN_EMAIL="nedasliubinas4@gmail.com";
@@ -1034,8 +1032,8 @@ async function loadCategories(){
 }
 function renderCategoryUI(cats){
   const nav=document.getElementById("mainNav"), cards=document.getElementById("categoryCards"), tabs=document.getElementById("categoryTabs");
-  if(nav) nav.innerHTML='<a class="active" href="#top">Pagrindinis</a><a href="#atnaujinimai">Atnaujinimai</a>'+cats.map(c=>`<a href="#prekes" data-nav-cat="${escapeHtml(c.name)}">${escapeHtml(c.name)}</a>`).join("");
-  if(cards) cards.innerHTML=cats.map(c=>`<div class="cat"><h3>${escapeHtml(c.name).toUpperCase()}</h3><p>${escapeHtml(c.description||"Platus pasirinkimas")}</p><button onclick='setCategory(${JSON.stringify(c.name)})'>Žiūrėti →</button></div>`).join("");
+  if(nav) nav.innerHTML='<a class="active" href="#top">Pagrindinis</a>'+cats.map(c=>`<a href="#prekes" data-nav-cat="${escapeHtml(c.name)}">${escapeHtml(c.name)}</a>`).join("");
+  if(cards) cards.innerHTML=`<div class="cat all-category-card"><h3>VISOS</h3><p>Peržiūrėti visas parduotuvės prekes</p><button onclick='setCategory("all")'>Žiūrėti visas →</button></div>`+cats.map(c=>`<div class="cat"><h3>${escapeHtml(c.name).toUpperCase()}</h3><p>${escapeHtml(c.description||"Platus pasirinkimas")}</p><button onclick='setCategory(${JSON.stringify(c.name)})'>Žiūrėti →</button></div>`).join("");
   if(tabs) tabs.innerHTML='<button class="tab active" data-cat="all">Visos</button>'+cats.map(c=>`<button class="tab" data-cat="${escapeHtml(c.name)}">${escapeHtml(c.name)}</button>`).join("");
   document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");active=b.dataset.cat;filter()});
   document.querySelectorAll("[data-nav-cat]").forEach(a=>a.onclick=()=>setCategory(a.dataset.navCat));
@@ -1525,7 +1523,6 @@ async function openOrderStatusView(order){
   document.getElementById("viewOrderNumber").textContent="#"+(order.order_number||"—");
   document.getElementById("viewOrderStatus").textContent=labels[status]||statusLabel(status);
   document.getElementById("viewOrderTotal").textContent=money(order.total_amount);
-  document.getElementById("viewOrderTracking").textContent=order.tracking_number||"Dar nepriskirtas";
   document.getElementById("viewOrderTracking2").textContent=order.tracking_number||"Dar nepriskirtas";
   document.getElementById("viewOrderShipping").textContent=(order.shipping_method||"—")+" • "+money(order.shipping_amount||0);
   document.getElementById("viewOrderAddress").textContent=order.address||"—";
