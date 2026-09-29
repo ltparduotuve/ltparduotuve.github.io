@@ -261,7 +261,8 @@ body.auth-locked{overflow:hidden}
 #cartBg{z-index:600!important}
 </style>
 <style id="unified-order-flow">
-.order-view-btn{border:1px solid #438dff;background:#122747;color:#fff;border-radius:8px;padding:8px 12px;font-size:10px;cursor:pointer}.order-received-btn{border:1px solid #2c956f;background:#0b2b21;color:#74f1bf;border-radius:8px;padding:8px 12px;font-size:10px;cursor:pointer;font-weight:800}.order-received-btn:hover{background:#103c2e;border-color:#49d39e}
+.order-view-btn{border:1px solid #438dff;background:#122747;color:#fff;border-radius:8px;padding:8px 12px;font-size:10px;cursor:pointer}.clean-order-card{cursor:default}.clean-order-card:hover{transform:translateY(-2px)}.order-view-actions{display:flex;flex-direction:column;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid #263950}.order-view-actions .order-received-btn{width:100%;min-height:45px}.order-view-actions .order-sent-note{text-align:center;font-size:10px}
+.order-received-btn{border:1px solid #2c956f;background:#0b2b21;color:#74f1bf;border-radius:8px;padding:8px 12px;font-size:10px;cursor:pointer;font-weight:800}.order-received-btn:hover{background:#103c2e;border-color:#49d39e}
 .order-view-btn:hover{background:#18345d;border-color:#62a3ff}
 .order-sent-note{width:100%;font-size:9px;color:#55d8a5;line-height:1.4;margin-top:2px}
 .bank-pay-screen.payment-sent-state .payment-timer-card{display:none!important}
@@ -647,7 +648,17 @@ body.auth-locked{overflow:hidden}
      </div>
      <div class="bank-order-items-title">🛒 Tavo užsakytos prekės</div>
      <div id="viewOrderItems" class="bank-order-items"></div>
+     <div class="bank-order-items-title">📍 Pristatymo informacija</div>
+     <div class="bank-order-status-grid">
+       <div><span>PRISTATYMAS</span><b id="viewOrderShipping">—</b></div>
+       <div><span>ADRESAS</span><b id="viewOrderAddress">—</b></div>
+       <div><span>MIESTAS</span><b id="viewOrderCity">—</b></div>
+       <div><span>PAŠTAS</span><b id="viewOrderEmail">—</b></div>
+       <div><span>TELEFONAS</span><b id="viewOrderPhone">—</b></div>
+       <div><span>SIUNTIMO NR.</span><b id="viewOrderTracking2">—</b></div>
+     </div>
      <div class="bank-order-code" id="viewOrderCode">Mokėjimo kodas: —</div>
+     <div id="viewOrderActions" class="order-view-actions"></div>
    </div>
 
    <div class="payment-bottom-note" id="bankPaymentBottomNote">Atlikęs pavedimą paspausk „Pinigai išsiųsti“. Tai nepatvirtina apmokėjimo automatiškai — mokėjimą dar patikrins administratorius.</div>
@@ -1296,7 +1307,25 @@ async function loadAdminOrders(){
   const {data,error}=await supabaseClient.from("orders").select("*, order_items(*)").order("created_at",{ascending:false});
   if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti užsakymų. Patikrink RLS/SQL.</div>';return}
   if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas užsakymų nėra.</div>';await loadAdminOrderStats();return}
-  list.innerHTML=data.map(o=>`<div class="admin-order"><div class="admin-order-info"><b>#${escapeHtml(o.order_number)}</b><small>${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")} • ${formatDate(o.created_at)}<br>${escapeHtml(o.phone||"")} • ${escapeHtml(o.address||"")}, ${escapeHtml(o.city||"")} ${escapeHtml(o.postal_code||"")}<br>${escapeHtml(o.shipping_method||"")} • <strong>${statusLabel(o.status)}</strong> • ${money(o.total_amount)}<br>💳 Mokėjimo paskirtis: <strong>${escapeHtml(o.payment_reference||"Dar nesugeneruota")}</strong>${o.payment_sent_at?`<br>✅ Klientas pažymėjo: <strong>PAVEDIMAS IŠSIŲSTAS</strong> • ${formatDate(o.payment_sent_at)}`:""}</small></div><div class="admin-order-actions"><select onchange="updateOrderStatus('${o.id}',this.value)">${["pending","paid","processing","completed","cancelled"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${statusLabel(s)}</option>`).join("")}</select><input id="tracking-${o.id}" value="${escapeHtml(o.tracking_number||"")}" placeholder="Siuntimo nr." title="Siuntimo numeris"><button class="admin-primary" onclick="saveTracking('${o.id}')">💾</button>${o.status!=="shipped"&&o.status!=="completed"&&o.status!=="cancelled"?`<button class="admin-secondary green" onclick="markOrderShipped('${o.id}')">📦 Išsiųsti</button>`:""}<button class="admin-secondary" onclick='showOrderDetails(${JSON.stringify(o).replace(/'/g,"&#39;")})'>👁️</button><button class="admin-danger" onclick="deleteAdminOrder('${o.id}')">🗑️</button></div></div>`).join("");
+  list.innerHTML=data.map(o=>`
+   <div class="order-card clean-order-card">
+    <div class="order-top">
+      <div>
+        <div class="order-number">#${escapeHtml(o.order_number)}</div>
+        <div class="order-date">${formatDate(o.created_at)}</div>
+      </div>
+      <span class="order-status ${statusClass(o.status)}">${statusLabel(o.status)}</span>
+    </div>
+    <div class="order-bottom">
+      <span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span>
+      <strong>${money(o.total_amount)}</strong>
+    </div>
+    <div class="order-actions">
+      ${o.status==="pending"&&!o.payment_sent_at?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Apmokėti užsakymą</button>`:""}
+      <button class="order-view-btn" onclick="viewMyOrder('${o.id}')">👁️ Peržiūrėti užsakymą</button>
+      ${o.status==="pending"&&!o.payment_sent_at?`<button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button>`:""}
+    </div>
+   </div>`).join("");
   await loadAdminOrderStats();
 }
 async function updateOrderStatus(id,status){
@@ -1311,10 +1340,13 @@ async function updateOrderStatus(id,status){
 }
 async function markOrderShipped(id){
   if(!isAdmin)return;
+  const {data:before}=await supabaseClient.from("orders").select("status,order_number").eq("id",id).maybeSingle();
+  if(!before)return alert("Užsakymas nerastas.");
+  if(before.status!=="processing")return alert("Pirmiausia pats pažymėk užsakymą kaip „Ruošiama“.");
   const input=document.getElementById("tracking-"+id);
   const tracking=input?.value.trim()||"";
   if(!tracking)return alert("Pirmiausia įrašyk siuntimo numerį.");
-  const {error}=await supabaseClient.from("orders").update({status:"shipped",tracking_number:tracking,updated_at:new Date().toISOString()}).eq("id",id);
+  const {error}=await supabaseClient.from("orders").update({status:"shipped",tracking_number:tracking,updated_at:new Date().toISOString()}).eq("id",id).eq("status","processing");
   if(error){console.error(error);return alert("Nepavyko pažymėti užsakymo kaip išsiųsto.");}
   await loadAdminOrders();await loadAdminStats();
   toast("✓ Užsakymas pažymėtas kaip išsiųstas");
@@ -1455,7 +1487,25 @@ async function openOrderStatusView(order){
   document.getElementById("viewOrderStatus").textContent=labels[status]||statusLabel(status);
   document.getElementById("viewOrderTotal").textContent=money(order.total_amount);
   document.getElementById("viewOrderTracking").textContent=order.tracking_number||"Dar nepriskirtas";
+  document.getElementById("viewOrderTracking2").textContent=order.tracking_number||"Dar nepriskirtas";
+  document.getElementById("viewOrderShipping").textContent=(order.shipping_method||"—")+" • "+money(order.shipping_amount||0);
+  document.getElementById("viewOrderAddress").textContent=order.address||"—";
+  document.getElementById("viewOrderCity").textContent=(order.city||"—")+" "+(order.postal_code||"");
+  document.getElementById("viewOrderEmail").textContent=order.email||"—";
+  document.getElementById("viewOrderPhone").textContent=order.phone||"—";
   document.getElementById("viewOrderCode").textContent="Mokėjimo kodas: "+(order.payment_reference||"—");
+  const orderActions=document.getElementById("viewOrderActions");
+  if(orderActions){
+    orderActions.innerHTML=order.status==="shipped"
+      ? `<button class="order-received-btn" onclick="confirmOrderReceived('${order.id}')">✓ Gavau užsakymą</button><div class="order-sent-note">Patvirtink tik tada, kai fiziškai gavai siuntą.</div>`
+      : order.status==="processing"
+      ? `<div class="order-sent-note">🔧 Užsakymas ruošiamas. Kai bus išsiųstas, čia atsiras siuntos numeris ir galėsi patvirtinti gavimą.</div>`
+      : order.status==="completed"
+      ? `<div class="order-sent-note">✓ Užsakymas jau pažymėtas kaip užbaigtas.</div>`
+      : order.status==="cancelled"
+      ? `<div class="order-sent-note" style="color:#ff8585">✕ Užsakymas atšauktas.</div>`
+      : `<div class="order-sent-note">⏳ Laukia apmokėjimo. Kai mokėjimas bus patvirtintas, užsakymas bus pradėtas ruošti.</div>`;
+  }
   document.getElementById("viewOrderItems").innerHTML=(order.order_items||[]).map(x=>`<div class="bank-order-item"><span>${escapeHtml(x.product_name)} <small>× ${x.quantity}</small></span><b>${money(Number(x.unit_price)*Number(x.quantity))}</b></div>`).join("")||"<div class='bank-order-item'>Prekių informacija nerasta.</div>";
   [".payment-top-grid",".bank-pay-grid",".payment-reference-warning","#bankPayInstructions",".bank-pay-actions"].forEach(sel=>{const el=document.querySelector("#bankPaymentModal "+sel);if(el)el.style.display="none"});
   document.getElementById("bankPayExpired").style.display="none";
@@ -1469,8 +1519,7 @@ async function viewMyOrder(orderId){
   const res=await supabaseClient.from("orders").select("*, order_items(*)").eq("id",orderId).maybeSingle();
   if(res.error||!res.data)return alert("Nepavyko įkelti užsakymo.");
   closeOrders();closeCheckout();closeCart();
-  if(res.data.status==="pending") await openPaymentModal(res.data);
-  else await openOrderStatusView(res.data);
+  await openOrderStatusView(res.data);
 }
 
 async function confirmOrderReceived(orderId){if(!confirm("Patvirtinti, kad gavai šį užsakymą?"))return;const {data,error}=await supabaseClient.rpc("confirm_order_received",{p_order_id:orderId});if(error){console.error(error);return alert("Nepavyko patvirtinti gavimo. Paleisk užsakymų gavimo SQL.");}if(data!==true)return alert("Šio užsakymo gavimo patvirtinti dabar negalima.");await loadMyOrders();toast("✓ Užsakymas pažymėtas kaip gautas");}
