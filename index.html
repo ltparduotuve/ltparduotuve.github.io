@@ -290,6 +290,10 @@ body.auth-locked{overflow:hidden}
 main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height:620px;pointer-events:none;overflow:hidden;z-index:1}.main-floater{position:absolute;display:grid;place-items:center;width:38px;height:38px;border:1px solid #4b73a5;border-radius:12px;background:#0b1728cc;box-shadow:0 0 22px #317dff33;color:#9fc6ff;font-size:17px;animation:mainFloater 11s ease-in-out infinite}.main-floater:nth-child(1){left:4%;top:8%;animation-delay:-2s}.main-floater:nth-child(2){right:7%;top:18%;animation-delay:-7s}.main-floater:nth-child(3){left:13%;top:48%;animation-delay:-5s}.main-floater:nth-child(4){right:17%;top:55%;animation-delay:-1s}.main-floater:nth-child(5){left:48%;top:12%;animation-delay:-9s}.main-floater:nth-child(6){right:37%;top:68%;animation-delay:-4s}@keyframes mainFloater{0%,100%{transform:translate3d(0,0,0) rotate(-5deg);opacity:.38}50%{transform:translate3d(35px,-28px,0) rotate(9deg);opacity:.9}}
 @media(max-width:600px){.main-floaters{height:500px}.main-floater{width:31px;height:31px;font-size:14px}.updates-modal{padding:10px}}
 </style>
+
+<style id="store-lock-duration-ui">
+.store-lock-expiry{margin-top:10px;padding:10px 12px;border:1px solid #263950;background:#08111d;border-radius:9px;color:#8fa1ba;font-size:9px}.store-lock-expiry b{color:#fff}.payment-progress-step.failed-step{color:#ff6f7f!important}.payment-progress-step.failed-step span{background:#45151d!important;border-color:#d84d60!important;color:#ff8b99!important;box-shadow:0 0 18px #d84d6044!important}.payment-progress-step.failed-step b{color:#ff8b99!important}
+</style>
 </head>
 <body class="auth-locked">
 
@@ -559,11 +563,13 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
    <div class="admin-note"><b>🔒 Parduotuvės prieinamumas</b><br>Čia gali užrakinti parduotuvę visiems klientams. Administratoriui parduotuvė išlieka pasiekiama, todėl galėsi tvarkyti prekes, užsakymus ir kitus nustatymus.</div>
    <div class="admin-form">
     <div class="admin-field"><label>BŪSENA</label><select id="storeLockEnabled"><option value="false">🟢 PARDUOTUVĖ ĮJUNGTA</option><option value="true">🔒 PARDUOTUVĖ UŽRAKINTA</option></select></div>
+    <div class="admin-field"><label>UŽRAKINIMO TRUKMĖ</label><select id="storeLockDuration"><option value="0">♾️ Iki kol atrakinsiu pats</option><option value="15">15 minučių</option><option value="30">30 minučių</option><option value="60">1 valanda</option><option value="120">2 valandos</option><option value="360">6 valandos</option><option value="720">12 valandų</option><option value="1440">24 valandos</option></select></div>
     <div class="admin-field"><label>PAVADINIMAS KLIENTUI</label><input id="storeLockTitleInput" value="Parduotuvė šiuo metu užrakinta"></div>
     <div class="admin-field"><label>PRANEŠIMAS KLIENTUI</label><textarea id="storeLockMessageInput" rows="4">Parduotuvė laikinai neprieinama dėl atnaujinimų ar kitų darbų.</textarea></div>
     <button class="admin-primary" type="button" onclick="saveStoreLock()">💾 IŠSAUGOTI PARDUOTUVĖS BŪSENĄ</button>
    </div>
-   <div class="admin-note" style="margin-top:14px">Pakeitimas saugomas Supabase duomenų bazėje, todėl vien HTML failo pakeitimas nepanaikins užrakto.</div>
+   <div class="store-lock-expiry" id="storeLockExpiryInfo">Užrakinimo laikas: <b>—</b></div>
+   <div class="admin-note" style="margin-top:14px">Pakeitimas saugomas Supabase duomenų bazėje, todėl vien HTML failo pakeitimas nepanaikins užrakto. Pasirinkus laiką, po jo parduotuvė automatiškai taps prieinama klientams.</div>
   </section>
   <section class="admin-section" id="admin-chat">
    <div class="admin-note"><b>💬 Tiesioginis klientų chat</b><br>Žinutės atkeliauja realiu laiku. Kai klientas parašo, gausi pranešimą ir vienu paspaudimu galėsi atsidaryti pokalbį.</div>
@@ -1001,9 +1007,9 @@ let activeCoupon=null;
 
 let storeLockChannel=null;
 async function getStoreLock(){
-  const {data,error}=await supabaseClient.from("store_lock").select("id,locked,title,message,updated_at").eq("id",1).maybeSingle();
+  const {data,error}=await supabaseClient.rpc("get_store_lock_state");
   if(error){console.warn("Store lock SQL not installed:",error);return {locked:false};}
-  return data||{id:1,locked:false,title:"",message:""};
+  return data||{id:1,locked:false,title:"",message:"",lock_until:null};
 }
 function showStoreLock(lock){
   const o=document.getElementById("storeLockOverlay");
@@ -1017,10 +1023,14 @@ async function applyStoreLock(){
   if(lock?.locked && !isAdmin){
     document.getElementById("storeLockOverlay")?.classList.add("open");
     showStoreLock(lock);
-  }else if(!lock?.locked){
+  }else{
     document.getElementById("storeLockOverlay")?.classList.remove("open");
   }
   return lock;
+}
+function formatLockUntil(v){
+  if(!v)return "iki kol atrakinsi pats";
+  return new Date(v).toLocaleString("lt-LT",{dateStyle:"short",timeStyle:"short"});
 }
 async function loadStoreLockSettings(){
   if(!isAdmin)return;
@@ -1029,18 +1039,32 @@ async function loadStoreLockSettings(){
   set("storeLockEnabled",String(!!lock.locked));
   set("storeLockTitleInput",lock.title||"Parduotuvė šiuo metu užrakinta");
   set("storeLockMessageInput",lock.message||"Parduotuvė laikinai neprieinama dėl atnaujinimų ar kitų darbų.");
+  set("storeLockDuration","0");
+  const info=document.getElementById("storeLockExpiryInfo");
+  if(info)info.innerHTML=lock.locked&&lock.lock_until?`Užrakinta iki: <b>${formatLockUntil(lock.lock_until)}</b>`:lock.locked?`Užrakinta: <b>iki kol atrakinsi pats</b>`:`Būsena: <b>Parduotuvė prieinama</b>`;
 }
 async function saveStoreLock(){
   if(!isAdmin)return alert("Neturite administratoriaus teisių.");
-  const payload={id:1,locked:document.getElementById("storeLockEnabled")?.value==="true",title:document.getElementById("storeLockTitleInput")?.value.trim()||"Parduotuvė šiuo metu užrakinta",message:document.getElementById("storeLockMessageInput")?.value.trim()||"Parduotuvė laikinai neprieinama dėl atnaujinimų ar kitų darbų.",updated_at:new Date().toISOString()};
-  const {error}=await supabaseClient.from("store_lock").upsert(payload,{onConflict:"id"});
-  if(error){console.error(error);return alert("Nepavyko pakeisti parduotuvės būsenos. Paleisk parduotuvės užrakto SQL.");}
-  showStoreLock(payload);
-  toast(payload.locked?"🔒 Parduotuvė užrakinta klientams":"🟢 Parduotuvė vėl prieinama klientams");
+  const locked=document.getElementById("storeLockEnabled")?.value==="true";
+  const duration=Number(document.getElementById("storeLockDuration")?.value||0);
+  const payload={locked,title:document.getElementById("storeLockTitleInput")?.value.trim()||"Parduotuvė šiuo metu užrakinta",message:document.getElementById("storeLockMessageInput")?.value.trim()||"Parduotuvė laikinai neprieinama dėl atnaujinimų ar kitų darbų."};
+  const {data,error}=await supabaseClient.rpc("set_store_lock",{p_locked:locked,p_title:payload.title,p_message:payload.message,p_duration_minutes:locked&&duration>0?duration:0});
+  if(error){console.error(error);return alert("Nepavyko pakeisti parduotuvės būsenos. Paleisk naują SQL.");}
+  const next=data||{...payload,id:1,locked,lock_until:null};
+  showStoreLock(next);
+  await loadStoreLockSettings();
+  toast(locked?(duration>0?`🔒 Parduotuvė užrakinta ${duration<60?duration+" min.":duration/60+" val."}`:"🔒 Parduotuvė užrakinta"):"🟢 Parduotuvė vėl prieinama klientams");
 }
 function subscribeStoreLock(){
   if(storeLockChannel)return;
-  storeLockChannel=supabaseClient.channel("store-lock-live").on("postgres_changes",{event:"*",schema:"public",table:"store_lock"},async()=>{await applyStoreLock();}).subscribe();
+  storeLockChannel=supabaseClient.channel("store-lock-live").on("postgres_changes",{event:"*",schema:"public",table:"store_lock"},async()=>{await applyStoreLock();if(isAdmin)await loadStoreLockSettings();}).subscribe();
+}
+let storeLockExpiryTimer=null;
+function startStoreLockPolling(){
+  if(storeLockExpiryTimer)return;
+  storeLockExpiryTimer=window.setInterval(async()=>{
+    if(document.visibilityState!=="hidden") await applyStoreLock();
+  },15000);
 }
 
 async function checkAdmin(user){
@@ -1085,7 +1109,7 @@ async function refreshCartInventory(){
   if(changed){renderCart();toast("⚠️ Sandėlio kiekis pasikeitė — krepšelis atnaujintas");}
 }
 function startInventoryRefresh(){if(inventoryRefreshTimer)return;inventoryRefreshTimer=window.setInterval(async()=>{if(document.visibilityState!=="hidden"){await loadStoreProducts();await refreshCartInventory();}},8000);}
-async function initAdmin(user){await checkAdmin(user);await applyStoreLock();subscribeStoreLock();await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();startInventoryRefresh();await loadPaymentSettings();await loadPublicUpdates();subscribePublicUpdates();if(isAdmin)subscribeAdminChat();}
+async function initAdmin(user){await checkAdmin(user);await applyStoreLock();subscribeStoreLock();startStoreLockPolling();await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();startInventoryRefresh();await loadPaymentSettings();await loadPublicUpdates();subscribePublicUpdates();if(isAdmin)subscribeAdminChat();}
 async function openAdmin(){
   if(!isAdmin)return alert("Neturite administratoriaus teisių.");
   document.getElementById("adminPanel").classList.add("open");
@@ -1306,8 +1330,18 @@ function setOrderProgress(status){
   const steps=[...document.querySelectorAll("#bankPaymentModal .payment-progress-step")];
   if(!steps.length)return;
   const labels=["Krepšelis","Duomenys","Patvirtinimas","Ruošiama","Įvykdyta"];
-  let stage=status==="pending"||status==="cancelled"||status==="unpaid"?3:(status==="processing"?4:(status==="shipped"?4:5));
-  steps.forEach((el,i)=>{el.classList.remove("active","done","completed-step");const n=i+1;const b=el.querySelector("b"),sp=el.querySelector("span");if(b)b.textContent=(status==="shipped"&&n===4)?"Išsiųsta":labels[i];if(status==="completed"){el.classList.add("completed-step");if(sp)sp.textContent="✓";return}if(n<stage)el.classList.add("done");if(n===stage)el.classList.add("active");if(sp)sp.textContent=n<stage?"✓":String(n);});
+  const failed=status==="cancelled"||status==="unpaid";
+  let stage=failed?3:(status==="pending"?3:(status==="processing"?4:(status==="shipped"?4:5)));
+  steps.forEach((el,i)=>{
+    el.classList.remove("active","done","completed-step","failed-step");
+    const n=i+1,b=el.querySelector("b"),sp=el.querySelector("span");
+    if(b)b.textContent=(status==="shipped"&&n===4)?"Išsiųsta":(failed&&n===3?"Neužbaigta":labels[i]);
+    if(failed&&n===3){el.classList.add("failed-step");if(sp)sp.textContent="×";return;}
+    if(status==="completed"){el.classList.add("completed-step");if(sp)sp.textContent="✓";return}
+    if(n<stage)el.classList.add("done");
+    if(n===stage)el.classList.add("active");
+    if(sp)sp.textContent=n<stage?"✓":String(n);
+  });
 }
 
 function statusClass(status){
@@ -1724,7 +1758,7 @@ async function openOrderStatusView(order){
       : order.status==="cancelled"
       ? `<div class="order-sent-note" style="color:#ff8585">✕ Užsakymas atšauktas.</div>`
       : order.status==="unpaid"
-      ? `<div class="order-sent-note" style="color:#ff8585">✕ Užsakymas neapmokėtas.</div>`
+      ? `<div class="order-sent-note" style="color:#ff6f7f;font-weight:900">✕ NEUŽBAIGTA — UŽSAKYMAS NEAPMOKĖTAS. Prekės grąžintos į sandėlį.</div>`
       : `<div class="order-sent-note">⏳ ${order.payment_sent_at?"Laukiama administratoriaus mokėjimo patvirtinimo.":"Laukiama apmokėjimo."}</div>`;
   }
   document.getElementById("viewOrderItems").innerHTML=(order.order_items||[]).map(x=>`<div class="bank-order-item"><span>${escapeHtml(x.product_name)} <small>× ${x.quantity}</small></span><b>${money(Number(x.unit_price)*Number(x.quantity))}</b></div>`).join("")||"<div class='bank-order-item'>Prekių informacija nerasta.</div>";
