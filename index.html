@@ -1010,13 +1010,23 @@ let isAdmin=false;
 let activeCoupon=null;
 
 let storeLockChannel=null;
+let lastStoreLockState={id:1,locked:false,title:"",message:"",lock_until:null};
 async function getStoreLock(){
   const {data,error}=await supabaseClient.rpc("get_store_lock_state");
-  if(error){console.warn("Store lock SQL not installed:",error);return {id:1,locked:false,title:"",message:"",lock_until:null};}
-  // Supabase RPC grąžina RETURNS TABLE rezultatą kaip masyvą.
-  // Normalizuojame į vieną objektą, kad užraktas nedingtų po išsaugojimo.
-  const row=Array.isArray(data)?data[0]:data;
-  return row||{id:1,locked:false,title:"",message:"",lock_until:null};
+  if(!error){
+    const row=Array.isArray(data)?data[0]:data;
+    if(row){ lastStoreLockState=row; return row; }
+  }
+  // Fallbackas: jei RPC trumpam neatsako, paimame būseną tiesiai iš viešos store_lock eilutės.
+  const fallback=await supabaseClient.from("store_lock").select("id,locked,title,message,updated_at,lock_until").eq("id",1).maybeSingle();
+  if(!fallback.error && fallback.data){
+    const row=fallback.data;
+    row.locked=!!row.locked && (!row.lock_until || new Date(row.lock_until).getTime()>Date.now());
+    lastStoreLockState=row;
+    return row;
+  }
+  console.warn("Store lock state temporarily unavailable:",error||fallback.error);
+  return lastStoreLockState;
 }
 function showStoreLock(lock){
   const o=document.getElementById("storeLockOverlay");
@@ -1079,20 +1089,31 @@ async function saveStoreLock(){
   const {data,error}=await supabaseClient.rpc("set_store_lock",{p_locked:locked,p_title:payload.title,p_message:payload.message,p_duration_minutes:locked&&duration>0?duration:0});
   if(error){console.error(error);return alert("Nepavyko pakeisti parduotuvės būsenos. Paleisk naują SQL.");}
   const next=data||{...payload,id:1,locked,lock_until:null};
-  showStoreLock(next);
+  lastStoreLockState=Array.isArray(next)?next[0]:next;
+  if(isAdmin) document.getElementById("storeLockOverlay")?.classList.remove("open");
+  else showStoreLock(lastStoreLockState);
   await loadStoreLockSettings();
   toast(locked?(duration>0?`🔒 Parduotuvė užrakinta ${duration<60?duration+" min.":duration/60+" val."}`:"🔒 Parduotuvė užrakinta"):"🟢 Parduotuvė vėl prieinama klientams");
 }
 function subscribeStoreLock(){
   if(storeLockChannel)return;
-  storeLockChannel=supabaseClient.channel("store-lock-live").on("postgres_changes",{event:"*",schema:"public",table:"store_lock"},async()=>{await applyStoreLock();if(isAdmin)await loadStoreLockSettings();}).subscribe();
+  storeLockChannel=supabaseClient.channel("store-lock-live")
+    .on("postgres_changes",{event:"*",schema:"public",table:"store_lock"},async()=>{
+      const lock=await getStoreLock();
+      if(isAdmin){ await loadStoreLockSettings(); }
+      else if(lock?.locked){ showStoreLock(lock); }
+      else { document.getElementById("storeLockOverlay")?.classList.remove("open"); }
+    })
+    .subscribe();
 }
 let storeLockExpiryTimer=null;
 function startStoreLockPolling(){
   if(storeLockExpiryTimer)return;
   storeLockExpiryTimer=window.setInterval(async()=>{
     if(document.visibilityState!=="hidden") await applyStoreLock();
-  },15000);
+  },2000);
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState!=="hidden")applyStoreLock();});
+  window.addEventListener("focus",()=>applyStoreLock());
 }
 let storeLockCountdownTimer=null;
 function startStoreLockCountdown(){
