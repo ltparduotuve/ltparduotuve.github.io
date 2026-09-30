@@ -617,7 +617,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     <div class="payment-timer-card">
       <span>⏱️ MOKĖJIMO LAIKAS</span>
       <strong id="bankPayTimer">12:00:00</strong>
-      <small id="bankPayTimerText">Mokėjimas turi būti atliktas per 12 valandų.</small>
+      <small id="bankPayTimerText">Mokėjimas turi būti atliktas per 30 minučių.</small>
     </div>
    </div>
 
@@ -1092,7 +1092,7 @@ async function loadAdminProducts(){
   const {data,error}=await supabaseClient.from("products").select("*").order("created_at",{ascending:false});
   if(error){list.innerHTML='<div class="admin-empty">Nepavyko įkelti prekių. Patikrink Supabase SQL/RLS.</div>';return}
   if(!data?.length){list.innerHTML='<div class="admin-empty">Dar nėra pridėtų prekių.</div>';return}
-  list.innerHTML=data.map(p=>{const d=Number(p.discount_percent||0);const price=salePrice(p);const editData=JSON.stringify(p).replace(/'/g,"&#39;");return `<div class="admin-product"><img src="${escapeHtml(p.image_url||"")}" onerror="this.style.opacity='.25'"><div class="admin-product-info"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(p.category)} • ${d?money(price)+" (−"+d+"%) • ":money(p.price)+" • "}${p.stock_limit!=null?`📦 Limitas: ${Number(p.stock_limit)} • Liko: ${Math.max(0,Number(p.stock_limit)-Number(p.stock_reserved||0)-Number(p.stock_sold||0))}`:"📦 Limitas: neribotas • "}${p.sold_out?"🔴 ISPARDUOTA":""} ${p.active?"🟢 Aktyvi":"🔴 Išjungta"}${p.badge?" • 🏷️ "+escapeHtml(p.badge):""}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editProduct(${editData})'>✏️ Koreguoti</button><button class="admin-secondary ${p.active?'orange':'green'}" onclick="toggleProduct('${p.id}',${!p.active})">${p.active?'🔴 Išjungti':'🟢 Įjungti'}</button><button class="admin-danger" onclick="deleteProduct('${p.id}')">🗑️ Ištrinti</button></div></div>`}).join("");
+  list.innerHTML=data.map(p=>{const d=Number(p.discount_percent||0);const price=salePrice(p);const editData=JSON.stringify(p).replace(/'/g,"&#39;");return `<div class="admin-product"><img src="${escapeHtml(p.image_url||"")}" onerror="this.style.opacity='.25'"><div class="admin-product-info"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(p.category)} • ${d?money(price)+" (−"+d+"%) • ":money(p.price)+" • "}${p.stock_limit!=null?`📦 Limitas: ${Number(p.stock_limit)} • Liko: ${Math.max(0,Number(p.stock_limit)-Number(p.stock_reserved||0)-Number(p.stock_sold||0))}`:"📦 Limitas: neribotas • "}${p.sold_out?"🔴 ISPARDUOTA":""} ${p.active?"🟢 Aktyvi":"🔴 Išjungta"}${p.badge?" • 🏷️ "+escapeHtml(p.badge):""}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editProduct(${editData})'>✏️ Koreguoti</button>${p.stock_limit!=null?`<button class="admin-secondary green" onclick="restockProduct('${p.id}',${Number(p.stock_limit||0)})">📦 Papildyti</button>`:""}<button class="admin-secondary ${p.active?'orange':'green'}" onclick="toggleProduct('${p.id}',${!p.active})">${p.active?'🔴 Išjungti':'🟢 Įjungti'}</button><button class="admin-danger" onclick="deleteProduct('${p.id}')">🗑️ Ištrinti</button></div></div>`}).join("");
 }
 function editProduct(p){
   document.getElementById("productEditId").value=p.id||"";
@@ -1142,6 +1142,19 @@ async function toggleProduct(id,active){
   const {error}=await supabaseClient.from("products").update({active}).eq("id",id);
   if(error)return alert("Nepavyko pakeisti prekės būsenos.");
   await loadAdminProducts();await loadAdminStats();await loadStoreProducts();
+}
+async function restockProduct(id,currentLimit){
+  if(!isAdmin)return;
+  const raw=prompt(`Kiek naujų vienetų gavai?\n\nDabartinis sandėlio limitas: ${Number(currentLimit||0)}`,"1");
+  if(raw===null)return;
+  const qty=Math.floor(Number(raw));
+  if(!Number.isFinite(qty)||qty<=0)return alert("Įrašyk teigiamą sveiką vienetų skaičių.");
+  const {error}=await supabaseClient.rpc("admin_restock_product",{p_product_id:id,p_quantity:qty});
+  if(error){console.error(error);return alert("Nepavyko papildyti prekės. Paleisk naujausią inventoriaus SQL.");}
+  await loadAdminProducts();
+  await loadAdminStats();
+  await loadStoreProducts();
+  toast(`✓ Sandėlis papildytas +${qty} vnt. — prekė vėl gali būti perkama`);
 }
 function productAvailable(p){
   if(p?.stock_limit===null || p?.stock_limit===undefined || p?.stock_limit==="") return Infinity;
@@ -1246,7 +1259,7 @@ let bankPaymentTimer=null;
 
 function paymentDeadline(order){
   const created=new Date(order?.created_at||Date.now()).getTime();
-  return created + (12*60*60*1000);
+  return created + (30*60*1000);
 }
 function formatCountdown(ms){
   ms=Math.max(0,ms);
