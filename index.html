@@ -913,17 +913,23 @@ async function loginUser(event){
 async function enterStore(user){
   const lock=await getStoreLock();
   const admin=await checkAdmin(user);
-  if(lock?.locked && !admin){
-    document.getElementById("authGate").style.display="none";
-    document.body.classList.remove("auth-locked");
-    document.getElementById("userEmail").textContent=user?.email || "Paskyra";
-    document.getElementById("storeLockOverlay").classList.add("open");
-    return;
-  }
-  document.getElementById("storeLockOverlay").classList.remove("open");
   document.getElementById("authGate").style.display="none";
   document.body.classList.remove("auth-locked");
   document.getElementById("userEmail").textContent=user?.email || "Paskyra";
+
+  // Klientas, patekęs į jau užrakintą parduotuvę, turi iškart gauti
+  // pilną užrakto vaizdą, laikmatį ir gyvą būsenos atnaujinimą.
+  // Anksčiau čia buvo return prieš initAdmin(), todėl po refresh
+  // nebuvo paleidžiamas countdown / Realtime / automatinis atrakinimas.
+  if(lock?.locked && !admin){
+    showStoreLock(lock);
+    subscribeStoreLock();
+    startStoreLockPolling();
+    startStoreLockCountdown();
+    return;
+  }
+
+  document.getElementById("storeLockOverlay")?.classList.remove("open");
   initAdmin(user);
   initChat();
 }
@@ -1015,7 +1021,13 @@ async function getStoreLock(){
   const {data,error}=await supabaseClient.rpc("get_store_lock_state");
   if(!error){
     const row=Array.isArray(data)?data[0]:data;
-    if(row){ lastStoreLockState=row; return row; }
+    if(row){
+      // Jei nustatytas automatinio atrakinimo laikas jau praėjo,
+      // klientui būsena turi būti laikoma atrakinta net jei RPC dar grąžina locked=true.
+      if(row.lock_until && new Date(row.lock_until).getTime() <= Date.now()) row.locked=false;
+      lastStoreLockState=row;
+      return row;
+    }
   }
   // Fallbackas: jei RPC trumpam neatsako, paimame būseną tiesiai iš viešos store_lock eilutės.
   const fallback=await supabaseClient.from("store_lock").select("id,locked,title,message,updated_at,lock_until").eq("id",1).maybeSingle();
