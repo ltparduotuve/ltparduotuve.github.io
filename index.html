@@ -1008,8 +1008,11 @@ let activeCoupon=null;
 let storeLockChannel=null;
 async function getStoreLock(){
   const {data,error}=await supabaseClient.rpc("get_store_lock_state");
-  if(error){console.warn("Store lock SQL not installed:",error);return {locked:false};}
-  return data||{id:1,locked:false,title:"",message:"",lock_until:null};
+  if(error){console.warn("Store lock SQL not installed:",error);return {id:1,locked:false,title:"",message:"",lock_until:null};}
+  // Supabase RPC grąžina RETURNS TABLE rezultatą kaip masyvą.
+  // Normalizuojame į vieną objektą, kad užraktas nedingtų po išsaugojimo.
+  const row=Array.isArray(data)?data[0]:data;
+  return row||{id:1,locked:false,title:"",message:"",lock_until:null};
 }
 function showStoreLock(lock){
   const o=document.getElementById("storeLockOverlay");
