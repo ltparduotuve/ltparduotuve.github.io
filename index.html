@@ -210,8 +210,8 @@ body.auth-locked{overflow:hidden}
 .tracking-box{margin-top:12px;padding:12px;border:1px solid #31557e;background:#0b1a2b;border-radius:10px;font-size:11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tracking-box span{font-family:monospace;color:#7fb0ff;font-weight:800}.tracking-box button{margin-left:auto;border:1px solid #31557e;background:#101f33;color:#fff;border-radius:7px;padding:7px 9px;cursor:pointer}
 @media(max-width:750px){.admin-order-stats{grid-template-columns:repeat(2,1fr)}}
 .chat-solve{width:100%;border:0;border-top:1px solid #22334a;background:#0d1726;color:#55d6a7;padding:9px;font-size:9px;cursor:pointer}.chat-solved{text-align:center;padding:30px 15px;color:#cdd8e8}.chat-solved p{font-size:10px;color:#8190a8;margin:8px 0}.rating-stars{display:flex;justify-content:center;gap:4px;margin:12px 0}.rating-stars button{border:0;background:none;color:#ffd45c;font-size:28px;cursor:pointer}.chat-solved input{width:100%;background:#08111d;border:1px solid #2b3e5a;color:#fff;border-radius:8px;padding:9px;font-size:9px}.chat-rate-submit{margin-top:8px;width:100%;border:1px solid #4c8cff;background:#102754;color:#fff;border-radius:8px;padding:9px;font-size:9px}.coupon-applied-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;padding:8px 10px;border:1px solid #23523f;background:#0b2019;border-radius:8px}.coupon-applied-row span{font-size:9px;color:#50d6a0}.coupon-remove{border:1px solid #7b3340;background:#29131a;color:#ff9aaa;border-radius:7px;padding:5px 8px;font-size:8px;cursor:pointer}
+.stock-badge{position:absolute;left:8px;bottom:8px;padding:5px 8px;border-radius:8px;background:#102f27;border:1px solid #2c956f;color:#74f1bf;font-size:8px;font-weight:900;z-index:2}.stock-badge.sold{background:#32141b;border-color:#9b4555;color:#ff9eac}.stock-disabled{opacity:.55!important;cursor:not-allowed!important}.product-modal-stock{margin:-10px 0 15px;padding:8px 10px;border:1px solid #2c956f;background:#0d2b24;color:#74f1bf;border-radius:8px;font-size:10px;font-weight:800}.product-modal-stock.sold{border-color:#9b4555;background:#32141b;color:#ff9eac}.product-modal-stock.reserved{border-color:#87651e;background:#2c220c;color:#ffd36a}.modal-add:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
 </style>
-
 <style id="payment-30min-style">
 .bank-pay-modal{align-items:flex-start;padding:28px 16px;overflow:auto;background:rgba(1,4,10,.96);backdrop-filter:blur(10px)}
 .bank-pay-screen{width:min(720px,100%);max-height:none;margin:10px auto 30px;background:#080d16;border:1px solid #29415f;box-shadow:0 30px 110px #000e}
@@ -459,6 +459,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     <div class="admin-field"><label>NUOTRAUKOS URL</label><input id="productImage" placeholder="https://..."></div>
     <div class="admin-field"><label>ŽENKLIUKAS</label><input id="productBadge" placeholder="Nauja / Populiarus / −20%"></div>
     <div class="admin-field"><label>NUOLAIDA (%)</label><input id="productDiscount" type="number" min="0" max="100" step="1" value="0" placeholder="10"></div>
+    <div class="admin-field"><label>PREKĖS LIMITAS / KIEKIS SANDĖLYJE</label><input id="productStockLimit" type="number" min="0" step="1" placeholder="Pvz. 4 (tuščia = neribota)"></div>
     <div class="admin-field"><label>AKTYVI</label><select id="productActive"><option value="true">Taip</option><option value="false">Ne</option></select></div>
     <div class="admin-field full"><label>APRAŠYMAS</label><textarea id="productDescription" placeholder="Trumpas prekės aprašymas"></textarea></div>
     <div class="admin-actions full"><button class="admin-primary" onclick="saveProduct()">💾 Išsaugoti prekę</button><button class="admin-secondary" onclick="clearProductForm()">Išvalyti</button></div>
@@ -578,6 +579,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <div id="modalBadge" class="modal-badge" style="display:none"></div>
 <h2 id="modalName"></h2><div id="modalCategory" class="product-modal-cat"></div>
 <div id="modalDescription" class="product-modal-desc"></div>
+<div id="modalStock" class="product-modal-stock"></div>
 <div id="modalPrice"></div>
 <div class="modal-actions"><div class="modal-qty"><button onclick="changeModalQty(-1)">−</button><span id="modalQty">1</span><button onclick="changeModalQty(1)">+</button></div><button class="modal-add" onclick="addModalToCart()">🛒 Į KREPŠELĮ</button></div>
 </div></div></div>
@@ -614,8 +616,8 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     <div class="bank-pay-amount"><span>APMOKĖTI SUMĄ</span><b id="bankPayAmount">0,00 €</b></div>
     <div class="payment-timer-card">
       <span>⏱️ MOKĖJIMO LAIKAS</span>
-      <strong id="bankPayTimer">30:00</strong>
-      <small id="bankPayTimerText">Mokėjimas turi būti atliktas per 30 minučių.</small>
+      <strong id="bankPayTimer">12:00:00</strong>
+      <small id="bankPayTimerText">Mokėjimas turi būti atliktas per 12 valandų.</small>
     </div>
    </div>
 
@@ -961,7 +963,32 @@ function subscribePublicUpdates(){
     .on("postgres_changes",{event:"*",schema:"public",table:"store_updates"},()=>loadPublicUpdates())
     .subscribe();
 }
-async function initAdmin(user){await checkAdmin(user);await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();await loadPaymentSettings();await loadPublicUpdates();subscribePublicUpdates();if(isAdmin)subscribeAdminChat();}
+let inventoryRefreshTimer=null;
+async function refreshCartInventory(){
+  if(!cart?.length)return;
+  const ids=cart.map(x=>x.product?.id).filter(Boolean);
+  if(!ids.length)return;
+  const {data}=await supabaseClient.from("products").select("*").in("id",ids);
+  if(!data?.length)return;
+  let changed=false;
+  for(const item of cart){
+    if(!item.product?.id)continue;
+    const fresh=data.find(p=>p.id===item.product.id);
+    if(!fresh)continue;
+    item.product=fresh;
+    const available=productAvailable(fresh);
+    if(available!==Infinity && item.qty>available){
+      item.qty=Math.max(0,available);
+      changed=true;
+    }
+  }
+  const before=cart.length;
+  cart=cart.filter(x=>x.qty>0);
+  if(cart.length!==before)changed=true;
+  if(changed){renderCart();toast("⚠️ Sandėlio kiekis pasikeitė — krepšelis atnaujintas");}
+}
+function startInventoryRefresh(){if(inventoryRefreshTimer)return;inventoryRefreshTimer=window.setInterval(async()=>{if(document.visibilityState!=="hidden"){await loadStoreProducts();await refreshCartInventory();}},8000);}
+async function initAdmin(user){await checkAdmin(user);await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();startInventoryRefresh();await loadPaymentSettings();await loadPublicUpdates();subscribePublicUpdates();if(isAdmin)subscribeAdminChat();}
 async function openAdmin(){
   if(!isAdmin)return alert("Neturite administratoriaus teisių.");
   document.getElementById("adminPanel").classList.add("open");
@@ -1065,7 +1092,7 @@ async function loadAdminProducts(){
   const {data,error}=await supabaseClient.from("products").select("*").order("created_at",{ascending:false});
   if(error){list.innerHTML='<div class="admin-empty">Nepavyko įkelti prekių. Patikrink Supabase SQL/RLS.</div>';return}
   if(!data?.length){list.innerHTML='<div class="admin-empty">Dar nėra pridėtų prekių.</div>';return}
-  list.innerHTML=data.map(p=>{const d=Number(p.discount_percent||0);const price=salePrice(p);const editData=JSON.stringify(p).replace(/'/g,"&#39;");return `<div class="admin-product"><img src="${escapeHtml(p.image_url||"")}" onerror="this.style.opacity='.25'"><div class="admin-product-info"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(p.category)} • ${d?money(price)+" (−"+d+"%) • ":money(p.price)+" • "}${p.active?"🟢 Aktyvi":"🔴 Išjungta"}${p.badge?" • 🏷️ "+escapeHtml(p.badge):""}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editProduct(${editData})'>✏️ Koreguoti</button><button class="admin-secondary ${p.active?'orange':'green'}" onclick="toggleProduct('${p.id}',${!p.active})">${p.active?'🔴 Išjungti':'🟢 Įjungti'}</button><button class="admin-danger" onclick="deleteProduct('${p.id}')">🗑️ Ištrinti</button></div></div>`}).join("");
+  list.innerHTML=data.map(p=>{const d=Number(p.discount_percent||0);const price=salePrice(p);const editData=JSON.stringify(p).replace(/'/g,"&#39;");return `<div class="admin-product"><img src="${escapeHtml(p.image_url||"")}" onerror="this.style.opacity='.25'"><div class="admin-product-info"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(p.category)} • ${d?money(price)+" (−"+d+"%) • ":money(p.price)+" • "}${p.stock_limit!=null?`📦 Limitas: ${Number(p.stock_limit)} • Liko: ${Math.max(0,Number(p.stock_limit)-Number(p.stock_reserved||0)-Number(p.stock_sold||0))}`:"📦 Limitas: neribotas • "}${p.sold_out?"🔴 ISPARDUOTA":""} ${p.active?"🟢 Aktyvi":"🔴 Išjungta"}${p.badge?" • 🏷️ "+escapeHtml(p.badge):""}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editProduct(${editData})'>✏️ Koreguoti</button><button class="admin-secondary ${p.active?'orange':'green'}" onclick="toggleProduct('${p.id}',${!p.active})">${p.active?'🔴 Išjungti':'🟢 Įjungti'}</button><button class="admin-danger" onclick="deleteProduct('${p.id}')">🗑️ Ištrinti</button></div></div>`}).join("");
 }
 function editProduct(p){
   document.getElementById("productEditId").value=p.id||"";
@@ -1075,21 +1102,31 @@ function editProduct(p){
   document.getElementById("productImage").value=p.image_url||"";
   document.getElementById("productBadge").value=p.badge||"";
   document.getElementById("productDiscount").value=p.discount_percent??0;
+  document.getElementById("productStockLimit").value=p.stock_limit??"";
   document.getElementById("productActive").value=String(p.active!==false);
   document.getElementById("productDescription").value=p.description||"";
   document.getElementById("productName").scrollIntoView({behavior:"smooth",block:"center"});
 }
 function clearProductForm(){
-  ["productEditId","productName","productPrice","productImage","productBadge","productDescription"].forEach(id=>document.getElementById(id).value="");
+  ["productEditId","productName","productPrice","productImage","productBadge","productDescription","productStockLimit"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("productDiscount").value="0";
   const sel=document.getElementById("productCategory");if(sel&&sel.options.length)sel.selectedIndex=0;document.getElementById("productActive").value="true";
 }
 async function saveProduct(){
   if(!isAdmin)return alert("Neturite administratoriaus teisių.");
   const discount=Math.min(100,Math.max(0,Number(document.getElementById("productDiscount").value||0)));
-  const payload={name:document.getElementById("productName").value.trim(),price:Number(document.getElementById("productPrice").value),category:document.getElementById("productCategory").value,image_url:document.getElementById("productImage").value.trim(),badge:document.getElementById("productBadge").value.trim(),discount_percent:discount,description:document.getElementById("productDescription").value.trim(),active:document.getElementById("productActive").value==="true"};
+  const rawStock=document.getElementById("productStockLimit")?.value.trim()||"";
+  const stockLimit=rawStock===""?null:Math.max(0,Math.floor(Number(rawStock)));
+  if(rawStock!==""&&!Number.isFinite(stockLimit))return alert("Įrašyk teisingą prekės kiekį.");
+  const payload={name:document.getElementById("productName").value.trim(),price:Number(document.getElementById("productPrice").value),category:document.getElementById("productCategory").value,image_url:document.getElementById("productImage").value.trim(),badge:document.getElementById("productBadge").value.trim(),discount_percent:discount,stock_limit:stockLimit,description:document.getElementById("productDescription").value.trim(),active:document.getElementById("productActive").value==="true",sold_out:stockLimit!==null&&stockLimit>0&&Number((window.__editingProduct||{}).stock_sold||0)>=stockLimit};
   if(!payload.name||!Number.isFinite(payload.price)||payload.price<0)return alert("Įrašyk prekės pavadinimą ir teisingą kainą.");
   const id=document.getElementById("productEditId").value;
+  if(id){
+    const existing=await supabaseClient.from("products").select("stock_sold,stock_reserved").eq("id",id).maybeSingle();
+    const sold=Number(existing.data?.stock_sold||0),reserved=Number(existing.data?.stock_reserved||0);
+    if(stockLimit!==null && stockLimit<sold+reserved)return alert(`Limitas negali būti mažesnis už jau parduotą / rezervuotą kiekį (${sold+reserved}).`);
+    payload.sold_out=stockLimit!==null&&stockLimit>0&&sold>=stockLimit;
+  }
   const result=id?await supabaseClient.from("products").update(payload).eq("id",id):await supabaseClient.from("products").insert(payload);
   if(result.error){console.error(result.error);return alert("Nepavyko išsaugoti prekės. Patikrink Supabase RLS/SQL.");}
   clearProductForm();await loadAdminProducts();await loadAdminStats();await loadStoreProducts();alert("✓ Prekė išsaugota.");
@@ -1106,6 +1143,18 @@ async function toggleProduct(id,active){
   if(error)return alert("Nepavyko pakeisti prekės būsenos.");
   await loadAdminProducts();await loadAdminStats();await loadStoreProducts();
 }
+function productAvailable(p){
+  if(p?.stock_limit===null || p?.stock_limit===undefined || p?.stock_limit==="") return Infinity;
+  return Math.max(0,Number(p.stock_limit||0)-Number(p.stock_reserved||0)-Number(p.stock_sold||0));
+}
+function productStockLabel(p){
+  if(p?.stock_limit===null || p?.stock_limit===undefined || p?.stock_limit==="") return "";
+  const available=productAvailable(p);
+  if(p.sold_out || Number(p.stock_sold||0)>=Number(p.stock_limit||0)) return "Išparduota";
+  if(available<=0) return "Laikinai rezervuota";
+  return `Liko ${available}`;
+}
+
 async function loadStoreProducts(){
   const {data,error}=await supabaseClient.from("products").select("*").eq("active",true).order("created_at",{ascending:false});
   if(error||!data)return;
@@ -1113,9 +1162,13 @@ async function loadStoreProducts(){
   grid.innerHTML="";
   data.forEach(p=>{
     const d=Math.min(100,Math.max(0,Number(p.discount_percent||0))); const finalPrice=salePrice(p);
+    const stockLabel=productStockLabel(p);
+    const unavailable=!!stockLabel&&(stockLabel==="Išparduota"||stockLabel==="Laikinai rezervuota");
     const card=document.createElement("div");card.className="product";card.dataset.cat=p.category;card.dataset.dbId=p.id;
     card.onclick=(e)=>{if(e.target.closest("button"))return;openProductModal(p)};
-    card.innerHTML=`<div class="photo"><img class="product-image" alt="${escapeHtml(p.name)}" src="${escapeHtml(p.image_url||"")}">${p.badge?`<span class="badge ${d?"sale":""}">${escapeHtml(p.badge)}</span>`:d?`<span class="badge sale">−${d}%</span>`:""}<button class="like" onclick="like(this)">♡</button></div><div class="info"><h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(p.category)}</p><div class="price-row"><b class="price">${d?`<span class="discount-old">${money(p.price)}</span><span class="discount-new">${money(finalPrice)}</span>`:money(p.price)}</b><button class="add" onclick='add(${JSON.stringify(p.name)},${finalPrice},1,${JSON.stringify(p)})'>🛒</button></div></div>`;
+    const stockBadge=stockLabel?`<span class="stock-badge ${stockLabel==="Išparduota"?"sold":""}">${stockLabel}</span>`:"";
+    const addButton=unavailable?`<button class="add stock-disabled" disabled title="${escapeHtml(stockLabel)}">${stockLabel==="Išparduota"?"✕":"⏳"}</button>`:`<button class="add" onclick='add(${JSON.stringify(p.name)},${finalPrice},1,${JSON.stringify(p)})'>🛒</button>`;
+    card.innerHTML=`<div class="photo"><img class="product-image" alt="${escapeHtml(p.name)}" src="${escapeHtml(p.image_url||"")}">${p.badge?`<span class="badge ${d?"sale":""}">${escapeHtml(p.badge)}</span>`:d?`<span class="badge sale">−${d}%</span>`:""}${stockBadge}<button class="like" onclick="like(this)">♡</button></div><div class="info"><h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(p.category)}${stockLabel?` • ${escapeHtml(stockLabel)}`:""}</p><div class="price-row"><b class="price">${d?`<span class="discount-old">${money(p.price)}</span><span class="discount-new">${money(finalPrice)}</span>`:money(p.price)}</b>${addButton}</div></div>`;
     grid.appendChild(card);
   });
   filter();
@@ -1136,21 +1189,21 @@ let adminOrdersChannel=null;
 function subscribeAdminOrders(){if(adminOrdersChannel||!isAdmin)return;adminOrdersChannel=supabaseClient.channel("admin-live-orders").on("postgres_changes",{event:"*",schema:"public",table:"orders"},()=>{loadAdminOrders();loadAdminStats()}).subscribe()}
 
 function statusLabel(status){
-  const map={"pending":"Laukia apmokėjimo","paid":"Apmokėtas","processing":"Ruošiama","shipped":"Išsiųstas","completed":"Įvykdyta","cancelled":"Atšauktas"};
+  const map={"pending":"Laukia apmokėjimo","paid":"Apmokėtas","processing":"Ruošiama","shipped":"Išsiųstas","completed":"Įvykdyta","cancelled":"Atšauktas","unpaid":"Neapmokėta"};
   return map[status]||status||"Nežinoma";
 }
 function setOrderProgress(status){
   const steps=[...document.querySelectorAll("#bankPaymentModal .payment-progress-step")];
   if(!steps.length)return;
   const labels=["Krepšelis","Duomenys","Patvirtinimas","Ruošiama","Įvykdyta"];
-  let stage=status==="pending"||status==="cancelled"?3:(status==="processing"?4:(status==="shipped"?4:5));
+  let stage=status==="pending"||status==="cancelled"||status==="unpaid"?3:(status==="processing"?4:(status==="shipped"?4:5));
   steps.forEach((el,i)=>{el.classList.remove("active","done","completed-step");const n=i+1;const b=el.querySelector("b"),sp=el.querySelector("span");if(b)b.textContent=(status==="shipped"&&n===4)?"Išsiųsta":labels[i];if(status==="completed"){el.classList.add("completed-step");if(sp)sp.textContent="✓";return}if(n<stage)el.classList.add("done");if(n===stage)el.classList.add("active");if(sp)sp.textContent=n<stage?"✓":String(n);});
 }
 
 function statusClass(status){
   if(status==="paid"||status==="completed")return "status-paid";
   if(status==="shipped")return "status-shipped";
-  if(status==="cancelled")return "status-cancelled";
+  if(status==="cancelled"||status==="unpaid")return "status-cancelled";
   return "status-pending";
 }
 function formatDate(v){return v?new Date(v).toLocaleString("lt-LT"):"—"}
@@ -1193,12 +1246,15 @@ let bankPaymentTimer=null;
 
 function paymentDeadline(order){
   const created=new Date(order?.created_at||Date.now()).getTime();
-  return created + (30*60*1000);
+  return created + (12*60*60*1000);
 }
 function formatCountdown(ms){
   ms=Math.max(0,ms);
   const total=Math.floor(ms/1000);
-  return String(Math.floor(total/60)).padStart(2,"0")+":"+String(total%60).padStart(2,"0");
+  const h=Math.floor(total/3600);
+  const m=Math.floor((total%3600)/60);
+  const sec=total%60;
+  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
 }
 async function expirePaymentIfNeeded(){
   const order=activeBankPayment.order;
@@ -1215,7 +1271,7 @@ async function tickBankPaymentTimer(){
   const remaining=paymentDeadline(activeBankPayment.order)-Date.now();
   if(remaining<=0){
     clearInterval(bankPaymentTimer);bankPaymentTimer=null;
-    timer.textContent="00:00";timer.style.color="#ff7f8f";
+    timer.textContent="00:00:00";timer.style.color="#ff7f8f";
     if(text)text.textContent="Mokėjimo laikas baigėsi.";
     document.getElementById("bankPayExpired").style.display="block";
     document.getElementById("bankPaySentBtn").disabled=true;
@@ -1323,11 +1379,12 @@ async function loadAdminOrderStats(){
   const rows=data||[];
   const activePaid=rows.filter(o=>["processing","shipped","completed"].includes(o.status));
   const paidSum=activePaid.reduce((a,o)=>a+Number(o.total_amount||0),0);
-  box.innerHTML=`<div class="admin-order-stat"><b>${rows.length}</b><small>VISI UŽSAKYMAI</small></div><div class="admin-order-stat"><b>${rows.filter(o=>o.status==="pending").length}</b><small>LAUKIA APMOKĖJIMO</small></div><div class="admin-order-stat"><b>${rows.filter(o=>o.status==="processing").length}</b><small>RUOŠIAMI</small></div><div class="admin-order-stat"><b>${rows.filter(o=>o.status==="shipped").length}</b><small>IŠSIŲSTI</small></div><div class="admin-order-stat"><b>${rows.filter(o=>o.status==="completed").length}</b><small>ĮVYKDYTI</small></div><div class="admin-order-stat"><b>${money(paidSum)}</b><small>APMOKĖTA / VYKDOMA</small></div>`;
+  box.innerHTML=`<div class="admin-order-stat"><b>${rows.length}</b><small>VISI UŽSAKYMAI</small></div><div class="admin-order-stat"><b>${rows.filter(o=>o.status==="pending").length}</b><small>LAUKIA APMOKĖJIMO</small></div><div class="admin-order-stat"><b>${rows.filter(o=>o.status==="processing").length}</b><small>RUOŠIAMI</small></div><div class="admin-order-stat"><b>${rows.filter(o=>o.status==="shipped").length}</b><small>IŠSIŲSTI</small></div><div class="admin-order-stat"><b>${rows.filter(o=>o.status==="completed").length}</b><small>ĮVYKDYTI</small></div><div class="admin-order-stat"><b>${rows.filter(o=>o.status==="unpaid").length}</b><small>NEAPMOKĖTA</small></div><div class="admin-order-stat"><b>${money(paidSum)}</b><small>APMOKĖTA / VYKDOMA</small></div>`;
 }
 async function loadAdminOrders(){
   const list=document.getElementById("adminOrderList"); if(!list||!isAdmin)return;
   list.innerHTML='<div class="admin-empty">Kraunama...</div>';
+  await expireAllPendingOrders();
   const {data,error}=await supabaseClient.from("orders").select("*, order_items(*)").order("created_at",{ascending:false});
   if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti užsakymų. Patikrink RLS/SQL.</div>';return}
   if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas užsakymų nėra.</div>';await loadAdminOrderStats();return}
@@ -1335,7 +1392,7 @@ async function loadAdminOrders(){
     const items=(o.order_items||[]).map(x=>`${escapeHtml(x.product_name)} × ${x.quantity}`).join(", ");
     let flow="";
     if(o.status==="pending"){
-      flow=`<div class="admin-order-flow"><div class="admin-order-flow-note">${o.payment_sent_at?"Klientas pažymėjo, kad pavedimas išsiųstas. Patikrink banką ir tik tada patvirtink gavimą.":"Pinigai dar nepažymėti kaip išsiųsti. Vis tiek gali rankiniu būdu patvirtinti, kai realiai matai pavedimą."}</div><div class="flow-actions"><button class="admin-secondary admin-confirm-pay" onclick="confirmAdminPayment('${o.id}')">💰 Patvirtinti apmokėjimą → Ruošiama</button><button class="admin-secondary admin-cancelled" onclick="cancelAdminOrder('${o.id}')">✕ Atšaukti</button></div></div>`;
+      flow=`<div class="admin-order-flow"><div class="admin-order-flow-note">${o.payment_sent_at?"Klientas pažymėjo, kad pavedimas išsiųstas. Patikrink banką.":"Laukia apmokėjimo. Jei pinigai realiai gauti, gali patvirtinti rankiniu būdu."}</div><div class="flow-actions"><button class="admin-secondary admin-confirm-pay" onclick="confirmAdminPayment('${o.id}')">💰 Patvirtinti apmokėjimą → Ruošiama</button><button class="admin-secondary admin-cancelled" onclick="markOrderUnpaid('${o.id}')">✕ Neapmokėta / grąžinti prekes</button></div></div>`;
     }else if(o.status==="processing"){
       flow=`<div class="admin-order-flow"><div class="admin-order-flow-note">Užsakymas ruošiamas. Įrašyk siuntos numerį ir tik tada spausk „Išsiųsti“.</div><div class="flow-actions"><input id="tracking-${o.id}" value="${escapeHtml(o.tracking_number||"")}" placeholder="Siuntimo numeris"><button class="admin-secondary admin-shipped" onclick="markOrderShipped('${o.id}')">📦 Išsiųsti</button></div></div>`;
     }else if(o.status==="shipped"){
@@ -1344,6 +1401,8 @@ async function loadAdminOrders(){
       flow=`<div class="admin-order-flow"><div class="admin-order-flow-note admin-completed">✓ Klientas patvirtino, kad gavo užsakymą. Užsakymas įvykdytas.</div></div>`;
     }else if(o.status==="cancelled"){
       flow=`<div class="admin-order-flow"><div class="admin-order-flow-note admin-cancelled">✕ Užsakymas atšauktas.</div></div>`;
+    }else if(o.status==="unpaid"){
+      flow=`<div class="admin-order-flow"><div class="admin-order-flow-note admin-cancelled">✕ Užsakymas pažymėtas kaip neapmokėtas. Prekės grąžintos į sandėlį.</div></div>`;
     }
     return `<div class="order-card clean-order-card"><div class="order-top"><div><div class="order-number">#${escapeHtml(o.order_number)}</div><div class="order-date">${formatDate(o.created_at)}</div><div class="admin-order-customer">${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")}<br>${escapeHtml(items||"Prekių nėra")}</div></div><span class="order-status ${statusClass(o.status)}">${statusLabel(o.status)}</span></div><div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div><div class="order-actions"><button class="order-view-btn" onclick="showOrderDetailsById('${o.id}')">👁️ Peržiūrėti duomenis</button>${o.status==="pending"&&!o.payment_sent_at?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Peržiūrėti apmokėjimą</button>`:""}</div>${flow}</div>`;
   }).join("");
@@ -1355,9 +1414,23 @@ async function confirmAdminPayment(id){
   if(getErr||!o)return alert("Užsakymas nerastas.");
   if(o.status!=="pending")return alert("Šio užsakymo jau nebegalima perkelti į ruošiamus.");
   if(!confirm(`Patvirtinti, kad gavai apmokėjimą už užsakymą #${o.order_number}, ir pradėti jį ruošti?`))return;
-  const {error}=await supabaseClient.from("orders").update({status:"processing",updated_at:new Date().toISOString()}).eq("id",id).eq("status","pending");
-  if(error){console.error(error);return alert("Nepavyko patvirtinti apmokėjimo.");}
-  await loadAdminOrders();await loadAdminStats();toast(`✓ #${o.order_number}: apmokėjimas patvirtintas, užsakymas ruošiamas`);
+  const {error}=await supabaseClient.rpc("admin_confirm_order_payment",{p_order_id:id});
+  if(error){console.error(error);return alert("Nepavyko patvirtinti apmokėjimo. Paleisk inventoriaus SQL.");}
+  await loadAdminOrders();await loadAdminStats();await loadStoreProducts();toast(`✓ #${o.order_number}: apmokėjimas patvirtintas, užsakymas ruošiamas`);
+}
+async function markOrderUnpaid(id){
+  if(!isAdmin)return;
+  const {data:o}=await supabaseClient.from("orders").select("status,order_number,payment_sent_at").eq("id",id).maybeSingle();
+  if(!o)return alert("Užsakymas nerastas.");
+  if(o.status!=="pending")return alert("Neapmokėta galima pažymėti tik laukiančiam apmokėjimo užsakymui.");
+  if(!confirm(`Pažymėti #${o.order_number} kaip neapmokėtą ir grąžinti rezervuotas prekes į sandėlį?`))return;
+  const {error}=await supabaseClient.rpc("admin_mark_order_unpaid",{p_order_id:id});
+  if(error){console.error(error);return alert("Nepavyko pažymėti kaip neapmokėta. Paleisk inventoriaus SQL.");}
+  await loadAdminOrders();await loadAdminStats();await loadStoreProducts();toast(`✓ #${o.order_number}: neapmokėta, prekės grąžintos į sandėlį`);
+}
+async function expireAllPendingOrders(){
+  if(!isAdmin)return;
+  try{await supabaseClient.rpc("expire_all_unpaid_orders");}catch(e){console.warn("Inventory expiry:",e)}
 }
 async function cancelAdminOrder(id){if(!isAdmin)return;const {data:o}=await supabaseClient.from("orders").select("status,order_number").eq("id",id).maybeSingle();if(!o)return;if(!["pending","processing"].includes(o.status))return alert("Šio užsakymo dabar atšaukti nebegalima.");if(!confirm(`Atšaukti užsakymą #${o.order_number}?`))return;const {error}=await supabaseClient.from("orders").update({status:"cancelled",updated_at:new Date().toISOString()}).eq("id",id).in("status",["pending","processing"]);if(error)return alert("Nepavyko atšaukti užsakymo.");await loadAdminOrders();await loadAdminStats();toast("✓ Užsakymas atšauktas");}
 async function markOrderShipped(id){
@@ -1517,9 +1590,9 @@ async function openOrderStatusView(order){
   if(title)title.textContent=`Užsakymas #${order.order_number||"—"}`;
   const status=order.status||"pending";
   setOrderProgress(status);
-  const labels={pending:order.payment_sent_at?"Laukiama mokėjimo patvirtinimo":"Laukiama apmokėjimo",processing:"Ruošiama",shipped:"Išsiųsta",completed:"Įvykdyta",cancelled:"Atšauktas",paid:"Laukiama mokėjimo patvirtinimo"};
+  const labels={pending:order.payment_sent_at?"Laukiama mokėjimo patvirtinimo":"Laukiama apmokėjimo",processing:"Ruošiama",shipped:"Išsiųsta",completed:"Įvykdyta",cancelled:"Atšauktas",unpaid:"Neapmokėta",paid:"Laukiama mokėjimo patvirtinimo"};
   document.getElementById("bankOrderStatusTitle").textContent=labels[status]||statusLabel(status);
-  document.getElementById("bankOrderStatusSub").textContent=status==="completed"?"Užsakymas užbaigtas.":status==="cancelled"?"Užsakymas atšauktas.":status==="shipped"?"Siunta išsiųsta. Patvirtink gavimą tik tada, kai ją fiziškai gausi.":status==="processing"?"Apmokėjimas patvirtintas. Užsakymas dabar ruošiamas.":order.payment_sent_at?"Pavedimas pažymėtas kaip išsiųstas. Laukiama administratoriaus patvirtinimo.":"Užsakymas pateiktas. Laukiama apmokėjimo.";
+  document.getElementById("bankOrderStatusSub").textContent=status==="completed"?"Užsakymas užbaigtas.":status==="cancelled"?"Užsakymas atšauktas.":status==="unpaid"?"Užsakymas neapmokėtas. Prekės grąžintos į sandėlį.":status==="shipped"?"Siunta išsiųsta. Patvirtink gavimą tik tada, kai ją fiziškai gausi.":status==="processing"?"Apmokėjimas patvirtintas. Užsakymas dabar ruošiamas.":order.payment_sent_at?"Pavedimas pažymėtas kaip išsiųstas. Laukiama administratoriaus patvirtinimo.":"Užsakymas pateiktas. Laukiama apmokėjimo.";
   document.getElementById("viewOrderNumber").textContent="#"+(order.order_number||"—");
   document.getElementById("viewOrderStatus").textContent=labels[status]||statusLabel(status);
   document.getElementById("viewOrderTotal").textContent=money(order.total_amount);
@@ -1540,6 +1613,8 @@ async function openOrderStatusView(order){
       ? `<div class="order-sent-note admin-completed">Užsakymas užbaigtas.</div>`
       : order.status==="cancelled"
       ? `<div class="order-sent-note" style="color:#ff8585">✕ Užsakymas atšauktas.</div>`
+      : order.status==="unpaid"
+      ? `<div class="order-sent-note" style="color:#ff8585">✕ Užsakymas neapmokėtas.</div>`
       : `<div class="order-sent-note">⏳ ${order.payment_sent_at?"Laukiama administratoriaus mokėjimo patvirtinimo.":"Laukiama apmokėjimo."}</div>`;
   }
   document.getElementById("viewOrderItems").innerHTML=(order.order_items||[]).map(x=>`<div class="bank-order-item"><span>${escapeHtml(x.product_name)} <small>× ${x.quantity}</small></span><b>${money(Number(x.unit_price)*Number(x.quantity))}</b></div>`).join("")||"<div class='bank-order-item'>Prekių informacija nerasta.</div>";
@@ -1574,7 +1649,7 @@ async function loadMyOrders(){
     <div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div>
     ${o.tracking_number?`<div class="tracking-box">📦 <b>Siuntimo numeris:</b> <span>${escapeHtml(o.tracking_number)}</span><button onclick="copyTracking('${escapeHtml(o.tracking_number)}');event.stopPropagation()">📋 Kopijuoti</button></div>`:""}
     <div class="order-actions" onclick="event.stopPropagation()">
-      ${o.status==="pending"&&!o.payment_sent_at?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Apmokėti užsakymą</button><button class="order-cancel-btn" onclick="cancelMyOrder('${o.id}')">✕ Atšaukti</button>`:""}
+      ${o.status==="pending"&&!o.payment_sent_at?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Apmokėti užsakymą</button>`:""}
       <button class="order-view-btn" onclick="viewMyOrder('${o.id}')">👁️ Peržiūrėti užsakymą</button>
     </div>
     <div class="order-detail" id="order-detail-${o.id}" style="display:none">
@@ -1584,7 +1659,7 @@ async function loadMyOrders(){
        <div class="order-info-box"><small>ADRESAS</small><b>${escapeHtml(o.address||"—")}, ${escapeHtml(o.city||"")}</b></div>
        <div class="order-info-box"><small>EL. PAŠTAS</small><b>${escapeHtml(o.email||"—")}</b></div>
        <div class="order-info-box"><small>TELEFONAS</small><b>${escapeHtml(o.phone||"—")}</b></div>
-       <div class="order-info-box"><small>SIUNTIMO NUMERIS</small><b>${escapeHtml(o.tracking_number||"Dar nepriskirtas")}</b></div><div class="order-info-box"><small>APMOKĖJIMAS</small><b>${o.payment_sent_at?"Pavedimas išsiųstas • laukia patvirtinimo":(o.status==="cancelled"?"Mokėjimo laikas baigėsi":"Laukia pavedimo")}</b></div>
+       <div class="order-info-box"><small>SIUNTIMO NUMERIS</small><b>${escapeHtml(o.tracking_number||"Dar nepriskirtas")}</b></div><div class="order-info-box"><small>APMOKĖJIMAS</small><b>${o.payment_sent_at?"Pavedimas išsiųstas • laukia patvirtinimo":(o.status==="cancelled"?"Mokėjimo laikas baigėsi":(o.status==="unpaid"?"Neapmokėta":"Laukia pavedimo"))}</b></div>
       </div>
     </div>
    </div>`).join("");
@@ -1758,6 +1833,13 @@ function add(name,price,qty=1,product=null){
   qty=Math.max(1,Number(qty)||1);
   const key=product?.id || name;
   const existing=cart.find(x=>x.key===key);
+  if(product?.stock_limit!==null && product?.stock_limit!==undefined && product?.stock_limit!==""){
+    const available=productAvailable(product);
+    const wanted=(existing?.qty||0)+qty;
+    if(wanted>available){
+      return alert(available<=0?"Šios prekės šiuo metu nebėra laisvame sandėlyje.":`Šios prekės galima pridėti tik ${available} vnt.`);
+    }
+  }
   if(existing) existing.qty+=qty;
   else cart.push({key,name,price:Number(price),qty,product});
   renderCart();
@@ -1795,20 +1877,32 @@ function openProductModal(p){
   modalProduct=p; modalQty=1;
   const d=Math.min(100,Math.max(0,Number(p.discount_percent||0)));
   const finalPrice=salePrice(p);
+  const stockLabel=productStockLabel(p);
+  const unavailable=!!stockLabel&&(stockLabel==="Išparduota"||stockLabel==="Laikinai rezervuota");
   document.getElementById("modalImage").src=p.image_url||"";
   document.getElementById("modalImage").alt=p.name||"";
   document.getElementById("modalName").textContent=p.name||"";
   document.getElementById("modalCategory").textContent=p.category||"";
   document.getElementById("modalDescription").textContent=p.description||"Šiai prekei aprašymas dar neįrašytas.";
+  const stock=document.getElementById("modalStock");
+  if(stock){stock.textContent=stockLabel;stock.className="product-modal-stock"+(stockLabel==="Išparduota"?" sold":"")+(stockLabel==="Laikinai rezervuota"?" reserved":"");stock.style.display=stockLabel?"block":"none";}
   const badge=document.getElementById("modalBadge");
   badge.textContent=p.badge|| (d?`−${d}%`:"");
   badge.style.display=(p.badge||d)?"inline-block":"none";
   document.getElementById("modalPrice").innerHTML=d?`<span class="modal-old-price">${money(p.price)}</span><span class="modal-price">${money(finalPrice)}</span>`:`<span class="modal-price">${money(finalPrice)}</span>`;
   document.getElementById("modalQty").textContent="1";
+  const addBtn=document.querySelector("#productModal .modal-add");
+  if(addBtn){addBtn.disabled=unavailable;addBtn.textContent=unavailable?(stockLabel==="Išparduota"?"✕ ISPARDUOTA":"⏳ LAIKINAI REZERVUOTA"):"🛒 Į KREPŠELĮ";}
   document.getElementById("productModal").classList.add("open");
 }
-function changeModalQty(delta){modalQty=Math.max(1,modalQty+delta);document.getElementById("modalQty").textContent=modalQty}
-function addModalToCart(){if(!modalProduct)return;add(modalProduct.name,salePrice(modalProduct),modalQty,modalProduct);closeProductModal()}
+function changeModalQty(delta){
+  if(!modalProduct)return;
+  const max=productAvailable(modalProduct);
+  modalQty=Math.max(1,modalQty+delta);
+  if(max!==Infinity)modalQty=Math.min(modalQty,Math.max(1,max));
+  document.getElementById("modalQty").textContent=modalQty;
+}
+function addModalToCart(){if(!modalProduct)return;const before=cart.find(x=>x.key===(modalProduct.id||modalProduct.name))?.qty||0;add(modalProduct.name,salePrice(modalProduct),modalQty,modalProduct);const after=cart.find(x=>x.key===(modalProduct.id||modalProduct.name))?.qty||0;if(after>before)closeProductModal()}
 function closeProductModal(){document.getElementById("productModal").classList.remove("open");modalProduct=null}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeProductModal()});
 
