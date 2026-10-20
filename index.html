@@ -220,6 +220,7 @@ body.auth-locked{overflow:hidden}
 .store-lock-icon{font-size:54px;margin-bottom:14px}.store-lock-card h2{margin:0 0 12px;font-size:28px}.store-lock-card p{margin:0;color:#9db2cd;line-height:1.6}.store-lock-card .store-lock-small{margin-top:18px;font-size:13px;color:#647c9c}.store-lock-countdown{margin:24px auto 0;padding:16px 20px;width:min(330px,100%);border:1px solid #31527d;border-radius:14px;background:#09182b;box-shadow:inset 0 0 25px rgba(49,82,125,.08)}.store-lock-countdown span{display:block;font-size:10px;font-weight:900;letter-spacing:1px;color:#7f9abb;margin-bottom:6px}.store-lock-countdown b{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:30px;letter-spacing:2px;color:#8fc3ff}
 .store-lock-admin{margin-top:24px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.store-lock-admin button{border:1px solid #31527d;background:#102441;color:#dbeaff;border-radius:12px;padding:11px 18px;cursor:pointer;font-weight:800}
 .store-lock-status{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:#32151a;color:#ffb8bf;font-size:12px;font-weight:900}
+.crypto-overlay{display:none;position:fixed;inset:0;z-index:2600;background:#000d;align-items:center;justify-content:center;padding:16px;overflow:auto}.crypto-overlay.open{display:flex}.crypto-box{width:min(550px,100%);max-height:92vh;overflow:auto;background:#0b1421;border:1px solid #3b5578;border-radius:18px;padding:23px;box-shadow:0 25px 80px #000d}.crypto-box h2{font-size:20px}.crypto-sub{font-size:11px;color:#99a9c0;line-height:1.65;margin:15px 0}.crypto-option{display:block;width:100%;padding:14px;margin-top:10px;text-align:left;border:1px solid #31527d;background:#101f33;color:#fff;border-radius:9px;cursor:pointer}.crypto-option:hover{border-color:#6ea5ff}.crypto-option:disabled{opacity:.4;cursor:not-allowed}.crypto-detail{padding:12px;background:#08111d;border:1px solid #263950;border-radius:10px;margin-top:10px}.crypto-detail small{display:block;font-size:10px;color:#92a5c0;margin-bottom:7px}.crypto-detail strong{font-size:16px;color:#76e8b7}.crypto-address{font-size:12px;overflow-wrap:anywhere;margin:8px 0;user-select:all}
 </style>
 <style id="payment-30min-style">
 .bank-pay-modal{align-items:flex-start;padding:28px 16px;overflow:auto;background:rgba(1,4,10,.96);backdrop-filter:blur(10px)}
@@ -564,6 +565,19 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     <div class="admin-field"><label>RODYTI BANKINĮ APMOKĖJIMĄ</label><select id="payEnabled"><option value="true">Taip</option><option value="false">Ne</option></select></div>
     <div class="admin-actions full"><button class="admin-primary" onclick="savePaymentSettings()">💾 Išsaugoti apmokėjimo duomenis</button><button class="admin-secondary" onclick="loadPaymentSettings()">↻ Atkurti</button></div>
    </div>
+   <div class="admin-note" style="margin-top:20px"><b>Kriptovaliutų mokėjimai</b><br>Įvesk gavimo adresą ir rankiniu būdu nustatyk EUR kursą už vieną monetą. Kursą reguliariai atnaujink. Pirkėjo užsakymui pasirinktas adresas ir kursas užfiksuojami ir vėliau nekeičiami.</div>
+   <div class="admin-form" id="cryptoAdminForm">
+    <div class="admin-field full"><label>Litecoin (LTC) adresas</label><input id="cryptoAddrLTC" placeholder="LTC gavimo adresas" autocomplete="off"></div>
+    <div class="admin-field"><label>EUR už 1 LTC</label><input id="cryptoRateLTC" type="number" step="any" min="0" placeholder="EUR kursas"></div>
+    <div class="admin-field"><label>LTC mokėjimai</label><select id="cryptoEnabledLTC"><option value="true">Įjungti</option><option value="false">Išjungti</option></select></div>
+    <div class="admin-field full"><label>Ethereum (ETH) adresas – Ethereum mainnet</label><input id="cryptoAddrETH" placeholder="0x..." autocomplete="off"></div>
+    <div class="admin-field"><label>EUR už 1 ETH</label><input id="cryptoRateETH" type="number" step="any" min="0" placeholder="EUR kursas"></div>
+    <div class="admin-field"><label>ETH mokėjimai</label><select id="cryptoEnabledETH"><option value="true">Įjungti</option><option value="false">Išjungti</option></select></div>
+    <div class="admin-field full"><label>Solana (SOL) adresas – Solana mainnet</label><input id="cryptoAddrSOL" placeholder="SOL gavimo adresas" autocomplete="off"></div>
+    <div class="admin-field"><label>EUR už 1 SOL</label><input id="cryptoRateSOL" type="number" step="any" min="0" placeholder="EUR kursas"></div>
+    <div class="admin-field"><label>SOL mokėjimai</label><select id="cryptoEnabledSOL"><option value="true">Įjungti</option><option value="false">Išjungti</option></select></div>
+    <div class="admin-actions full"><button class="admin-primary" onclick="saveCryptoSettings()">Išsaugoti kriptovaliutų nustatymus</button><button class="admin-secondary" onclick="loadCryptoSettings()">Atnaujinti</button></div>
+   </div>
    <div class="admin-payment-help">Mokėjimo paskirtis kiekvienam užsakymui sugeneruojama atskirai, pvz. <b>LT-2026-A7F3K9Q2</b>. Klientas turi naudoti būtent savo užsakymo kodą.</div>
   </section>
   <section class="admin-section" id="admin-storelock">
@@ -635,6 +649,8 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 </div>
 
 
+<div id="paymentMethodModal" class="crypto-overlay" onclick="closePaymentMethodModal()"><div class="crypto-box" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center"><h2>Pasirink atsiskaitymo būdą</h2><button class="close" onclick="closePaymentMethodModal()">✕</button></div><p id="paymentMethodOrder" class="crypto-sub"></p><button class="crypto-option" onclick="selectPaymentMethod('bank')">🏦 Bankinis pavedimas</button><button class="crypto-option" onclick="selectPaymentMethod('LTC')">Litecoin (LTC)</button><button class="crypto-option" onclick="selectPaymentMethod('ETH')">Ethereum (ETH) · Ethereum mainnet</button><button class="crypto-option" onclick="selectPaymentMethod('SOL')">Solana (SOL) · Solana mainnet</button><p class="crypto-sub">Mokėjimui skiriama 30 minučių nuo užsakymo sukūrimo. Kriptovaliutų pervedimus tikrina administratorius.</p></div></div>
+<div id="cryptoPaymentModal" class="crypto-overlay" onclick="closeCryptoPayment()"><div class="crypto-box" onclick="event.stopPropagation()"><div style="display:flex;align-items:center;justify-content:space-between"><h2 id="cryptoPayTitle">Kriptovaliutos mokėjimas</h2><button class="close" onclick="closeCryptoPayment()">✕</button></div><p class="crypto-sub" id="cryptoPayOrder"></p><div class="crypto-detail"><small>SUMA</small><strong id="cryptoPayAmount"></strong></div><div class="crypto-detail"><small>TINKLAS</small><strong id="cryptoPayNetwork"></strong></div><div class="crypto-detail"><small>GAVĖJO ADRESAS</small><div class="crypto-address" id="cryptoPayAddress"></div><button class="admin-secondary" onclick="copyCryptoAddress()">📋 Kopijuoti adresą</button></div><div class="crypto-detail"><small>LIKĘS LAIKAS</small><strong id="cryptoPayTimer">30:00</strong></div><p class="crypto-sub">Siųsk tik nurodytą kriptovaliutą nurodytu tinklu. Pasirinkus neteisingą tinklą lėšos gali būti prarastos. Mokėjimą patvirtina administratorius.</p><button id="cryptoSentBtn" class="admin-primary" style="width:100%;padding:13px" onclick="markCryptoPaymentSent()">✓ Pinigai išsiųsti</button></div></div>
 <div id="bankPaymentModal" class="bank-pay-modal" onclick="closeBankPayment()">
  <div class="bank-pay-card bank-pay-screen" onclick="event.stopPropagation()">
   <div class="bank-pay-head">
@@ -1215,13 +1231,13 @@ async function initAdmin(user){await checkAdmin(user);await applyStoreLock();sub
 async function openAdmin(){
   if(!isAdmin)return alert("Neturite administratoriaus teisių.");
   document.getElementById("adminPanel").classList.add("open");
-  await loadAdminStats();await loadCategories();await loadAdminProducts();await loadAdminCoupons();await loadAdminBulkDiscounts();await loadAdminOrders();await loadPaymentSettings();await loadStoreLockSettings();subscribeAdminOrders();await loadAdminChats();
+  await loadAdminStats();await loadCategories();await loadAdminProducts();await loadAdminCoupons();await loadAdminBulkDiscounts();await loadAdminOrders();await loadPaymentSettings();await loadCryptoSettings();await loadStoreLockSettings();subscribeAdminOrders();await loadAdminChats();
 }
 function closeAdmin(){document.getElementById("adminPanel").classList.remove("open")}
 function adminTab(name,btn){
   document.querySelectorAll(".admin-tab").forEach(x=>x.classList.remove("active"));
   document.querySelectorAll(".admin-section").forEach(x=>x.classList.remove("active"));
-  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="updates")loadAdminUpdates();if(name==="bulk")loadAdminBulkDiscounts();if(name==="payments")loadPaymentSettings();if(name==="storelock")loadStoreLockSettings();
+  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="updates")loadAdminUpdates();if(name==="bulk")loadAdminBulkDiscounts();if(name==="payments"){loadPaymentSettings();loadCryptoSettings();}if(name==="storelock")loadStoreLockSettings();
 }
 async function loadAdminStats(){
   const p=await supabaseClient.from("products").select("id",{count:"exact",head:true});
@@ -1458,6 +1474,60 @@ function statusClass(status){
 }
 function formatDate(v){return v?new Date(v).toLocaleString("lt-LT"):"—"}
 
+let currentPaymentChoice=null,cryptoPaymentState=null,cryptoTimerHandle=null;
+async function loadCryptoSettings(){
+ const {data,error}=await supabaseClient.from('store_crypto_wallets').select('currency,address,eur_per_coin,enabled');
+ if(error){console.warn('Crypto SQL missing:',error);return []}
+ if(isAdmin)(data||[]).forEach(w=>{for(const [id,value] of [[`cryptoAddr${w.currency}`,w.address],[`cryptoRate${w.currency}`,w.eur_per_coin],[`cryptoEnabled${w.currency}`,String(w.enabled)]]){const el=document.getElementById(id);if(el)el.value=value??''}});
+ return data||[];
+}
+async function saveCryptoSettings(){
+ if(!isAdmin)return alert('Tik administratoriui.');
+ const updates=['LTC','ETH','SOL'].map(currency=>({currency,address:document.getElementById('cryptoAddr'+currency).value.trim(),eur_per_coin:Number(document.getElementById('cryptoRate'+currency).value),enabled:document.getElementById('cryptoEnabled'+currency).value==='true'}));
+ if(updates.some(x=>x.enabled&&(!x.address||!Number.isFinite(x.eur_per_coin)||x.eur_per_coin<=0)))return alert('Įjungtai valiutai būtinas adresas ir teigiamas EUR kursas.');
+ if(updates.some(x=>x.address&&((x.currency==='ETH'&&!/^0x[0-9a-fA-F]{40}$/.test(x.address))||(x.currency==='SOL'&&!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(x.address)))))return alert('Patikrink ETH arba SOL adresą.');
+ const {error}=await supabaseClient.from('store_crypto_wallets').upsert(updates,{onConflict:'currency'});
+ if(error)return alert('Nepavyko išsaugoti. Paleisk naują Supabase SQL: '+error.message);
+ toast('✓ Kriptovaliutų nustatymai išsaugoti');
+}
+async function openPaymentModal(order){
+ if(!order?.id)return;
+ const {data,error}=await supabaseClient.from('orders').select('*').eq('id',order.id).maybeSingle();
+ if(error||!data)return alert('Nepavyko įkelti užsakymo');
+ if(data.status!=='pending')return openOrderStatusView(data);
+ const {data:existing}=await supabaseClient.from('order_crypto_payments').select('*').eq('order_id',data.id).maybeSingle();
+ if(existing)return openCryptoPayment(data,existing);
+ currentPaymentChoice=data;
+ document.getElementById('paymentMethodOrder').textContent=`Užsakymas #${data.order_number} · ${money(data.total_amount)}`;
+ document.getElementById('paymentMethodModal').classList.add('open');
+ const wallets=await loadCryptoSettings();
+ ['LTC','ETH','SOL'].forEach((c,i)=>{const btn=document.querySelectorAll('#paymentMethodModal .crypto-option')[i+1];if(btn){const w=wallets.find(x=>x.currency===c);btn.disabled=!(w?.enabled&&w.address&&Number(w.eur_per_coin)>0);}});
+}
+function closePaymentMethodModal(){document.getElementById('paymentMethodModal').classList.remove('open')}
+async function selectPaymentMethod(method){
+ const order=currentPaymentChoice;if(!order)return;
+ closePaymentMethodModal();
+ if(method==='bank')return openBankPaymentModal(order);
+ const {data,error}=await supabaseClient.rpc('choose_order_crypto_payment',{p_order_id:order.id,p_currency:method});
+ if(error)return alert('Kriptovaliutos pasirinkti nepavyko: '+error.message);
+ await openCryptoPayment(order,data);
+}
+async function openCryptoPayment(order,payment){
+ clearInterval(cryptoTimerHandle);
+ cryptoPaymentState={order,payment};
+ document.getElementById('cryptoPayTitle').textContent=`Mokėjimas ${payment.currency}`;
+ document.getElementById('cryptoPayOrder').textContent=`Užsakymas #${order.order_number} · ${money(order.total_amount)}`;
+ document.getElementById('cryptoPayAmount').textContent=`${Number(payment.crypto_amount).toFixed(8)} ${payment.currency}`;
+ document.getElementById('cryptoPayNetwork').textContent=payment.currency==='ETH'?'Ethereum mainnet':payment.currency==='SOL'?'Solana mainnet':'Litecoin';
+ document.getElementById('cryptoPayAddress').textContent=payment.wallet_address;
+ const btn=document.getElementById('cryptoSentBtn');btn.disabled=!!order.payment_sent_at;btn.textContent=order.payment_sent_at?'✓ Mokėjimas pažymėtas kaip išsiųstas':'✓ Pinigai išsiųsti';
+ document.getElementById('cryptoPaymentModal').classList.add('open');
+ function tick(){const remain=paymentDeadline(order)-Date.now();document.getElementById('cryptoPayTimer').textContent=remain>0?formatCountdown(remain):'00:00:00';if(remain<=0&&!order.payment_sent_at){btn.disabled=true;btn.textContent='Mokėjimo laikas baigėsi';clearInterval(cryptoTimerHandle);supabaseClient.rpc('expire_order_payment',{p_order_id:order.id});}}
+ tick();cryptoTimerHandle=setInterval(tick,1000);
+}
+function closeCryptoPayment(){clearInterval(cryptoTimerHandle);document.getElementById('cryptoPaymentModal').classList.remove('open')}
+async function copyCryptoAddress(){const v=cryptoPaymentState?.payment?.wallet_address;if(!v)return;try{await navigator.clipboard.writeText(v);toast('✓ Adresas nukopijuotas')}catch(e){alert(v)}}
+async function markCryptoPaymentSent(){const order=cryptoPaymentState?.order;if(!order)return;if(paymentDeadline(order)<=Date.now())return alert('Mokėjimo laikas baigėsi.');const {error}=await supabaseClient.rpc('mark_payment_sent',{p_order_id:order.id});if(error)return alert('Nepavyko pažymėti mokėjimo: '+error.message);order.payment_sent_at=new Date().toISOString();document.getElementById('cryptoSentBtn').disabled=true;document.getElementById('cryptoSentBtn').textContent='✓ Laukiama administratoriaus patvirtinimo';await loadMyOrders();}
 async function loadPaymentSettings(){
   const {data,error}=await supabaseClient.from("store_payment_settings").select("*").eq("id",1).maybeSingle();
   if(error){console.warn("Payment settings SQL not installed:",error);return null}
@@ -1531,7 +1601,7 @@ async function tickBankPaymentTimer(){
   }
   timer.textContent=formatCountdown(remaining);
 }
-async function openPaymentModal(order){
+async function openBankPaymentModal(order){
   if(!order?.id)return alert("Užsakymas nerastas.");
   const freshRes=await supabaseClient.from("orders").select("*, order_items(*)").eq("id",order.id).maybeSingle();
   if(freshRes.error||!freshRes.data)return alert("Nepavyko įkelti užsakymo.");
@@ -1638,7 +1708,10 @@ async function loadAdminOrders(){
   const {data,error}=await supabaseClient.from("orders").select("*, order_items(*)").order("created_at",{ascending:false});
   if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti užsakymų. Patikrink RLS/SQL.</div>';return}
   if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas užsakymų nėra.</div>';await loadAdminOrderStats();return}
+  const {data:cryptoRows}=await supabaseClient.from('order_crypto_payments').select('order_id,currency,crypto_amount,wallet_address').in('order_id',data.map(x=>x.id));
+  const cryptoMap=new Map((cryptoRows||[]).map(x=>[x.order_id,x]));
   list.innerHTML=data.map(o=>{
+    const crypto=cryptoMap.get(o.id);
     const items=(o.order_items||[]).map(x=>`${escapeHtml(x.product_name)} × ${x.quantity}`).join(", ");
     let flow="";
     if(o.status==="pending"){
@@ -1654,7 +1727,7 @@ async function loadAdminOrders(){
     }else if(o.status==="unpaid"){
       flow=`<div class="admin-order-flow"><div class="admin-order-flow-note admin-cancelled">✕ Užsakymas pažymėtas kaip neapmokėtas.</div></div>`;
     }
-    return `<div class="order-card clean-order-card"><div class="order-top"><div><div class="order-number">#${escapeHtml(o.order_number)}</div><div class="order-date">${formatDate(o.created_at)}</div><div class="admin-order-customer">${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")}<br>${escapeHtml(items||"Prekių nėra")}</div></div><span class="order-status ${statusClass(o.status)}">${statusLabel(o.status)}</span></div><div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div><div class="order-actions"><button class="order-view-btn" onclick="showOrderDetailsById('${o.id}')">👁️ Peržiūrėti duomenis</button><button class="admin-danger" onclick="deleteOneAdminOrder('${o.id}','${escapeHtml(o.order_number)}')">🗑️ Ištrinti</button>${o.status==="pending"&&!o.payment_sent_at?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Peržiūrėti apmokėjimą</button>`:""}</div>${flow}</div>`;
+    return `<div class="order-card clean-order-card"><div class="order-top"><div><div class="order-number">#${escapeHtml(o.order_number)}</div><div class="order-date">${formatDate(o.created_at)}</div><div class="admin-order-customer">${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")}<br>${escapeHtml(items||"Prekių nėra")}${crypto?`<br>💰 Crypto: ${Number(crypto.crypto_amount).toFixed(8)} ${escapeHtml(crypto.currency)} · ${escapeHtml(crypto.wallet_address)}`:""}</div></div><span class="order-status ${statusClass(o.status)}">${statusLabel(o.status)}</span></div><div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div><div class="order-actions"><button class="order-view-btn" onclick="showOrderDetailsById('${o.id}')">👁️ Peržiūrėti duomenis</button><button class="admin-danger" onclick="deleteOneAdminOrder('${o.id}','${escapeHtml(o.order_number)}')">🗑️ Ištrinti</button>${o.status==="pending"&&!o.payment_sent_at?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Peržiūrėti apmokėjimą</button>`:""}</div>${flow}</div>`;
   }).join("");
   await loadAdminOrderStats();
 }
