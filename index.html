@@ -646,7 +646,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 </div>
 <div class="coupon-box"><label class="coupon-toggle"><input id="couponToggle" type="checkbox" onchange="toggleCouponBox()"><span>Turiu nuolaidos kodą</span></label><div id="couponForm" class="coupon-hidden"><div class="coupon-row"><input id="couponInput" placeholder="Įrašyk nuolaidos kodą"><button class="admin-primary" onclick="applyCoupon()">Pritaikyti</button></div><div class="coupon-message" id="couponMessage"></div></div></div>
 <div class="cart-summary"><div class="cart-summary-row"><span>Tarpinė suma</span><strong id="subtotal">0.00 €</strong></div><div class="cart-summary-row"><span>Kupono nuolaida</span><strong id="discountTotal">− 0.00 €</strong></div><div class="cart-summary-row" id="bulkDiscountRow" style="display:none"><span id="bulkDiscountLabel">Kiekio akcija</span><strong id="bulkDiscountTotal">− 0.00 €</strong></div><div class="cart-summary-total"><span>Iš viso</span><b id="total">0.00 €</b></div><div id="couponApplied"></div></div>
-<button class="checkout" style="margin-top:14px" onclick="openCheckout()">TĘSTI Į UŽSAKYMO FORMĄ →</button>
+<button id="cartProceedCheckout" type="button" class="checkout" style="margin-top:14px" onclick="return openCheckout()">TĘSTI Į UŽSAKYMO FORMĄ →</button>
 </aside></div>
 
 <div id="productModal" class="product-modal" onclick="closeProductModal()">
@@ -2135,60 +2135,34 @@ async function handleCheckoutSaveToggle(checked){
   if(data?.user?.email)document.getElementById("coEmail").value=data.user.email;
 }
 function openCheckout(){
-  if(!Array.isArray(cart) || !cart.length){
-    alert("Krepšelis tuščias.");
-    return false;
-  }
-
-  const cartBg=document.getElementById("cartBg");
   const modal=document.getElementById("checkoutModal");
-  if(!modal){
-    alert("Užsakymo forma nerasta. Perkrauk puslapį.");
-    return false;
-  }
-
-  // Open the checkout FIRST. Nothing asynchronous can block the navigation.
-  if(cartBg) cartBg.style.display="none";
+  if(!modal){alert("Užsakymo forma nerasta. Perkrauk puslapį.");return false;}
+  if(!Array.isArray(cart)||cart.length===0){alert("Krepšelis tuščias.");return false;}
+  // Show the delivery form synchronously, regardless of profile/API loading.
+  document.getElementById("cartBg")?.style.setProperty("display","none");
   modal.classList.add("open");
-  modal.style.display="flex";
+  modal.style.setProperty("display","flex","important");
   document.body.style.overflow="hidden";
-
   const errorEl=document.getElementById("checkoutError");
-  if(errorEl) errorEl.textContent="";
-
-  clearCheckoutFields();
-
-  const saveBox=document.getElementById("saveCheckoutData");
-  let saved=null;
+  if(errorEl)errorEl.textContent="";
   try{
-    const raw=localStorage.getItem("ltparduotuve_checkout");
-    saved=raw?JSON.parse(raw):null;
-  }catch(e){ saved=null; }
-
-  if(saveBox) saveBox.checked=!!saved;
-
-  if(saved){
-    const fields={
-      coFirstName:saved.first_name||"",
-      coLastName:saved.last_name||"",
-      coPhone:saved.phone||"",
-      coAddress:saved.address||"",
-      coCity:saved.city||"",
-      coPostal:saved.postal_code||""
-    };
-    Object.entries(fields).forEach(([id,value])=>{
-      const el=document.getElementById(id);
-      if(el) el.value=value;
-    });
-  }
-
-  // Email is only read after the checkout is already visible.
-  supabaseClient.auth.getUser().then(({data})=>{
-    const email=document.getElementById("coEmail");
-    if(email && data?.user?.email) email.value=data.user.email;
-  }).catch(err=>console.warn("Auth email:",err));
-
-  renderCheckoutSummary();
+    clearCheckoutFields();
+    const saved=JSON.parse(localStorage.getItem("ltparduotuve_checkout")||"null");
+    const checkbox=document.getElementById("saveCheckoutData");
+    if(checkbox)checkbox.checked=!!saved;
+    if(saved){
+      for(const [id,key] of Object.entries({coFirstName:"first_name",coLastName:"last_name",coPhone:"phone",coAddress:"address",coCity:"city",coPostal:"postal_code"})){
+        const el=document.getElementById(id);if(el)el.value=saved[key]||"";
+      }
+    }
+  }catch(err){console.warn("Checkout autofill:",err);}
+  try{renderCheckoutSummary()}catch(err){console.error("Checkout summary:",err);}
+  try{
+    supabaseClient.auth.getUser().then(({data})=>{
+      const email=document.getElementById("coEmail");
+      if(email&&data?.user?.email)email.value=data.user.email;
+    }).catch(err=>console.warn("Checkout user:",err));
+  }catch(err){console.warn("Checkout user:",err)}
   return false;
 }
 
@@ -2243,9 +2217,11 @@ async function submitOrder(){
   subscribeMyOrderUpdates();
   await loadMyOrders();
   toast(`✓ Užsakymas #${order.order_number||"sukurtas"}`);
-  activeBankPayment.order.payment_sent_at=new Date().toISOString();
-  document.querySelector("#bankPaymentModal .bank-pay-actions").style.display="none";
-  await loadMyOrders();
+  // The customer chooses a payment method only AFTER the checkout form is submitted.
+  if(order?.id){
+    try{await openPaymentModal(order)}
+    catch(err){console.error("Payment selection:",err);alert("Užsakymas sukurtas. Mokėjimą gali atidaryti per „Mano užsakymai“.")}
+  }
 }
 let cart=[];
 const CART_STORAGE_KEY='ltparduotuve_cart_v2';
