@@ -474,7 +474,6 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
      <div class="admin-stat"><b id="statOrders">0</b><span>UŽSAKYMAI</span></div>
      <div class="admin-stat"><b id="statRevenue">0.00 €</b><span>UŽSAKYMŲ SUMA</span></div>
    </div>
-   <div class="admin-note">Admin teisės tikrinamos per Supabase. Duomenų bazės RLS taisyklės riboja administratoriaus veiksmus.</div>
   </section>
   <section class="admin-section" id="admin-products">
    <div class="admin-note"><b>📦 Prekių valdymas</b><br>Čia gali pridėti naują prekę arba paspausti <b>✏️ Koreguoti</b> prie jau esančios prekės. Taip pat gali ją išjungti arba visam laikui ištrinti.</div>
@@ -486,7 +485,8 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     <div class="admin-field"><label>NUOTRAUKOS URL</label><input id="productImage" placeholder="https://..."></div>
     <div class="admin-field"><label>ŽENKLIUKAS</label><input id="productBadge" placeholder="Nauja / Populiarus / −20%"></div>
     <div class="admin-field"><label>NUOLAIDA (%)</label><input id="productDiscount" type="number" min="0" max="100" step="1" value="0" placeholder="10"></div>
-    <div class="admin-field"><label>PREKĖS LIMITAS / KIEKIS SANDĖLYJE</label><input id="productStockLimit" type="number" min="0" step="1" placeholder="Pvz. 4 (tuščia = neribota)"></div>
+    <div class="admin-field"><label>PREKĖS LIMITAS / KIEKIS SANDĖLYJE</label><input id="productStockLimit" type="number" min="0" step="1" placeholder="Pvz. 4 (0 = neribota)"></div>
+    <div class="admin-field"><label>PREKĖS BŪSENA</label><select id="productSoldOut"><option value="false">Parduodama</option><option value="true">Parduota / neparduodama (rodyti kataloge)</option></select></div>
     <div class="admin-field"><label>AKTYVI</label><select id="productActive"><option value="true">Taip</option><option value="false">Ne</option></select></div>
     <div class="admin-field full"><label>APRAŠYMAS</label><textarea id="productDescription" placeholder="Trumpas prekės aprašymas"></textarea></div>
     <div class="admin-actions full"><button class="admin-primary" onclick="saveProduct()">💾 Išsaugoti prekę</button><button class="admin-secondary" onclick="clearProductForm()">Išvalyti</button></div>
@@ -501,6 +501,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     <div class="admin-field"><label>PAVADINIMAS</label><input id="categoryName" placeholder="Pvz. Geriausi pasirinkimai"></div>
     <div class="admin-field"><label>APRAŠYMAS</label><input id="categoryDescription" placeholder="Trumpas kategorijos aprašymas"></div>
     <div class="admin-field"><label>TVARKA</label><input id="categorySort" type="number" min="0" step="1" value="0" placeholder="0"></div>
+    <div class="admin-field"><label>PREKĖS BŪSENA</label><select id="productSoldOut"><option value="false">Parduodama</option><option value="true">Parduota / neparduodama (rodyti kataloge)</option></select></div>
     <div class="admin-field"><label>AKTYVI</label><select id="categoryActive"><option value="true">Taip</option><option value="false">Ne</option></select></div>
     <div class="admin-actions full"><button class="admin-primary" onclick="saveCategory()">💾 Išsaugoti kategoriją</button><button class="admin-secondary" onclick="clearCategoryForm()">Išvalyti</button></div>
    </div>
@@ -528,6 +529,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     <input type="hidden" id="bulkEditId">
     <div class="admin-field"><label>NUO KIEK PREKIŲ</label><input id="bulkMinItems" type="number" min="1" step="1" placeholder="2"></div>
     <div class="admin-field"><label>NUOLAIDA (%)</label><input id="bulkDiscount" type="number" min="0" max="100" step="0.1" placeholder="5"></div>
+    <div class="admin-field"><label>PREKĖS BŪSENA</label><select id="productSoldOut"><option value="false">Parduodama</option><option value="true">Parduota / neparduodama (rodyti kataloge)</option></select></div>
     <div class="admin-field"><label>AKTYVI</label><select id="bulkActive"><option value="true">Taip</option><option value="false">Ne</option></select></div>
     <div class="admin-actions full"><button class="admin-primary" onclick="saveBulkDiscount()">💾 Išsaugoti akciją</button><button class="admin-secondary" onclick="clearBulkDiscountForm()">Išvalyti</button></div>
    </div>
@@ -703,7 +705,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
        <div><span>TELEFONAS</span><b id="viewOrderPhone">—</b></div>
        <div><span>SIUNTIMO NR.</span><b id="viewOrderTracking2">—</b></div>
      </div>
-     <div class="bank-order-code" id="viewOrderCode">Mokėjimo kodas: —</div>
+     <div class="bank-order-code" id="viewOrderCode">Mokėjimo paskirtis: —</div>
      <div id="viewOrderActions" class="order-view-actions"></div>
    </div>
 
@@ -1050,7 +1052,7 @@ function showStoreLock(lock){
   const until=lock?.lock_until?new Date(lock.lock_until):null;
   const timed=!!(until && !Number.isNaN(until.getTime()));
   if(wrap)wrap.style.display=(lock?.locked&&timed)?"block":"none";
-  if(untilText)untilText.textContent=lock?.locked?(timed?`Atsidarys: ${until.toLocaleString("lt-LT",{dateStyle:"short",timeStyle:"short"})}`:"Parduotuvė liks užrakinta, kol ją atrakinsi."):"Pabandykite grįžti vėliau.";
+  if(untilText)untilText.textContent=lock?.locked?(timed?`Atsidarys: ${until.toLocaleString("lt-LT",{dateStyle:"short",timeStyle:"short"})}`:"Parduotuvė šiuo metu nepasiekiama."):"Pabandykite grįžti vėliau.";
   o.classList.toggle("open",!!lock?.locked);
   updateStoreLockCountdown(lock);
 }
@@ -1168,7 +1170,7 @@ async function refreshCartInventory(){
     const fresh=data.find(p=>p.id===item.product.id);
     if(!fresh)continue;
     item.product=fresh;
-    const available=productAvailable(fresh);
+    const available=fresh.sold_out?0:productAvailable(fresh);
     if(available!==Infinity && item.qty>available){
       item.qty=Math.max(0,available);
       changed=true;
@@ -1284,7 +1286,7 @@ async function loadAdminProducts(){
   const {data,error}=await supabaseClient.from("products").select("*").order("created_at",{ascending:false});
   if(error){list.innerHTML='<div class="admin-empty">Nepavyko įkelti prekių. Patikrink Supabase SQL/RLS.</div>';return}
   if(!data?.length){list.innerHTML='<div class="admin-empty">Dar nėra pridėtų prekių.</div>';return}
-  list.innerHTML=data.map(p=>{const d=Number(p.discount_percent||0);const price=salePrice(p);const editData=JSON.stringify(p).replace(/'/g,"&#39;");return `<div class="admin-product"><img src="${escapeHtml(p.image_url||"")}" onerror="this.style.opacity='.25'"><div class="admin-product-info"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(p.category)} • ${d?money(price)+" (−"+d+"%) • ":money(p.price)+" • "}${p.stock_limit!=null?`📦 Limitas: ${Number(p.stock_limit)} • Liko: ${Math.max(0,Number(p.stock_limit)-Number(p.stock_reserved||0)-Number(p.stock_sold||0))}`:"📦 Limitas: neribotas • "}${p.sold_out?"🔴 ISPARDUOTA":""} ${p.active?"🟢 Aktyvi":"🔴 Išjungta"}${p.badge?" • 🏷️ "+escapeHtml(p.badge):""}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editProduct(${editData})'>✏️ Koreguoti</button>${p.stock_limit!=null?`<button class="admin-secondary green" onclick="restockProduct('${p.id}',${Number(p.stock_limit||0)})">📦 Papildyti</button>`:""}<button class="admin-secondary ${p.active?'orange':'green'}" onclick="toggleProduct('${p.id}',${!p.active})">${p.active?'🔴 Išjungti':'🟢 Įjungti'}</button><button class="admin-danger" onclick="deleteProduct('${p.id}')">🗑️ Ištrinti</button></div></div>`}).join("");
+  list.innerHTML=data.map(p=>{const d=Number(p.discount_percent||0);const price=salePrice(p);const editData=JSON.stringify(p).replace(/'/g,"&#39;");return `<div class="admin-product"><img src="${escapeHtml(p.image_url||"")}" onerror="this.style.opacity='.25'"><div class="admin-product-info"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(p.category)} • ${d?money(price)+" (−"+d+"%) • ":money(p.price)+" • "}${p.stock_limit!=null&&Number(p.stock_limit)>0?`📦 Limitas: ${Number(p.stock_limit)} • Liko: ${Math.max(0,Number(p.stock_limit)-Number(p.stock_reserved||0)-Number(p.stock_sold||0))}`:"📦 Limitas: neribotas • "}${p.sold_out?"🔴 ISPARDUOTA":""} ${p.active?"🟢 Aktyvi":"🔴 Išjungta"}${p.badge?" • 🏷️ "+escapeHtml(p.badge):""}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editProduct(${editData})'>✏️ Koreguoti</button>${p.stock_limit!=null&&Number(p.stock_limit)>0?`<button class="admin-secondary green" onclick="restockProduct('${p.id}',${Number(p.stock_limit||0)})">📦 Papildyti</button>`:""}<button class="admin-secondary ${p.active?'orange':'green'}" onclick="toggleProduct('${p.id}',${!p.active})">${p.active?'🔴 Išjungti':'🟢 Įjungti'}</button><button class="admin-danger" onclick="deleteProduct('${p.id}')">🗑️ Ištrinti</button></div></div>`}).join("");
 }
 function editProduct(p){
   document.getElementById("productEditId").value=p.id||"";
@@ -1294,13 +1296,16 @@ function editProduct(p){
   document.getElementById("productImage").value=p.image_url||"";
   document.getElementById("productBadge").value=p.badge||"";
   document.getElementById("productDiscount").value=p.discount_percent??0;
-  document.getElementById("productStockLimit").value=p.stock_limit??"";
+  document.getElementById("productStockLimit").value=p.stock_limit??0;
+  document.getElementById("productSoldOut").value=String(!!p.sold_out);
   document.getElementById("productActive").value=String(p.active!==false);
   document.getElementById("productDescription").value=p.description||"";
   document.getElementById("productName").scrollIntoView({behavior:"smooth",block:"center"});
 }
 function clearProductForm(){
   ["productEditId","productName","productPrice","productImage","productBadge","productDescription","productStockLimit"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("productSoldOut").value="false";
+  document.getElementById("productStockLimit").value="0";
   document.getElementById("productDiscount").value="0";
   const sel=document.getElementById("productCategory");if(sel&&sel.options.length)sel.selectedIndex=0;document.getElementById("productActive").value="true";
 }
@@ -1308,16 +1313,16 @@ async function saveProduct(){
   if(!isAdmin)return alert("Neturite administratoriaus teisių.");
   const discount=Math.min(100,Math.max(0,Number(document.getElementById("productDiscount").value||0)));
   const rawStock=document.getElementById("productStockLimit")?.value.trim()||"";
-  const stockLimit=rawStock===""?null:Math.max(0,Math.floor(Number(rawStock)));
+  const stockLimit=rawStock===""||Number(rawStock)===0?null:Math.max(0,Math.floor(Number(rawStock)));
   if(rawStock!==""&&!Number.isFinite(stockLimit))return alert("Įrašyk teisingą prekės kiekį.");
-  const payload={name:document.getElementById("productName").value.trim(),price:Number(document.getElementById("productPrice").value),category:document.getElementById("productCategory").value,image_url:document.getElementById("productImage").value.trim(),badge:document.getElementById("productBadge").value.trim(),discount_percent:discount,stock_limit:stockLimit,description:document.getElementById("productDescription").value.trim(),active:document.getElementById("productActive").value==="true",sold_out:stockLimit!==null&&stockLimit>0&&Number((window.__editingProduct||{}).stock_sold||0)>=stockLimit};
+  const payload={name:document.getElementById("productName").value.trim(),price:Number(document.getElementById("productPrice").value),category:document.getElementById("productCategory").value,image_url:document.getElementById("productImage").value.trim(),badge:document.getElementById("productBadge").value.trim(),discount_percent:discount,stock_limit:stockLimit,description:document.getElementById("productDescription").value.trim(),active:document.getElementById("productActive").value==="true",sold_out:document.getElementById("productSoldOut").value==="true"||(stockLimit!==null&&Number((window.__editingProduct||{}).stock_sold||0)>=stockLimit)};
   if(!payload.name||!Number.isFinite(payload.price)||payload.price<0)return alert("Įrašyk prekės pavadinimą ir teisingą kainą.");
   const id=document.getElementById("productEditId").value;
   if(id){
     const existing=await supabaseClient.from("products").select("stock_sold,stock_reserved").eq("id",id).maybeSingle();
     const sold=Number(existing.data?.stock_sold||0),reserved=Number(existing.data?.stock_reserved||0);
     if(stockLimit!==null && stockLimit<sold+reserved)return alert(`Limitas negali būti mažesnis už jau parduotą / rezervuotą kiekį (${sold+reserved}).`);
-    payload.sold_out=stockLimit!==null&&stockLimit>0&&sold>=stockLimit;
+    payload.sold_out=document.getElementById("productSoldOut").value==="true"||(stockLimit!==null&&sold>=stockLimit);
   }
   const result=id?await supabaseClient.from("products").update(payload).eq("id",id):await supabaseClient.from("products").insert(payload);
   if(result.error){console.error(result.error);return alert("Nepavyko išsaugoti prekės. Patikrink Supabase RLS/SQL.");}
@@ -1349,11 +1354,12 @@ async function restockProduct(id,currentLimit){
   toast(`✓ Sandėlis papildytas +${qty} vnt. — prekė vėl gali būti perkama`);
 }
 function productAvailable(p){
-  if(p?.stock_limit===null || p?.stock_limit===undefined || p?.stock_limit==="") return Infinity;
+  if(p?.stock_limit===null || p?.stock_limit===undefined || p?.stock_limit==="" || Number(p.stock_limit)===0) return Infinity;
   return Math.max(0,Number(p.stock_limit||0)-Number(p.stock_reserved||0)-Number(p.stock_sold||0));
 }
 function productStockLabel(p){
-  if(p?.stock_limit===null || p?.stock_limit===undefined || p?.stock_limit==="") return "";
+  if(p?.sold_out)return "Parduota";
+  if(p?.stock_limit===null || p?.stock_limit===undefined || p?.stock_limit==="" || Number(p.stock_limit)===0) return "";
   const available=productAvailable(p);
   if(p.sold_out || Number(p.stock_sold||0)>=Number(p.stock_limit||0)) return "Išparduota";
   if(available<=0) return "Laikinai rezervuota";
@@ -1368,11 +1374,11 @@ async function loadStoreProducts(){
   data.forEach(p=>{
     const d=Math.min(100,Math.max(0,Number(p.discount_percent||0))); const finalPrice=salePrice(p);
     const stockLabel=productStockLabel(p);
-    const unavailable=!!stockLabel&&(stockLabel==="Išparduota"||stockLabel==="Laikinai rezervuota");
+    const unavailable=!!stockLabel&&(stockLabel==="Išparduota"||stockLabel==="Parduota"||stockLabel==="Laikinai rezervuota");
     const card=document.createElement("div");card.className="product";card.dataset.cat=p.category;card.dataset.dbId=p.id;
     card.onclick=(e)=>{if(e.target.closest("button"))return;openProductModal(p)};
-    const stockBadge=stockLabel?`<span class="stock-badge ${stockLabel==="Išparduota"?"sold":""}">${stockLabel}</span>`:"";
-    const addButton=unavailable?`<button class="add stock-disabled" disabled title="${escapeHtml(stockLabel)}">${stockLabel==="Išparduota"?"✕":"⏳"}</button>`:`<button class="add" onclick='add(${JSON.stringify(p.name)},${finalPrice},1,${JSON.stringify(p)})'>🛒</button>`;
+    const stockBadge=stockLabel?`<span class="stock-badge ${(stockLabel==="Išparduota"||stockLabel==="Parduota")?"sold":""}">${stockLabel}</span>`:"";
+    const addButton=unavailable?`<button class="add stock-disabled" disabled title="${escapeHtml(stockLabel)}">${(stockLabel==="Išparduota"||stockLabel==="Parduota")?"✕":"⏳"}</button>`:`<button class="add" onclick='add(${JSON.stringify(p.name)},${finalPrice},1,${JSON.stringify(p)})'>🛒</button>`;
     card.innerHTML=`<div class="photo"><img class="product-image" alt="${escapeHtml(p.name)}" src="${escapeHtml(p.image_url||"")}">${p.badge?`<span class="badge ${d?"sale":""}">${escapeHtml(p.badge)}</span>`:d?`<span class="badge sale">−${d}%</span>`:""}${stockBadge}<button class="like" onclick="like(this)">♡</button></div><div class="info"><h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(p.category)}${stockLabel?` • ${escapeHtml(stockLabel)}`:""}</p><div class="price-row"><b class="price">${d?`<span class="discount-old">${money(p.price)}</span><span class="discount-new">${money(finalPrice)}</span>`:money(p.price)}</b>${addButton}</div></div>`;
     grid.appendChild(card);
   });
@@ -1447,10 +1453,10 @@ function randomPaymentReference(){
   return `LT-${new Date().getFullYear()}-${out}`;
 }
 async function ensurePaymentReference(orderId){
-  const {data,error}=await supabaseClient.rpc("assign_order_payment_reference",{p_order_id:orderId});
+  const {data,error}=await supabaseClient.rpc("assign_order_payment_purpose",{p_order_id:orderId});
   if(error){
     console.error("PAYMENT REFERENCE ERROR",error);
-    alert("Mokėjimo kodo klaida: " + (error.message || error.details || error.hint || "Nežinoma Supabase klaida"));
+    alert("Mokėjimo paskirties klaida: " + (error.message || error.details || error.hint || "Nežinoma Supabase klaida"));
     return null;
   }
   return data||null;
@@ -1817,7 +1823,7 @@ async function openOrderStatusView(order){
   document.getElementById("viewOrderCity").textContent=(order.city||"—")+" "+(order.postal_code||"");
   document.getElementById("viewOrderEmail").textContent=order.email||"—";
   document.getElementById("viewOrderPhone").textContent=order.phone||"—";
-  document.getElementById("viewOrderCode").textContent="Mokėjimo kodas: "+(order.payment_reference||"—");
+  document.getElementById("viewOrderCode").textContent="Mokėjimo paskirtis: "+(order.payment_reference||"—");
   const orderActions=document.getElementById("viewOrderActions");
   if(orderActions){
     orderActions.innerHTML=order.status==="shipped"
@@ -2093,21 +2099,21 @@ function openProductModal(p){
   const d=Math.min(100,Math.max(0,Number(p.discount_percent||0)));
   const finalPrice=salePrice(p);
   const stockLabel=productStockLabel(p);
-  const unavailable=!!stockLabel&&(stockLabel==="Išparduota"||stockLabel==="Laikinai rezervuota");
+  const unavailable=!!stockLabel&&(stockLabel==="Išparduota"||stockLabel==="Parduota"||stockLabel==="Laikinai rezervuota");
   document.getElementById("modalImage").src=p.image_url||"";
   document.getElementById("modalImage").alt=p.name||"";
   document.getElementById("modalName").textContent=p.name||"";
   document.getElementById("modalCategory").textContent=p.category||"";
   document.getElementById("modalDescription").textContent=p.description||"Šiai prekei aprašymas dar neįrašytas.";
   const stock=document.getElementById("modalStock");
-  if(stock){stock.textContent=stockLabel;stock.className="product-modal-stock"+(stockLabel==="Išparduota"?" sold":"")+(stockLabel==="Laikinai rezervuota"?" reserved":"");stock.style.display=stockLabel?"block":"none";}
+  if(stock){stock.textContent=stockLabel;stock.className="product-modal-stock"+((stockLabel==="Išparduota"||stockLabel==="Parduota")?" sold":"")+(stockLabel==="Laikinai rezervuota"?" reserved":"");stock.style.display=stockLabel?"block":"none";}
   const badge=document.getElementById("modalBadge");
   badge.textContent=p.badge|| (d?`−${d}%`:"");
   badge.style.display=(p.badge||d)?"inline-block":"none";
   document.getElementById("modalPrice").innerHTML=d?`<span class="modal-old-price">${money(p.price)}</span><span class="modal-price">${money(finalPrice)}</span>`:`<span class="modal-price">${money(finalPrice)}</span>`;
   document.getElementById("modalQty").textContent="1";
   const addBtn=document.querySelector("#productModal .modal-add");
-  if(addBtn){addBtn.disabled=unavailable;addBtn.textContent=unavailable?(stockLabel==="Išparduota"?"✕ ISPARDUOTA":"⏳ LAIKINAI REZERVUOTA"):"🛒 Į KREPŠELĮ";}
+  if(addBtn){addBtn.disabled=unavailable;addBtn.textContent=unavailable?((stockLabel==="Išparduota"||stockLabel==="Parduota")?"✕ PARDUOTA":"⏳ LAIKINAI REZERVUOTA"):"🛒 Į KREPŠELĮ";}
   document.getElementById("productModal").classList.add("open");
 }
 function changeModalQty(delta){
