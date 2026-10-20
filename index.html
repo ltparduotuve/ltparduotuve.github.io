@@ -551,7 +551,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
   </section>
   <section class="admin-section" id="admin-orders">
    <div class="admin-order-stats" id="adminOrderStats"></div>
-   <div class="admin-actions" style="margin-bottom:10px"><button class="admin-secondary" onclick="loadAdminOrders()">↻ Atnaujinti užsakymus</button></div>
+   <div class="admin-actions" style="margin-bottom:10px"><button class="admin-secondary" onclick="loadAdminOrders()">↻ Atnaujinti užsakymus</button><button class="admin-danger" onclick="deleteAllAdminOrders()">🗑️ Ištrinti visus užsakymus</button></div>
    <div class="admin-list" id="adminOrderList"><div class="admin-empty">Kraunama...</div></div>
   </section>
   <section class="admin-section" id="admin-payments">
@@ -779,11 +779,39 @@ const supabaseClient = window.supabase.createClient(
 let chatUser=null,chatThread=null,chatChannel=null,chatReady=false;const renderedMessageIds=new Set();
 async function ensureChatUser(){if(chatUser)return chatUser;const {data,error}=await supabaseClient.auth.getSession();if(error)throw error;if(!data.session?.user)throw new Error("Reikia prisijungti prie paskyros.");chatUser=data.session.user;return chatUser}
 function setChatStatus(text,online=false){const s=document.querySelector(".chat-head small");if(s){s.textContent="● "+text;s.style.color=online?"#20e5a0":"#f0b44d"}}
-async function ensureChatThread(){const user=await ensureChatUser();const {data,error}=await supabaseClient.from("chat_sessions").select("*").eq("user_id",user.id).order("created_at",{ascending:false}).limit(1).maybeSingle();if(error)throw error;const expired=data&&data.status==="open"&&data.last_activity&&Date.now()-new Date(data.last_activity).getTime()>86400000;if(data&&data.status==="open"&&!expired){chatThread=data;return data}if(data&&data.status==="solved"&&!data.rating){chatThread=data;return data}if(data&&(data.status==="open"||data.status==="solved")&&(expired||(data.status==="solved"&&data.solved_at&&Date.now()-new Date(data.solved_at).getTime()>86400000)))await supabaseClient.from("chat_sessions").update({status:"closed",closed_at:new Date().toISOString()}).eq("id",data.id);const thread={user_id:user.id,user_email:user.email||"",thread_id:crypto.randomUUID(),status:"open",last_activity:new Date().toISOString()};const ins=await supabaseClient.from("chat_sessions").insert(thread).select("*").single();if(ins.error)throw ins.error;chatThread=ins.data;return ins.data}
+let chatThreadPromise=null;
+async function ensureChatThread(){
+  const user=await ensureChatUser();
+  if(chatThread?.user_id===user.id && (chatThread.status==="open" || (chatThread.status==="solved"&&!chatThread.rating)))return chatThread;
+  if(chatThreadPromise)return chatThreadPromise;
+  chatThreadPromise=(async()=>{
+    // Iš naujo prisijungus naudojama ta pati aktyvi sesija, nepriklausomai nuo jos amžiaus.
+    const {data,error}=await supabaseClient.from("chat_sessions").select("*").eq("user_id",user.id).in("status",["open","solved"]).order("created_at",{ascending:false});
+    if(error)throw error;
+    const existing=(data||[]).find(x=>x.status==="open")||(data||[]).find(x=>x.status==="solved"&&!x.rating);
+    if(existing){chatThread=existing;return existing}
+    const thread={user_id:user.id,user_email:user.email||"",thread_id:crypto.randomUUID(),status:"open",last_activity:new Date().toISOString()};
+    const ins=await supabaseClient.from("chat_sessions").insert(thread).select("*").single();
+    if(ins.error){
+      // Jei pokalbis vienu metu jau buvo sukurtas kitame skirtuke, naudojame jį.
+      const retry=await supabaseClient.from("chat_sessions").select("*").eq("user_id",user.id).eq("status","open").order("created_at",{ascending:false}).limit(1).maybeSingle();
+      if(retry.error||!retry.data)throw ins.error;
+      chatThread=retry.data;return retry.data;
+    }
+    chatThread=ins.data;return ins.data;
+  })();
+  try{return await chatThreadPromise}finally{chatThreadPromise=null}
+}
 async function loadChatMessages(){await ensureChatThread();const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",chatThread.thread_id).order("created_at",{ascending:true});if(error)throw error;const body=document.getElementById("chatBody");body.innerHTML="";renderedMessageIds.clear();(data||[]).forEach(renderChatMessage);if(chatThread.status==="solved"&&!chatThread.rating){showChatRating();return}if(!data?.length){bubble("Sveiki! 👋 Kaip galime padėti?");bubble("Parašykite savo klausimą — žinutė bus perduota administratoriui.")}}
 function renderChatMessage(row){if(!row||renderedMessageIds.has(row.id))return;renderedMessageIds.add(row.id);bubble(row.message,row.sender==="customer"?"user":"")}
 function subscribeToChat(){if(chatChannel||!chatThread)return;chatChannel=supabaseClient.channel("customer-live-"+chatThread.thread_id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"session_id=eq."+chatThread.thread_id},p=>renderChatMessage(p.new)).on("postgres_changes",{event:"UPDATE",schema:"public",table:"chat_sessions",filter:"id=eq."+chatThread.id},p=>{chatThread=p.new;if(p.new.status==="solved"&&!p.new.rating)showChatRating()}).subscribe(st=>{if(st==="SUBSCRIBED"){chatReady=true;setChatStatus("Administratorius prisijungęs • LIVE",true)}})}
-async function initChat(){if(chatReady)return;setChatStatus("Jungiamasi...");try{await ensureChatUser();await ensureChatThread();await loadChatMessages();subscribeToChat()}catch(e){console.error(e);setChatStatus("Nepavyko prisijungti");bubble("Nepavyko prisijungti prie pokalbio. Pabandykite perkrauti puslapį.")}}
+let chatInitPromise=null;
+async function initChat(){
+  if(chatReady)return;
+  if(chatInitPromise)return chatInitPromise;
+  chatInitPromise=(async()=>{setChatStatus("Jungiamasi...");try{await ensureChatUser();await ensureChatThread();await loadChatMessages();subscribeToChat()}catch(e){console.error(e);setChatStatus("Nepavyko prisijungti");bubble("Nepavyko prisijungti prie pokalbio. Pabandykite perkrauti puslapį.")}})();
+  try{await chatInitPromise}finally{chatInitPromise=null}
+}
 async function sendChatMessage(text){const message=String(text||"").trim();if(!message)return;try{await initChat();if(!chatThread)return;if(chatThread.status==="solved"){showChatRating();return}const {error}=await supabaseClient.from("messages").insert({session_id:chatThread.thread_id,sender:"customer",message});if(error)throw error;await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("id",chatThread.id)}catch(e){console.error(e);bubble("Žinutės išsiųsti nepavyko. Pabandykite dar kartą.")}}
 async function solveChat(){if(!chatThread)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("id",chatThread.id).eq("status","open");if(r.error)return alert("Nepavyko uždaryti pokalbio.");chatThread={...chatThread,status:"solved"};showChatRating()}
 function showChatRating(){const body=document.getElementById("chatBody");body.innerHTML=`<div class="chat-solved"><b>✓ Pokalbis uždarytas</b><p>Jeigu nori, gali įvertinti administratoriaus pagalbą nuo 1 iki 5 ⭐</p><div class="rating-stars">${[1,2,3,4,5].map(n=>`<button id="ratingStar${n}" onclick="selectChatRating(${n})">☆</button>`).join("")}</div><input id="ratingText" placeholder="Komentaras (nebūtina)"><button class="chat-rate-submit" onclick="rateChat()">⭐ Pateikti įvertinimą</button><button class="chat-rate-submit" style="margin-top:6px;border-color:#33465f;background:#0d1726" onclick="closeChatWithoutRating()">Uždaryti</button></div>`;window.selectedChatRating=0}
@@ -956,7 +984,7 @@ function clearAuthExpiry(){
 
 async function logoutAndLock(message="Sesija baigėsi. Prisijunkite iš naujo."){
   clearAuthExpiry();
-  chatUser=null;chatThread=null;chatReady=false;
+  chatUser=null;chatThread=null;chatThreadPromise=null;chatInitPromise=null;chatReady=false;
   if(chatChannel){try{supabaseClient.removeChannel(chatChannel)}catch(e){} chatChannel=null;}
   try{await supabaseClient.auth.signOut({scope:"local"});}catch(e){console.error(e)}
   document.getElementById("userDropdown")?.classList.remove("open");
@@ -1624,11 +1652,26 @@ async function loadAdminOrders(){
     }else if(o.status==="cancelled"){
       flow=`<div class="admin-order-flow"><div class="admin-order-flow-note admin-cancelled">✕ Užsakymas atšauktas.</div></div>`;
     }else if(o.status==="unpaid"){
-      flow=`<div class="admin-order-flow"><div class="admin-order-flow-note admin-cancelled">✕ Užsakymas pažymėtas kaip neapmokėtas. Prekės grąžintos į sandėlį.</div></div>`;
+      flow=`<div class="admin-order-flow"><div class="admin-order-flow-note admin-cancelled">✕ Užsakymas pažymėtas kaip neapmokėtas.</div></div>`;
     }
-    return `<div class="order-card clean-order-card"><div class="order-top"><div><div class="order-number">#${escapeHtml(o.order_number)}</div><div class="order-date">${formatDate(o.created_at)}</div><div class="admin-order-customer">${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")}<br>${escapeHtml(items||"Prekių nėra")}</div></div><span class="order-status ${statusClass(o.status)}">${statusLabel(o.status)}</span></div><div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div><div class="order-actions"><button class="order-view-btn" onclick="showOrderDetailsById('${o.id}')">👁️ Peržiūrėti duomenis</button>${o.status==="pending"&&!o.payment_sent_at?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Peržiūrėti apmokėjimą</button>`:""}</div>${flow}</div>`;
+    return `<div class="order-card clean-order-card"><div class="order-top"><div><div class="order-number">#${escapeHtml(o.order_number)}</div><div class="order-date">${formatDate(o.created_at)}</div><div class="admin-order-customer">${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")}<br>${escapeHtml(items||"Prekių nėra")}</div></div><span class="order-status ${statusClass(o.status)}">${statusLabel(o.status)}</span></div><div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div><div class="order-actions"><button class="order-view-btn" onclick="showOrderDetailsById('${o.id}')">👁️ Peržiūrėti duomenis</button><button class="admin-danger" onclick="deleteOneAdminOrder('${o.id}','${escapeHtml(o.order_number)}')">🗑️ Ištrinti</button>${o.status==="pending"&&!o.payment_sent_at?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Peržiūrėti apmokėjimą</button>`:""}</div>${flow}</div>`;
   }).join("");
   await loadAdminOrderStats();
+}
+async function deleteOneAdminOrder(id,number){
+  if(!isAdmin)return;
+  if(!confirm(`Visam laikui ištrinti užsakymą #${number}? Šio veiksmo atšaukti negalima.`))return;
+  const {error}=await supabaseClient.rpc("admin_delete_shop_order",{p_order_id:id});
+  if(error){console.error(error);return alert("Nepavyko ištrinti užsakymo: "+error.message)}
+  await loadAdminOrders();await loadAdminStats();toast("✓ Užsakymas ištrintas");
+}
+async function deleteAllAdminOrders(){
+  if(!isAdmin)return;
+  const check=prompt('Tai negrįžtamai pašalins VISUS užsakymus ir jų prekių įrašus. Įrašyk ISTRINTI VISUS, jei tikrai nori:');
+  if(check!=="ISTRINTI VISUS")return;
+  const {error}=await supabaseClient.rpc("admin_delete_all_shop_orders");
+  if(error){console.error(error);return alert("Nepavyko ištrinti visų užsakymų: "+error.message)}
+  await loadAdminOrders();await loadAdminStats();toast("✓ Visi užsakymai ištrinti");
 }
 async function confirmAdminPayment(id){
   if(!isAdmin)return;
@@ -1814,7 +1857,7 @@ async function openOrderStatusView(order){
   setOrderProgress(status);
   const labels={pending:order.payment_sent_at?"Laukiama mokėjimo patvirtinimo":"Laukiama apmokėjimo",processing:"Ruošiama",shipped:"Išsiųsta",completed:"Įvykdyta",cancelled:"Atšauktas",unpaid:"Neapmokėta",paid:"Laukiama mokėjimo patvirtinimo"};
   document.getElementById("bankOrderStatusTitle").textContent=labels[status]||statusLabel(status);
-  document.getElementById("bankOrderStatusSub").textContent=status==="completed"?"Užsakymas užbaigtas.":status==="cancelled"?"Užsakymas atšauktas.":status==="unpaid"?"Užsakymas neapmokėtas. Prekės grąžintos į sandėlį.":status==="shipped"?"Siunta išsiųsta. Patvirtink gavimą tik tada, kai ją fiziškai gausi.":status==="processing"?"Apmokėjimas patvirtintas. Užsakymas dabar ruošiamas.":order.payment_sent_at?"Pavedimas pažymėtas kaip išsiųstas. Laukiama administratoriaus patvirtinimo.":"Užsakymas pateiktas. Laukiama apmokėjimo.";
+  document.getElementById("bankOrderStatusSub").textContent=status==="completed"?"Užsakymas užbaigtas.":status==="cancelled"?"Užsakymas atšauktas.":status==="unpaid"?"Užsakymas neapmokėtas.":status==="shipped"?"Siunta išsiųsta. Patvirtink gavimą tik tada, kai ją fiziškai gausi.":status==="processing"?"Apmokėjimas patvirtintas. Užsakymas dabar ruošiamas.":order.payment_sent_at?"Pavedimas pažymėtas kaip išsiųstas. Laukiama administratoriaus patvirtinimo.":"Užsakymas pateiktas. Laukiama apmokėjimo.";
   document.getElementById("viewOrderNumber").textContent="#"+(order.order_number||"—");
   document.getElementById("viewOrderStatus").textContent=labels[status]||statusLabel(status);
   document.getElementById("viewOrderTotal").textContent=money(order.total_amount);
@@ -1836,7 +1879,7 @@ async function openOrderStatusView(order){
       : order.status==="cancelled"
       ? `<div class="order-sent-note" style="color:#ff8585">✕ Užsakymas atšauktas.</div>`
       : order.status==="unpaid"
-      ? `<div class="order-sent-note" style="color:#ff6f7f;font-weight:900">✕ NEUŽBAIGTA — UŽSAKYMAS NEAPMOKĖTAS. Prekės grąžintos į sandėlį.</div>`
+      ? `<div class="order-sent-note" style="color:#ff6f7f;font-weight:900">✕ NEUŽBAIGTA — UŽSAKYMAS NEAPMOKĖTAS.</div>`
       : `<div class="order-sent-note">⏳ ${order.payment_sent_at?"Laukiama administratoriaus mokėjimo patvirtinimo.":"Laukiama apmokėjimo."}</div>`;
   }
   document.getElementById("viewOrderItems").innerHTML=(order.order_items||[]).map(x=>`<div class="bank-order-item"><span>${escapeHtml(x.product_name)} <small>× ${x.quantity}</small></span><b>${money(Number(x.unit_price)*Number(x.quantity))}</b></div>`).join("")||"<div class='bank-order-item'>Prekių informacija nerasta.</div>";
