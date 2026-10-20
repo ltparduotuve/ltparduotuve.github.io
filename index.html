@@ -296,6 +296,16 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <style id="store-lock-duration-ui">
 .store-lock-expiry{margin-top:10px;padding:10px 12px;border:1px solid #263950;background:#08111d;border-radius:9px;color:#8fa1ba;font-size:9px}.store-lock-expiry b{color:#fff}.payment-progress-step.failed-step{color:#ff6f7f!important}.payment-progress-step.failed-step span{background:#45151d!important;border-color:#d84d60!important;color:#ff8b99!important;box-shadow:0 0 18px #d84d6044!important}.payment-progress-step.failed-step b{color:#ff8b99!important}
 </style>
+<style id="crypto-ui-refresh">
+.crypto-payment-ui,.crypto-status-ui{align-items:flex-start;padding:25px 12px;background:rgba(2,6,14,.95);backdrop-filter:blur(12px)}
+.crypto-shell{width:min(720px,100%);margin:12px auto 30px;max-height:calc(100vh - 50px);overflow-y:auto;border:1px solid #2c4768;border-radius:18px;background:#080e19;box-shadow:0 28px 95px #000d;color:#f5f8ff}
+.crypto-head{display:flex;justify-content:space-between;align-items:center;gap:14px;border-bottom:1px solid #23354e;padding:22px 25px;background:linear-gradient(160deg,#10233a,#080e19)}
+.crypto-head h2{font-size:20px;line-height:1.4}.crypto-head small{display:block;color:#8ba1bd;font-size:11px;margin-top:5px}.crypto-body{padding:24px}
+.crypto-progress{margin-bottom:22px}.crypto-pay-top{display:grid;grid-template-columns:1fr 1fr;gap:12px}.crypto-card{border:1px solid #263d58;border-radius:10px;background:#091522;padding:15px;margin-bottom:11px;min-width:0}.crypto-card span{display:block;color:#88a2c1;font-size:10px;font-weight:800;margin-bottom:8px;letter-spacing:.3px}.crypto-card b{font-size:13px;overflow-wrap:anywhere}.crypto-card strong{display:block;color:#79edc1;font-size:25px;line-height:1.3;overflow-wrap:anywhere}.crypto-card small{display:block;color:#8297ad;font-size:10px;margin-top:5px}.crypto-time{background:#191509;border-color:#806326}.crypto-time strong{color:#ffd66d}
+.crypto-address{font-family:ui-monospace,monospace;font-size:12px!important;line-height:1.65;color:#dbe8fc;overflow-wrap:anywhere;user-select:all}.crypto-copy{background:#173354;border:1px solid #5175a1;color:#dbeaff;border-radius:8px;padding:9px 12px;cursor:pointer;font-size:11px}.crypto-warning{background:#2a200c;color:#ffda80;border:1px solid #79612c;border-radius:10px;padding:13px;font-size:11px;line-height:1.6;margin:13px 0}.crypto-submit{width:100%;min-height:46px;background:linear-gradient(120deg,#2d75f0,#6755db);border:1px solid #7da5ff;color:white;font-weight:800;border-radius:9px;cursor:pointer}.crypto-submit:disabled{opacity:.55;cursor:not-allowed}.crypto-help{color:#8093ad;font-size:10px;text-align:center;line-height:1.6;margin-top:12px}
+.crypto-status-panel{border:1px solid #294461;border-radius:12px;background:#091522;padding:19px}.crypto-status-panel h3{font-size:18px;margin-bottom:6px}.crypto-status-panel>p{font-size:11px;line-height:1.65;color:#96a9c1;margin-bottom:16px}.crypto-status-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.crypto-status-grid .crypto-card{background:#07111e}.crypto-status-panel h4{margin:17px 0 9px;color:#b3c2d5;font-size:11px}.crypto-address-card{margin-top:4px}
+@media(max-width:590px){.crypto-head{padding:16px}.crypto-body{padding:15px}.crypto-pay-top,.crypto-status-grid{grid-template-columns:1fr}.crypto-status-panel{padding:12px}.crypto-progress{gap:3px}.crypto-progress .payment-progress-step b{font-size:7px}}
+</style>
 </head>
 <body class="auth-locked">
 
@@ -650,7 +660,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 
 
 <div id="paymentMethodModal" class="crypto-overlay" onclick="closePaymentMethodModal()"><div class="crypto-box" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center"><h2>Pasirink atsiskaitymo būdą</h2><button class="close" onclick="closePaymentMethodModal()">✕</button></div><p id="paymentMethodOrder" class="crypto-sub"></p><button class="crypto-option" onclick="selectPaymentMethod('bank')">🏦 Bankinis pavedimas</button><button class="crypto-option" onclick="showCryptoCurrencyChoices()">🪙 Kriptovaliuta (LTC, ETH, SOL)</button><div id="cryptoCurrencyChoices" style="display:none;margin:10px 0 0;padding:12px;border:1px solid #31527d;border-radius:10px"><p class="crypto-sub">Pasirink valiutą ir jos tinklą:</p><button class="crypto-option crypto-currency" onclick="selectPaymentMethod('LTC')">Litecoin (LTC)</button><button class="crypto-option crypto-currency" onclick="selectPaymentMethod('ETH')">Ethereum (ETH) · Ethereum mainnet</button><button class="crypto-option crypto-currency" onclick="selectPaymentMethod('SOL')">Solana (SOL) · Solana mainnet</button></div><p class="crypto-sub">Mokėjimui skiriama 30 minučių nuo užsakymo sukūrimo. Kriptovaliutų kursai nustatomi automatiškai užsakymo metu. Gavimą patvirtina administratorius.</p></div></div>
-<div id="cryptoPaymentModal" class="crypto-overlay" onclick="closeCryptoPayment()"><div class="crypto-box" onclick="event.stopPropagation()"><div style="display:flex;align-items:center;justify-content:space-between"><h2 id="cryptoPayTitle">Kriptovaliutos mokėjimas</h2><button class="close" onclick="closeCryptoPayment()">✕</button></div><p class="crypto-sub" id="cryptoPayOrder"></p><div class="crypto-detail"><small>SUMA</small><strong id="cryptoPayAmount"></strong></div><div class="crypto-detail"><small>TINKLAS</small><strong id="cryptoPayNetwork"></strong></div><div class="crypto-detail"><small>GAVĖJO ADRESAS</small><div class="crypto-address" id="cryptoPayAddress"></div><button class="admin-secondary" onclick="copyCryptoAddress()">📋 Kopijuoti adresą</button></div><div class="crypto-detail"><small>LIKĘS LAIKAS</small><strong id="cryptoPayTimer">30:00</strong></div><p class="crypto-sub">Siųsk tik nurodytą kriptovaliutą nurodytu tinklu. Pasirinkus neteisingą tinklą lėšos gali būti prarastos. Mokėjimą patvirtina administratorius.</p><button id="cryptoSentBtn" class="admin-primary" style="width:100%;padding:13px" onclick="markCryptoPaymentSent()">✓ Pinigai išsiųsti</button></div></div>
+<div id="cryptoPaymentModal" class="crypto-overlay crypto-payment-ui" onclick="closeCryptoPayment()"><div class="crypto-shell" onclick="event.stopPropagation()"><div class="crypto-head"><div><h2>🪙 <span id="cryptoPayTitle">Kriptovaliutos mokėjimas</span></h2><small id="cryptoPayOrder"></small></div><button class="close" onclick="closeCryptoPayment()">✕</button></div><div class="crypto-body"><div class="payment-progress crypto-progress"><div class="payment-progress-step done"><span>✓</span><b>Krepšelis</b></div><i></i><div class="payment-progress-step done"><span>✓</span><b>Duomenys</b></div><i></i><div class="payment-progress-step active"><span>3</span><b>Patvirtinimas</b></div><i></i><div class="payment-progress-step"><span>4</span><b>Ruošiama</b></div><i></i><div class="payment-progress-step"><span>5</span><b>Įvykdyta</b></div></div><div class="crypto-pay-top"><div class="crypto-card crypto-amount"><span>MOKĖTINA SUMA</span><strong id="cryptoPayAmount"></strong><small>Užfiksuota užsakymo metu</small></div><div class="crypto-card crypto-time"><span>⏱ MOKĖJIMO LAIKAS</span><strong id="cryptoPayTimer">30:00</strong><small>Pažymėk pavedimą per 30 minučių</small></div></div><div class="crypto-card"><span>KRIPTOVALIUTOS TINKLAS</span><b id="cryptoPayNetwork"></b></div><div class="crypto-card"><span>GAVĖJO PINIGINĖS ADRESAS</span><div class="crypto-address" id="cryptoPayAddress"></div><button class="crypto-copy" onclick="copyCryptoAddress()">📋 Kopijuoti adresą</button></div><div class="crypto-warning">⚠️ Siųsk tik nurodytą kriptovaliutą per nurodytą tinklą. Pasirinkus neteisingą tinklą lėšos gali būti prarastos.</div><button id="cryptoSentBtn" class="crypto-submit" onclick="markCryptoPaymentSent()">✓ Kriptovaliuta išsiųsta</button><p class="crypto-help">Paspaudus „Kriptovaliuta išsiųsta“, užsakymas lauks administratoriaus patvirtinimo.</p></div></div></div>
 <div id="bankPaymentModal" class="bank-pay-modal" onclick="closeBankPayment()">
  <div class="bank-pay-card bank-pay-screen" onclick="event.stopPropagation()">
   <div class="bank-pay-head">
@@ -730,7 +740,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
   </div>
  </div>
 </div>
-<div id="cryptoOrderStatusModal" class="crypto-overlay" onclick="closeCryptoOrderStatusView()"><div class="crypto-box crypto-order-detail" onclick="event.stopPropagation()"><div class="bank-pay-head" style="padding:0 0 15px"><div><h2>🪙 Kriptovaliutos užsakymas</h2><small id="cryptoOrderStatusNumber"></small></div><button class="close" onclick="closeCryptoOrderStatusView()">✕</button></div><h3 id="cryptoOrderStatusHeading" style="margin:16px 0 5px"></h3><p id="cryptoOrderStatusDescription" class="crypto-sub"></p><div class="crypto-detail"><small>ATSISKAITYMO BŪDAS</small><strong id="cryptoOrderStatusMethod"></strong></div><div class="crypto-detail"><small>UŽSAKYMO SUMA</small><strong id="cryptoOrderStatusEur"></strong></div><div class="crypto-detail"><small>KRIPTOVALIUTOS SUMA (UŽFIKSUOTA)</small><strong id="cryptoOrderStatusAmount"></strong></div><div class="crypto-detail"><small>GAVĖJO ADRESAS</small><div class="crypto-address" id="cryptoOrderStatusAddress"></div></div><div class="bank-order-items-title" style="margin-top:19px">🛒 Tavo užsakytos prekės</div><div id="cryptoOrderStatusItems" class="bank-order-items"></div><div class="bank-order-items-title">📍 Pristatymo informacija</div><div class="bank-order-status-grid" id="cryptoOrderShippingDetails"></div><div id="cryptoOrderActions" class="order-view-actions"></div></div></div>
+<div id="cryptoOrderStatusModal" class="crypto-overlay crypto-status-ui" onclick="closeCryptoOrderStatusView()"><div class="crypto-shell" onclick="event.stopPropagation()"><div class="crypto-head"><div><h2>🪙 Kriptovaliutos užsakymas</h2><small id="cryptoOrderStatusNumber"></small></div><button class="close" onclick="closeCryptoOrderStatusView()">✕</button></div><div class="crypto-body"><div class="payment-progress crypto-progress crypto-status-progress"><div class="payment-progress-step done"><span>✓</span><b>Krepšelis</b></div><i></i><div class="payment-progress-step done"><span>✓</span><b>Duomenys</b></div><i></i><div class="payment-progress-step active"><span>3</span><b>Patvirtinimas</b></div><i></i><div class="payment-progress-step"><span>4</span><b>Ruošiama</b></div><i></i><div class="payment-progress-step"><span>5</span><b>Įvykdyta</b></div></div><section class="crypto-status-panel"><h3 id="cryptoOrderStatusHeading"></h3><p id="cryptoOrderStatusDescription"></p><div class="crypto-status-grid"><div class="crypto-card"><span>ATSISKAITYMO BŪDAS</span><b id="cryptoOrderStatusMethod"></b></div><div class="crypto-card"><span>UŽSAKYMO SUMA</span><b id="cryptoOrderStatusEur"></b></div><div class="crypto-card"><span>KRIPTOVALIUTOS SUMA</span><b id="cryptoOrderStatusAmount"></b></div><div class="crypto-card"><span>BŪSENA</span><b id="cryptoOrderStatusState"></b></div></div><div class="crypto-card crypto-address-card"><span>GAVĖJO PINIGINĖS ADRESAS</span><div class="crypto-address" id="cryptoOrderStatusAddress"></div></div><h4>🛒 Tavo užsakytos prekės</h4><div id="cryptoOrderStatusItems" class="bank-order-items"></div><h4>📍 Pristatymo informacija</h4><div class="bank-order-status-grid" id="cryptoOrderShippingDetails"></div><div id="cryptoOrderActions" class="order-view-actions"></div></section></div></div></div>
 <div id="checkoutModal" class="checkout-modal" onclick="closeCheckout()">
  <div class="checkout-card" onclick="event.stopPropagation()">
   <div class="checkout-head"><div><h2>🧾 Užsakymo pateikimas</h2><small>Užpildyk pristatymo informaciją</small></div><button class="close" onclick="closeCheckout()">✕</button></div>
@@ -982,6 +992,7 @@ async function enterStore(user){
   initChat();
 }
 
+document.addEventListener("click",e=>{if(!e.target.closest(".user-menu"))document.getElementById("userDropdown")?.classList.remove("open")});
 function toggleUserMenu(){
   document.getElementById("userDropdown").classList.toggle("open");
 }
@@ -1208,28 +1219,22 @@ async function refreshCartInventory(){
   if(!cart?.length)return;
   const ids=cart.map(x=>x.product?.id).filter(Boolean);
   if(!ids.length)return;
-  const {data}=await supabaseClient.from("products").select("*").in("id",ids);
-  if(!data?.length)return;
-  let changed=false;
+  const {data,error}=await supabaseClient.from("products").select("*").in("id",ids);
+  if(error||!data)return;
+  let updated=false;
   for(const item of cart){
     if(!item.product?.id)continue;
     const fresh=data.find(p=>p.id===item.product.id);
-    if(!fresh)continue;
-    item.product=fresh;
-    const available=fresh.sold_out?0:productAvailable(fresh);
-    if(available!==Infinity && item.qty>available){
-      item.qty=Math.max(0,available);
-      changed=true;
-    }
+    if(fresh){item.product=fresh;updated=true;}
   }
-  const before=cart.length;
-  cart=cart.filter(x=>x.qty>0);
-  if(cart.length!==before)changed=true;
-  if(changed){renderCart();toast("⚠️ Sandėlio kiekis pasikeitė — krepšelis atnaujintas");}
+  // Inventory refresh must never silently remove products from the user's cart.
+  // Availability is checked again at checkout on the server.
+  if(updated)saveCartSnapshot();
 }
 function startInventoryRefresh(){if(inventoryRefreshTimer)return;inventoryRefreshTimer=window.setInterval(async()=>{if(document.visibilityState!=="hidden"){await loadStoreProducts();await refreshCartInventory();}},8000);}
 async function initAdmin(user){await checkAdmin(user);await applyStoreLock();subscribeStoreLock();startStoreLockPolling();startStoreLockCountdown();await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();startInventoryRefresh();await loadPaymentSettings();await loadPublicUpdates();subscribePublicUpdates();if(isAdmin)subscribeAdminChat();}
 async function openAdmin(){
+  document.getElementById("userDropdown")?.classList.remove("open");
   if(!isAdmin)return alert("Neturite administratoriaus teisių.");
   document.getElementById("adminPanel").classList.add("open");
   await loadAdminStats();await loadCategories();await loadAdminProducts();await loadAdminCoupons();await loadAdminBulkDiscounts();await loadAdminOrders();await loadPaymentSettings();await loadCryptoSettings();await loadStoreLockSettings();subscribeAdminOrders();await loadAdminChats();
@@ -1449,8 +1454,8 @@ function statusLabel(status){
   const map={"pending":"Laukia apmokėjimo","paid":"Apmokėtas","processing":"Ruošiama","shipped":"Išsiųstas","completed":"Įvykdyta","cancelled":"Atšauktas","unpaid":"Neapmokėta"};
   return map[status]||status||"Nežinoma";
 }
-function setOrderProgress(status){
-  const steps=[...document.querySelectorAll("#bankPaymentModal .payment-progress-step")];
+function setOrderProgress(status, selector="#bankPaymentModal"){
+  const steps=[...document.querySelectorAll(selector+" .payment-progress-step")];
   if(!steps.length)return;
   const labels=["Krepšelis","Duomenys","Patvirtinimas","Ruošiama","Įvykdyta"];
   const failed=status==="cancelled"||status==="unpaid";
@@ -1519,6 +1524,7 @@ async function openCryptoPayment(order,payment){
  clearInterval(cryptoTimerHandle);
  cryptoPaymentState={order,payment};
  document.getElementById('cryptoPayTitle').textContent=`Mokėjimas ${payment.currency}`;
+ setOrderProgress(order.status,'#cryptoPaymentModal');
  document.getElementById('cryptoPayOrder').textContent=`Užsakymas #${order.order_number} · ${money(order.total_amount)}`;
  document.getElementById('cryptoPayAmount').textContent=`${Number(payment.crypto_amount).toFixed(8)} ${payment.currency}`;
  document.getElementById('cryptoPayNetwork').textContent=payment.currency==='ETH'?'Ethereum mainnet':payment.currency==='SOL'?'Solana mainnet':'Litecoin';
@@ -1876,6 +1882,7 @@ async function applyCoupon(){
 
 
 async function openOrders(){
+  document.getElementById("userDropdown")?.classList.remove("open");
   subscribeMyOrderUpdates();
   const modal=document.getElementById("ordersModal");
   modal.classList.add("open");
@@ -1976,11 +1983,13 @@ async function openCryptoOrderStatusView(order,payment){
  closeBankPayment();closeCryptoPayment();
  const put=(id,text)=>{document.getElementById(id).textContent=text??'—'};
  const label=order.status==='pending'?(order.payment_sent_at?'Laukiama mokėjimo patvirtinimo':'Laukiama apmokėjimo'):statusLabel(order.status);
+ setOrderProgress(order.status,'#cryptoOrderStatusModal');
  put('cryptoOrderStatusNumber',`Užsakymas #${order.order_number}`);
  put('cryptoOrderStatusHeading',label);
  put('cryptoOrderStatusDescription',order.status==='unpaid'?'✕ NEUŽBAIGTA — UŽSAKYMAS NEAPMOKĖTAS.':order.status==='cancelled'?'Užsakymas atšauktas.':order.status==='completed'?'Užsakymas užbaigtas.':order.status==='processing'?'Apmokėjimas patvirtintas. Užsakymas ruošiamas.':order.status==='shipped'?'Siunta išsiųsta.':order.payment_sent_at?'Kriptovaliuta pažymėta kaip išsiųsta. Laukiama administratoriaus patvirtinimo.':'Laukiama kriptovaliutos pervedimo.');
  const network=payment.currency==='ETH'?'Ethereum mainnet':payment.currency==='SOL'?'Solana mainnet':'Litecoin';
  put('cryptoOrderStatusMethod',`${payment.currency} · ${network}`);
+ put('cryptoOrderStatusState',label);
  put('cryptoOrderStatusEur',money(order.total_amount));
  put('cryptoOrderStatusAmount',`${Number(payment.crypto_amount).toFixed(8)} ${payment.currency}`);
  put('cryptoOrderStatusAddress',payment.wallet_address);
@@ -2181,6 +2190,9 @@ async function submitOrder(){
   await openPaymentModal(order);
 }
 let cart=[];
+const CART_STORAGE_KEY='ltparduotuve_cart_v2';
+function saveCartSnapshot(){try{localStorage.setItem(CART_STORAGE_KEY,JSON.stringify(cart.map(x=>({key:x.key,name:x.name,price:x.price,qty:x.qty,productId:x.product?.id||null}))))}catch(e){console.warn('Cart save',e)}}
+function restoreCartSnapshot(){try{const saved=JSON.parse(localStorage.getItem(CART_STORAGE_KEY)||'[]');if(Array.isArray(saved))cart=saved.filter(x=>typeof x.key==='string'&&Number.isFinite(Number(x.price))&&Number.isInteger(Number(x.qty))&&x.qty>0).slice(0,100).map(x=>({key:x.key,name:String(x.name||''),price:Number(x.price),qty:x.qty,product:x.productId?{id:x.productId}:null}));}catch(e){cart=[]}renderCart()}
 let modalProduct=null;
 let modalQty=1;
 
@@ -2208,6 +2220,7 @@ function changeQty(i,delta){
 function removeItem(i){cart.splice(i,1);renderCart()}
 function removeCoupon(){activeCoupon=null;const input=document.getElementById("couponInput");if(input)input.value="";setCouponMessage("Nuolaidos kodas panaikintas.",true);renderCart();toast("✓ Nuolaidos kodas panaikintas")}
 function renderCart(){
+  saveCartSnapshot();
   renderFreeShipping();
   const subtotal=cart.reduce((a,b)=>a+b.price*b.qty,0);
   const pct=activeCoupon?Number(activeCoupon.discount_percent||0):0;
@@ -2225,7 +2238,7 @@ function renderCart(){
   const a=document.getElementById("couponApplied");if(a)a.innerHTML=activeCoupon?`<div class="coupon-applied-row"><span>✓ ${escapeHtml(activeCoupon.code)} −${pct}% • sutaupai ${money(couponDiscount)}</span><button class="coupon-remove" onclick="removeCoupon()">✕ Panaikinti nuolaidą</button></div>`:"";
   if(document.getElementById("checkoutModal")?.classList.contains("open")) renderCheckoutSummary();
 }
-function openCart(){document.getElementById("cartBg").style.display="block";renderCart()}
+function openCart(){document.getElementById("userDropdown")?.classList.remove("open");document.getElementById("cartBg").style.display="block";renderCart()}
 function closeCart(){document.getElementById("cartBg").style.display="none"}
 
 function openProductModal(p){
@@ -2291,7 +2304,7 @@ async function send(){
 document.getElementById("msg").addEventListener("keydown",e=>{
   if(e.key==="Enter") send();
 });
-renderCart();
+restoreCartSnapshot();
 </script>
 <script>document.addEventListener("keydown",e=>{if(e.key==="Escape")closeUpdatesModal();});</script>
 </body></html>
