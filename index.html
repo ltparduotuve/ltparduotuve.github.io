@@ -568,13 +568,13 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
    <div class="admin-note" style="margin-top:20px"><b>Kriptovaliutų mokėjimai</b><br>Įvesk gavimo adresą ir rankiniu būdu nustatyk EUR kursą už vieną monetą. Kursą reguliariai atnaujink. Pirkėjo užsakymui pasirinktas adresas ir kursas užfiksuojami ir vėliau nekeičiami.</div>
    <div class="admin-form" id="cryptoAdminForm">
     <div class="admin-field full"><label>Litecoin (LTC) adresas</label><input id="cryptoAddrLTC" placeholder="LTC gavimo adresas" autocomplete="off"></div>
-    <div class="admin-field"><label>EUR už 1 LTC</label><input id="cryptoRateLTC" type="number" step="any" min="0" placeholder="EUR kursas"></div>
+    <div class="admin-field" style="display:none"><label>Kursas (automatinis) – EUR už 1 LTC</label><input id="cryptoRateLTC" type="number" step="any" min="0" placeholder="EUR kursas"></div>
     <div class="admin-field"><label>LTC mokėjimai</label><select id="cryptoEnabledLTC"><option value="true">Įjungti</option><option value="false">Išjungti</option></select></div>
     <div class="admin-field full"><label>Ethereum (ETH) adresas – Ethereum mainnet</label><input id="cryptoAddrETH" placeholder="0x..." autocomplete="off"></div>
-    <div class="admin-field"><label>EUR už 1 ETH</label><input id="cryptoRateETH" type="number" step="any" min="0" placeholder="EUR kursas"></div>
+    <div class="admin-field" style="display:none"><label>Kursas (automatinis) – EUR už 1 ETH</label><input id="cryptoRateETH" type="number" step="any" min="0" placeholder="EUR kursas"></div>
     <div class="admin-field"><label>ETH mokėjimai</label><select id="cryptoEnabledETH"><option value="true">Įjungti</option><option value="false">Išjungti</option></select></div>
     <div class="admin-field full"><label>Solana (SOL) adresas – Solana mainnet</label><input id="cryptoAddrSOL" placeholder="SOL gavimo adresas" autocomplete="off"></div>
-    <div class="admin-field"><label>EUR už 1 SOL</label><input id="cryptoRateSOL" type="number" step="any" min="0" placeholder="EUR kursas"></div>
+    <div class="admin-field" style="display:none"><label>Kursas (automatinis) – EUR už 1 SOL</label><input id="cryptoRateSOL" type="number" step="any" min="0" placeholder="EUR kursas"></div>
     <div class="admin-field"><label>SOL mokėjimai</label><select id="cryptoEnabledSOL"><option value="true">Įjungti</option><option value="false">Išjungti</option></select></div>
     <div class="admin-actions full"><button class="admin-primary" onclick="saveCryptoSettings()">Išsaugoti kriptovaliutų nustatymus</button><button class="admin-secondary" onclick="loadCryptoSettings()">Atnaujinti</button></div>
    </div>
@@ -649,7 +649,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 </div>
 
 
-<div id="paymentMethodModal" class="crypto-overlay" onclick="closePaymentMethodModal()"><div class="crypto-box" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center"><h2>Pasirink atsiskaitymo būdą</h2><button class="close" onclick="closePaymentMethodModal()">✕</button></div><p id="paymentMethodOrder" class="crypto-sub"></p><button class="crypto-option" onclick="selectPaymentMethod('bank')">🏦 Bankinis pavedimas</button><button class="crypto-option" onclick="selectPaymentMethod('LTC')">Litecoin (LTC)</button><button class="crypto-option" onclick="selectPaymentMethod('ETH')">Ethereum (ETH) · Ethereum mainnet</button><button class="crypto-option" onclick="selectPaymentMethod('SOL')">Solana (SOL) · Solana mainnet</button><p class="crypto-sub">Mokėjimui skiriama 30 minučių nuo užsakymo sukūrimo. Kriptovaliutų pervedimus tikrina administratorius.</p></div></div>
+<div id="paymentMethodModal" class="crypto-overlay" onclick="closePaymentMethodModal()"><div class="crypto-box" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center"><h2>Pasirink atsiskaitymo būdą</h2><button class="close" onclick="closePaymentMethodModal()">✕</button></div><p id="paymentMethodOrder" class="crypto-sub"></p><button class="crypto-option" onclick="selectPaymentMethod('bank')">🏦 Bankinis pavedimas</button><button class="crypto-option" onclick="showCryptoCurrencyChoices()">🪙 Kriptovaliuta (LTC, ETH, SOL)</button><div id="cryptoCurrencyChoices" style="display:none;margin:10px 0 0;padding:12px;border:1px solid #31527d;border-radius:10px"><p class="crypto-sub">Pasirink valiutą ir jos tinklą:</p><button class="crypto-option crypto-currency" onclick="selectPaymentMethod('LTC')">Litecoin (LTC)</button><button class="crypto-option crypto-currency" onclick="selectPaymentMethod('ETH')">Ethereum (ETH) · Ethereum mainnet</button><button class="crypto-option crypto-currency" onclick="selectPaymentMethod('SOL')">Solana (SOL) · Solana mainnet</button></div><p class="crypto-sub">Mokėjimui skiriama 30 minučių nuo užsakymo sukūrimo. Kriptovaliutų kursai nustatomi automatiškai užsakymo metu. Gavimą patvirtina administratorius.</p></div></div>
 <div id="cryptoPaymentModal" class="crypto-overlay" onclick="closeCryptoPayment()"><div class="crypto-box" onclick="event.stopPropagation()"><div style="display:flex;align-items:center;justify-content:space-between"><h2 id="cryptoPayTitle">Kriptovaliutos mokėjimas</h2><button class="close" onclick="closeCryptoPayment()">✕</button></div><p class="crypto-sub" id="cryptoPayOrder"></p><div class="crypto-detail"><small>SUMA</small><strong id="cryptoPayAmount"></strong></div><div class="crypto-detail"><small>TINKLAS</small><strong id="cryptoPayNetwork"></strong></div><div class="crypto-detail"><small>GAVĖJO ADRESAS</small><div class="crypto-address" id="cryptoPayAddress"></div><button class="admin-secondary" onclick="copyCryptoAddress()">📋 Kopijuoti adresą</button></div><div class="crypto-detail"><small>LIKĘS LAIKAS</small><strong id="cryptoPayTimer">30:00</strong></div><p class="crypto-sub">Siųsk tik nurodytą kriptovaliutą nurodytu tinklu. Pasirinkus neteisingą tinklą lėšos gali būti prarastos. Mokėjimą patvirtina administratorius.</p><button id="cryptoSentBtn" class="admin-primary" style="width:100%;padding:13px" onclick="markCryptoPaymentSent()">✓ Pinigai išsiųsti</button></div></div>
 <div id="bankPaymentModal" class="bank-pay-modal" onclick="closeBankPayment()">
  <div class="bank-pay-card bank-pay-screen" onclick="event.stopPropagation()">
@@ -730,6 +730,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
   </div>
  </div>
 </div>
+<div id="cryptoOrderStatusModal" class="crypto-overlay" onclick="closeCryptoOrderStatusView()"><div class="crypto-box crypto-order-detail" onclick="event.stopPropagation()"><div class="bank-pay-head" style="padding:0 0 15px"><div><h2>🪙 Kriptovaliutos užsakymas</h2><small id="cryptoOrderStatusNumber"></small></div><button class="close" onclick="closeCryptoOrderStatusView()">✕</button></div><h3 id="cryptoOrderStatusHeading" style="margin:16px 0 5px"></h3><p id="cryptoOrderStatusDescription" class="crypto-sub"></p><div class="crypto-detail"><small>ATSISKAITYMO BŪDAS</small><strong id="cryptoOrderStatusMethod"></strong></div><div class="crypto-detail"><small>UŽSAKYMO SUMA</small><strong id="cryptoOrderStatusEur"></strong></div><div class="crypto-detail"><small>KRIPTOVALIUTOS SUMA (UŽFIKSUOTA)</small><strong id="cryptoOrderStatusAmount"></strong></div><div class="crypto-detail"><small>GAVĖJO ADRESAS</small><div class="crypto-address" id="cryptoOrderStatusAddress"></div></div><div class="bank-order-items-title" style="margin-top:19px">🛒 Tavo užsakytos prekės</div><div id="cryptoOrderStatusItems" class="bank-order-items"></div><div class="bank-order-items-title">📍 Pristatymo informacija</div><div class="bank-order-status-grid" id="cryptoOrderShippingDetails"></div><div id="cryptoOrderActions" class="order-view-actions"></div></div></div>
 <div id="checkoutModal" class="checkout-modal" onclick="closeCheckout()">
  <div class="checkout-card" onclick="event.stopPropagation()">
   <div class="checkout-head"><div><h2>🧾 Užsakymo pateikimas</h2><small>Užpildyk pristatymo informaciją</small></div><button class="close" onclick="closeCheckout()">✕</button></div>
@@ -1484,7 +1485,7 @@ async function loadCryptoSettings(){
 async function saveCryptoSettings(){
  if(!isAdmin)return alert('Tik administratoriui.');
  const updates=['LTC','ETH','SOL'].map(currency=>({currency,address:document.getElementById('cryptoAddr'+currency).value.trim(),eur_per_coin:Number(document.getElementById('cryptoRate'+currency).value),enabled:document.getElementById('cryptoEnabled'+currency).value==='true'}));
- if(updates.some(x=>x.enabled&&(!x.address||!Number.isFinite(x.eur_per_coin)||x.eur_per_coin<=0)))return alert('Įjungtai valiutai būtinas adresas ir teigiamas EUR kursas.');
+ if(updates.some(x=>x.enabled&&!x.address))return alert('Įjungtai valiutai būtinas adresas.');
  if(updates.some(x=>x.address&&((x.currency==='ETH'&&!/^0x[0-9a-fA-F]{40}$/.test(x.address))||(x.currency==='SOL'&&!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(x.address)))))return alert('Patikrink ETH arba SOL adresą.');
  const {error}=await supabaseClient.from('store_crypto_wallets').upsert(updates,{onConflict:'currency'});
  if(error)return alert('Nepavyko išsaugoti. Paleisk naują Supabase SQL: '+error.message);
@@ -1494,22 +1495,24 @@ async function openPaymentModal(order){
  if(!order?.id)return;
  const {data,error}=await supabaseClient.from('orders').select('*').eq('id',order.id).maybeSingle();
  if(error||!data)return alert('Nepavyko įkelti užsakymo');
- if(data.status!=='pending')return openOrderStatusView(data);
+ if(data.status!=='pending'||data.payment_sent_at)return openOrderStatusView(data);
  const {data:existing}=await supabaseClient.from('order_crypto_payments').select('*').eq('order_id',data.id).maybeSingle();
  if(existing)return openCryptoPayment(data,existing);
  currentPaymentChoice=data;
  document.getElementById('paymentMethodOrder').textContent=`Užsakymas #${data.order_number} · ${money(data.total_amount)}`;
+ document.getElementById('cryptoCurrencyChoices').style.display='none';
  document.getElementById('paymentMethodModal').classList.add('open');
  const wallets=await loadCryptoSettings();
- ['LTC','ETH','SOL'].forEach((c,i)=>{const btn=document.querySelectorAll('#paymentMethodModal .crypto-option')[i+1];if(btn){const w=wallets.find(x=>x.currency===c);btn.disabled=!(w?.enabled&&w.address&&Number(w.eur_per_coin)>0);}});
+ ['LTC','ETH','SOL'].forEach((c,i)=>{const btn=document.querySelectorAll('#paymentMethodModal .crypto-currency')[i];if(btn){const w=wallets.find(x=>x.currency===c);btn.disabled=!(w?.enabled&&w.address);}});
 }
+function showCryptoCurrencyChoices(){document.getElementById('cryptoCurrencyChoices').style.display='block'}
 function closePaymentMethodModal(){document.getElementById('paymentMethodModal').classList.remove('open')}
 async function selectPaymentMethod(method){
  const order=currentPaymentChoice;if(!order)return;
  closePaymentMethodModal();
  if(method==='bank')return openBankPaymentModal(order);
- const {data,error}=await supabaseClient.rpc('choose_order_crypto_payment',{p_order_id:order.id,p_currency:method});
- if(error)return alert('Kriptovaliutos pasirinkti nepavyko: '+error.message);
+ const {data,error}=await supabaseClient.functions.invoke('crypto-quote',{body:{order_id:order.id,currency:method}});
+ if(error||!data?.order_id)return alert('Nepavyko gauti aktualaus kriptovaliutos kurso. Patikrink, ar įdiegta crypto-quote Edge Function. '+(data?.error||error?.message||''));
  await openCryptoPayment(order,data);
 }
 async function openCryptoPayment(order,payment){
@@ -1527,7 +1530,7 @@ async function openCryptoPayment(order,payment){
 }
 function closeCryptoPayment(){clearInterval(cryptoTimerHandle);document.getElementById('cryptoPaymentModal').classList.remove('open')}
 async function copyCryptoAddress(){const v=cryptoPaymentState?.payment?.wallet_address;if(!v)return;try{await navigator.clipboard.writeText(v);toast('✓ Adresas nukopijuotas')}catch(e){alert(v)}}
-async function markCryptoPaymentSent(){const order=cryptoPaymentState?.order;if(!order)return;if(paymentDeadline(order)<=Date.now())return alert('Mokėjimo laikas baigėsi.');const {error}=await supabaseClient.rpc('mark_payment_sent',{p_order_id:order.id});if(error)return alert('Nepavyko pažymėti mokėjimo: '+error.message);order.payment_sent_at=new Date().toISOString();document.getElementById('cryptoSentBtn').disabled=true;document.getElementById('cryptoSentBtn').textContent='✓ Laukiama administratoriaus patvirtinimo';await loadMyOrders();}
+async function markCryptoPaymentSent(){const order=cryptoPaymentState?.order;if(!order)return;if(paymentDeadline(order)<=Date.now())return alert('Mokėjimo laikas baigėsi.');const {error}=await supabaseClient.rpc('mark_payment_sent',{p_order_id:order.id});if(error)return alert('Nepavyko pažymėti mokėjimo: '+error.message);order.payment_sent_at=new Date().toISOString();document.getElementById('cryptoSentBtn').disabled=true;document.getElementById('cryptoSentBtn').textContent='✓ Laukiama administratoriaus patvirtinimo';await loadMyOrders();await openOrderStatusView({...order,payment_sent_at:order.payment_sent_at});closeCryptoPayment();}
 async function loadPaymentSettings(){
   const {data,error}=await supabaseClient.from("store_payment_settings").select("*").eq("id",1).maybeSingle();
   if(error){console.warn("Payment settings SQL not installed:",error);return null}
@@ -1921,6 +1924,10 @@ function subscribeMyOrderUpdates(){
 async function copyTracking(v){try{await navigator.clipboard.writeText(v);toast("✓ Siuntimo numeris nukopijuotas")}catch(e){toast(v)}}
 
 async function openOrderStatusView(order){
+  if(!Array.isArray(order.order_items)){const {data:items}=await supabaseClient.from('order_items').select('*').eq('order_id',order.id);order={...order,order_items:items||[]};}
+  const {data:cryptoRecord,error:cryptoError}=await supabaseClient.from('order_crypto_payments').select('*').eq('order_id',order.id).maybeSingle();
+  if(cryptoError)console.warn('Crypto details:',cryptoError);
+  if(cryptoRecord)return openCryptoOrderStatusView(order,cryptoRecord);
   clearInterval(bankPaymentTimer);bankPaymentTimer=null;
   activeBankPayment={order,settings:null,reference:order.payment_reference||"",paymentSent:!!order.payment_sent_at};
   const modal=document.getElementById("bankPaymentModal");
@@ -1940,7 +1947,7 @@ async function openOrderStatusView(order){
   document.getElementById("viewOrderCity").textContent=(order.city||"—")+" "+(order.postal_code||"");
   document.getElementById("viewOrderEmail").textContent=order.email||"—";
   document.getElementById("viewOrderPhone").textContent=order.phone||"—";
-  document.getElementById("viewOrderCode").textContent="Mokėjimo paskirtis: "+(order.payment_reference||"—");
+  document.getElementById("viewOrderCode").textContent="Atsiskaitymas: bankinis pavedimas · Mokėjimo paskirtis: "+(order.payment_reference||"—");
   const orderActions=document.getElementById("viewOrderActions");
   if(orderActions){
     orderActions.innerHTML=order.status==="shipped"
@@ -1961,6 +1968,27 @@ async function openOrderStatusView(order){
   document.getElementById("bankOrderStatusView").style.display="block";
   document.getElementById("bankPaymentBottomNote").style.display="none";
   modal.classList.add("open");
+}
+
+
+function closeCryptoOrderStatusView(){document.getElementById('cryptoOrderStatusModal').classList.remove('open')}
+async function openCryptoOrderStatusView(order,payment){
+ closeBankPayment();closeCryptoPayment();
+ const put=(id,text)=>{document.getElementById(id).textContent=text??'—'};
+ const label=order.status==='pending'?(order.payment_sent_at?'Laukiama mokėjimo patvirtinimo':'Laukiama apmokėjimo'):statusLabel(order.status);
+ put('cryptoOrderStatusNumber',`Užsakymas #${order.order_number}`);
+ put('cryptoOrderStatusHeading',label);
+ put('cryptoOrderStatusDescription',order.status==='unpaid'?'✕ NEUŽBAIGTA — UŽSAKYMAS NEAPMOKĖTAS.':order.status==='cancelled'?'Užsakymas atšauktas.':order.status==='completed'?'Užsakymas užbaigtas.':order.status==='processing'?'Apmokėjimas patvirtintas. Užsakymas ruošiamas.':order.status==='shipped'?'Siunta išsiųsta.':order.payment_sent_at?'Kriptovaliuta pažymėta kaip išsiųsta. Laukiama administratoriaus patvirtinimo.':'Laukiama kriptovaliutos pervedimo.');
+ const network=payment.currency==='ETH'?'Ethereum mainnet':payment.currency==='SOL'?'Solana mainnet':'Litecoin';
+ put('cryptoOrderStatusMethod',`${payment.currency} · ${network}`);
+ put('cryptoOrderStatusEur',money(order.total_amount));
+ put('cryptoOrderStatusAmount',`${Number(payment.crypto_amount).toFixed(8)} ${payment.currency}`);
+ put('cryptoOrderStatusAddress',payment.wallet_address);
+ document.getElementById('cryptoOrderStatusItems').innerHTML=(order.order_items||[]).map(x=>`<div class="bank-order-item"><span>${escapeHtml(x.product_name)} <small>× ${Number(x.quantity)}</small></span><b>${money(Number(x.unit_price)*Number(x.quantity))}</b></div>`).join('')||'<div class="bank-order-item">Prekių informacija nerasta.</div>';
+ const fields=[['PRISTATYMAS',(order.shipping_method||'—')+' · '+money(order.shipping_amount||0)],['ADRESAS',order.address],['MIESTAS',(order.city||'—')+' '+(order.postal_code||'')],['PAŠTAS',order.email],['TELEFONAS',order.phone],['SIUNTIMO NR.',order.tracking_number||'Dar nepriskirtas']];
+ document.getElementById('cryptoOrderShippingDetails').innerHTML=fields.map(([name,value])=>`<div><span>${name}</span><b>${escapeHtml(value||'—')}</b></div>`).join('');
+ document.getElementById('cryptoOrderActions').innerHTML=order.status==='shipped'?`<button class="order-received-btn" onclick="confirmOrderReceived('${order.id}')">✓ Gavau užsakymą</button>`:'';
+ document.getElementById('cryptoOrderStatusModal').classList.add('open');
 }
 
 async function viewMyOrder(orderId){
@@ -2145,7 +2173,7 @@ async function submitOrder(){
   });
   if(error){console.error(error);errorEl.textContent=error.message||"Nepavyko sukurti užsakymo.";return}
   const order=data?.[0]||data;
-  if(order?.id) order.payment_reference=await ensurePaymentReference(order.id);
+  // Mokėjimo paskirtis priskiriama tik pasirinkus bankinį pavedimą.
   cart=[];activeCoupon=null;renderCart();closeCheckout();
   subscribeMyOrderUpdates();
   await loadMyOrders();
