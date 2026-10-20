@@ -420,7 +420,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <section class="hero" id="top"><div class="hero-inner">
 <div class="side">
 <a class="side-card" href="https://discord.gg/FGsRsNNBuQ" target="_blank" rel="noopener"><strong>💬 Discord</strong><br><span class="link-btn">ATIDARYTI DISCORD →</span></a>
-<a class="side-card" href="mailto:nedasliubinas4@gmail.com"><strong>✉️ El. paštas</strong><br><span class="link-btn">RAŠYTI EL. PAŠTU →</span></a>
+<a class="side-card" href="mailto:Geriaunepazink@gmail.com"><strong>✉️ El. paštas</strong><br><span class="link-btn">RAŠYTI EL. PAŠTU →</span></a>
 </div>
 <div class="hero-main"><div class="crown">♛</div><div class="lt">LT</div><h1>PARDUOTUVĖ</h1><div class="sub">DAUGIAU NEI TIK PARDUOTUVĖ</div><a class="cta" href="#prekes">APSIPIRKTI DABAR →</a></div>
 <div class="side">
@@ -464,7 +464,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 
 <div class="grid" id="grid"></div>
 
-<div class="contact"><div class="contact-card"><h3>✉️ El. paštas</h3><p>Klausimams ir pagalbai.</p><a class="contact-btn" href="mailto:nedasliubinas4@gmail.com">RAŠYTI EL. PAŠTU →</a></div><div class="contact-card"><h3>💬 Discord / Ticket</h3><p>Prisijunk ir susisiek per ticket.</p><a class="contact-btn" href="https://discord.gg/FGsRsNNBuQ" target="_blank" rel="noopener">ATIDARYTI DISCORD →</a></div></div>
+<div class="contact"><div class="contact-card"><h3>✉️ El. paštas</h3><p>Klausimams ir pagalbai.</p><a class="contact-btn" href="mailto:Geriaunepazink@gmail.com">RAŠYTI EL. PAŠTU →</a></div><div class="contact-card"><h3>💬 Discord / Ticket</h3><p>Prisijunk ir susisiek per ticket.</p><a class="contact-btn" href="https://discord.gg/FGsRsNNBuQ" target="_blank" rel="noopener">ATIDARYTI DISCORD →</a></div></div>
 </main>
 <footer>© 2026 LT PARDUOTUVĖ • Pagalba 24/7</footer>
 
@@ -643,7 +643,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <div id="freeShippingBox" class="free-shipping-box">
  <div class="free-shipping-top">
   <div class="free-shipping-icon">🚚</div>
-  <div><div id="freeShippingTitle" class="free-shipping-title">Pridėk prekių iki nemokamo pristatymo</div><div id="freeShippingSub" class="free-shipping-sub">Nemokamas pristatymas nuo 30,00 €</div></div>
+  <div><div id="freeShippingTitle" class="free-shipping-title">Pridėk prekių iki nemokamo pristatymo</div><div id="freeShippingSub" class="free-shipping-sub">Nemokamas pristatymas nuo 50,00 €</div></div>
   <div id="freeShippingPercent" class="free-shipping-percent">0%</div>
  </div>
  <div class="free-shipping-track"><div id="freeShippingFill" class="free-shipping-fill" style="width:0%"></div></div>
@@ -1429,8 +1429,13 @@ function productStockLabel(p){
   if(p?.sold_out)return "Parduota";
   if(p?.stock_limit===null || p?.stock_limit===undefined || p?.stock_limit==="" || Number(p.stock_limit)===0) return "";
   const available=productAvailable(p);
-  if(p.sold_out || Number(p.stock_sold||0)>=Number(p.stock_limit||0)) return "Išparduota";
-  if(available<=0) return "Laikinai rezervuota";
+  const reserved=Math.max(0,Number(p.stock_reserved||0));
+  const sold=Math.max(0,Number(p.stock_sold||0));
+  const limit=Number(p.stock_limit||0);
+  if(available<=0){
+    if(reserved>0)return "Laikinai rezervuota";
+    if(sold>=limit)return "Parduota";
+  }
   return `Liko ${available}`;
 }
 
@@ -1530,13 +1535,51 @@ async function openPaymentModal(order){
 }
 function showCryptoCurrencyChoices(){document.getElementById('cryptoCurrencyChoices').style.display='block'}
 function closePaymentMethodModal(){document.getElementById('paymentMethodModal').classList.remove('open')}
+let paymentSelectionBusy=false;
 async function selectPaymentMethod(method){
+ if(paymentSelectionBusy)return;
  const order=currentPaymentChoice;if(!order)return;
- closePaymentMethodModal();
- if(method==='bank')return openBankPaymentModal(order);
- const {data,error}=await supabaseClient.functions.invoke('crypto-quote',{body:{order_id:order.id,currency:method}});
- if(error||!data?.order_id)return alert('Nepavyko gauti aktualaus kriptovaliutos kurso. Patikrink, ar įdiegta crypto-quote Edge Function. '+(data?.error||error?.message||''));
- await openCryptoPayment(order,data);
+ paymentSelectionBusy=true;
+ const buttons=document.querySelectorAll('#paymentMethodModal .crypto-option');
+ buttons.forEach(b=>b.disabled=true);
+ try{
+   const fresh=await supabaseClient.from('orders').select('*').eq('id',order.id).maybeSingle();
+   if(fresh.error||!fresh.data)throw new Error('Nepavyko patikrinti užsakymo');
+   if(fresh.data.status!=='pending'||fresh.data.payment_sent_at)throw new Error('Mokėjimo būdo keisti nebegalima');
+   const chosen=fresh.data;
+   const existingRes=await supabaseClient.from('order_crypto_payments').select('*').eq('order_id',order.id).maybeSingle();
+   if(existingRes.error)throw existingRes.error;
+   const existing=existingRes.data;
+   const same=(method==='bank'&&!existing)||(method!=='bank'&&existing?.currency===method);
+   // Reset the OLD method server-side, atomically and only before money is marked sent.
+   // Never change order status, amounts, items, or reservations.
+   if(!same && method==='bank'){
+     const settings=await loadPaymentSettings();
+     if(!settings?.enabled||!settings.account_number||!settings.beneficiary)throw new Error('Bankinis mokėjimas neaktyvus arba nenustatyti rekvizitai');
+   }
+   if(!same){
+     const reset=await supabaseClient.rpc('reset_unsent_shop_payment',{p_order_id:order.id});
+     if(reset.error)throw reset.error;
+     chosen.payment_reference=null;
+   }
+   if(method==='bank'){
+     // Closing the chooser only after successful server update.
+     closePaymentMethodModal();
+     await openBankPaymentModal(chosen);
+   }else{
+     let payment= same?existing:null;
+     if(!payment){
+       const q=await supabaseClient.functions.invoke('crypto-quote',{body:{order_id:order.id,currency:method}});
+       if(q.error||!q.data?.order_id)throw new Error(q.data?.error||q.error?.message||'Nepavyko gauti kriptovaliutos kurso');
+       payment=q.data;
+     }
+     closePaymentMethodModal();
+     await openCryptoPayment(chosen,payment);
+   }
+ }catch(err){
+   console.error('Payment method change:',err);
+   alert('Nepavyko pakeisti mokėjimo būdo: '+(err?.message||'Nežinoma klaida')+'\nUžsakymas, mokėtina suma ir rezervuotos prekės liko nepakeistos.');
+ }finally{paymentSelectionBusy=false;buttons.forEach(b=>b.disabled=false);}
 }
 async function openCryptoPayment(order,payment){
  clearInterval(cryptoTimerHandle);
@@ -1990,6 +2033,7 @@ if(!window.__paymentStatusPoll){window.__paymentStatusPoll=setInterval(pollVisib
 async function changeUnsentPaymentMethod(){
  const order=document.getElementById('bankPaymentModal')?.classList.contains('open')?activeBankPayment.order:cryptoPaymentState?.order;
  if(!order||order.payment_sent_at)return;
+ if(!confirm("Ar tikrai nori keisti mokėjimo būdą? Jei jau pervedei pinigus, nekeisk būdo ir pažymėk juos kaip išsiųstus."))return;
  closeBankPayment();closeCryptoPayment();
  // The payment method is only final after the customer marks the funds as sent.
  currentPaymentChoice=order;
@@ -2125,7 +2169,7 @@ async function loadMyOrders(){
 
 function cartSubtotal(){return cart.reduce((a,b)=>a+Number(b.price||0)*Number(b.qty||0),0)}
 function freeShippingProgress(){
-  const threshold=30;
+  const threshold=50;
   const subtotal=cartSubtotal();
   const percent=Math.min(100,Math.max(0,(subtotal/threshold)*100));
   const remaining=Math.max(0,threshold-subtotal);
@@ -2142,13 +2186,13 @@ function renderFreeShipping(){
   if(x.free){
     box.classList.add("free");
     if(title)title.textContent="🎉 Jūs gavote nemokamą pristatymą!";
-    if(sub)sub.textContent="Užsakymo prekių suma siekia 30,00 € arba daugiau.";
+    if(sub)sub.textContent="Užsakymo prekių suma siekia 50,00 € arba daugiau.";
     if(pct)pct.textContent="100%";
     if(fill)fill.style.width="100%";
   }else{
     box.classList.remove("free");
     if(title)title.textContent=`Jūs esate ${money(x.remaining)} nuo nemokamo pristatymo.`;
-    if(sub)sub.textContent="Nemokamas pristatymas nuo 30,00 €";
+    if(sub)sub.textContent="Nemokamas pristatymas nuo 50,00 €";
     if(pct)pct.textContent=Math.round(x.percent)+"%";
     if(fill)fill.style.width=x.percent+"%";
   }
