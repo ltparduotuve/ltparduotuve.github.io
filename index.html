@@ -169,6 +169,7 @@ body.auth-locked{overflow:hidden}
 }
 
 /* === ORDERS + CHECKOUT === */
+.customer-order-card{cursor:default}.customer-order-card:hover{transform:none;box-shadow:none;border-color:#263950}
 .account-action{margin-top:6px}
 .orders-modal,.checkout-modal{display:none;position:fixed;inset:0;z-index:900;background:#000c;padding:18px;align-items:center;justify-content:center}
 .orders-modal.open,.checkout-modal.open{display:flex}
@@ -1865,7 +1866,7 @@ async function loadMyOrders(){
   if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti užsakymų. Paleisk užsakymų SQL.</div>';return}
   if(!data?.length){list.innerHTML='<div class="admin-empty">📦 Dar neturi užsakymų.</div>';return}
   list.innerHTML=data.map(o=>`
-   <div class="order-card" onclick="toggleOrderDetail('${o.id}')">
+   <div class="order-card customer-order-card">
     <div class="order-top"><div><div class="order-number">#${escapeHtml(o.order_number)}</div><div class="order-date">${formatDate(o.created_at)}</div></div><span class="order-status ${statusClass(o.status)}">${statusLabel(o.status)}</span></div>
     <div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div>
     ${o.tracking_number?`<div class="tracking-box">📦 <b>Siuntimo numeris:</b> <span>${escapeHtml(o.tracking_number)}</span><button onclick="copyTracking('${escapeHtml(o.tracking_number)}');event.stopPropagation()">📋 Kopijuoti</button></div>`:""}
@@ -1873,19 +1874,8 @@ async function loadMyOrders(){
       ${o.status==="pending"&&!o.payment_sent_at?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Apmokėti užsakymą</button>`:""}
       <button class="order-view-btn" onclick="viewMyOrder('${o.id}')">👁️ Peržiūrėti užsakymą</button>
     </div>
-    <div class="order-detail" id="order-detail-${o.id}" style="display:none">
-      <div class="order-items">${(o.order_items||[]).map(x=>`<div class="order-item-row"><span>${escapeHtml(x.product_name)} × ${x.quantity}</span><b>${money(Number(x.unit_price)*Number(x.quantity))}</b></div>`).join("")}</div>
-      <div class="order-info-grid">
-       <div class="order-info-box"><small>PRISTATYMAS</small><b>${escapeHtml(o.shipping_method||"—")} • ${money(o.shipping_amount)}</b></div>
-       <div class="order-info-box"><small>ADRESAS</small><b>${escapeHtml(o.address||"—")}, ${escapeHtml(o.city||"")}</b></div>
-       <div class="order-info-box"><small>EL. PAŠTAS</small><b>${escapeHtml(o.email||"—")}</b></div>
-       <div class="order-info-box"><small>TELEFONAS</small><b>${escapeHtml(o.phone||"—")}</b></div>
-       <div class="order-info-box"><small>SIUNTIMO NUMERIS</small><b>${escapeHtml(o.tracking_number||"Dar nepriskirtas")}</b></div><div class="order-info-box"><small>APMOKĖJIMAS</small><b>${o.payment_sent_at?"Pavedimas išsiųstas • laukia patvirtinimo":(o.status==="cancelled"?"Mokėjimo laikas baigėsi":(o.status==="unpaid"?"Neapmokėta":"Laukia pavedimo"))}</b></div>
-      </div>
-    </div>
    </div>`).join("");
 }
-function toggleOrderDetail(id){const el=document.getElementById("order-detail-"+id);if(el)el.style.display=el.style.display==="none"?"block":"none"}
 
 function cartSubtotal(){return cart.reduce((a,b)=>a+Number(b.price||0)*Number(b.qty||0),0)}
 function freeShippingProgress(){
