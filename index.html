@@ -225,6 +225,16 @@ body.auth-locked{overflow:hidden}
 /* Patvirtintas mokėjimas: aiški varnelė, ne laukimo animacija. */
 .payment-progress-step.done span,.payment-progress-step.completed-step span{animation:none!important}
 .payment-progress-step.done:has(+ i + .payment-progress-step.active) span{background:#0d3b2b;border-color:#29a976;color:#39df9a}
+
+/* Account settings UI */
+.account-settings-overlay{display:none;position:fixed;inset:0;z-index:2800;background:#020713d9;backdrop-filter:blur(12px);padding:20px;align-items:center;justify-content:center}
+.account-settings-overlay.open{display:flex}.account-settings-panel{width:min(600px,100%);max-height:90vh;overflow:auto;border-radius:18px;border:1px solid #46658d;background:linear-gradient(155deg,#101d32,#080e19);box-shadow:0 25px 90px #000b;color:#fff}
+.account-settings-header{display:flex;justify-content:space-between;align-items:center;padding:23px 25px;border-bottom:1px solid #263b55}.account-settings-header h2{font-size:21px}.account-settings-header p{font-size:11px;color:#91a5c2;margin-top:5px}
+.account-settings-content{padding:23px;display:grid;gap:14px}.account-settings-group{background:#0b1525;border:1px solid #304665;border-radius:13px;padding:18px;display:grid;gap:9px}.account-settings-group h3{font-size:14px}.account-settings-group label{font-size:11px;color:#abc0d8}.account-settings-group select{padding:11px;border:1px solid #4a6284;border-radius:9px;background:#0a1323;color:#fff;width:100%}.account-settings-note{font-size:11px;color:#90a6c0;line-height:1.6}.account-settings-action{padding:11px;border:1px solid #5f92f5;border-radius:9px;background:#173c78;color:#fff;cursor:pointer;font-weight:700}
+body.theme-water{--blue:#12b8ed;--green:#53e6d6}body.theme-water:before{background:radial-gradient(circle at 50% 20%,#008fbd65,transparent 38%),radial-gradient(circle at 80% 60%,#1259bb44,transparent 50%),#031326}body.theme-water .hero{background:radial-gradient(circle,#007eac55,transparent 55%),#061c2c}
+body.theme-lava{--blue:#fa794b;--green:#ffbb6b}body.theme-lava:before{background:radial-gradient(circle at 50% 20%,#cb461b5c,transparent 35%),radial-gradient(circle at 80% 65%,#a72b2044,transparent 48%),#170807}body.theme-lava .hero{background:radial-gradient(circle,#ed60264a,transparent 55%),#1b0b0b}
+body.theme-light{--blue:#2769c9;--green:#007c65;background:#ecf2fa;color:#17263c}body.theme-light:before{background:linear-gradient(140deg,#e8f3ff,#f7faff)}body.theme-light header{background:#edf4fbf2}body.theme-light .nav a,body.theme-light .logo,body.theme-light .nav-icon{color:#173352}body.theme-light .product,body.theme-light .cat,body.theme-light .contact-card{background:#fff;color:#182b45}body.theme-light .hero{background:linear-gradient(130deg,#bdd7f7,#eff6ff);color:#183050}body.theme-light .hero .sub{color:#385572}
+
 </style>
 <style id="payment-30min-style">
 .bank-pay-modal{align-items:flex-start;padding:28px 16px;overflow:auto;background:rgba(1,4,10,.96);backdrop-filter:blur(10px)}
@@ -396,7 +406,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
         <div id="newPasswordMsg" class="auth-msg" role="status"></div>
         <button id="newPasswordRetry" type="button" class="auth-link-button" style="display:none" onclick="restartPasswordRecovery()">Prašyti naujos atkūrimo nuorodos</button>
       </form>
-      <div class="auth-note">Sukūrę paskyrą galėsite naudotis katalogu, krepšeliu ir klientų pagalba.</div>
+
     </div>
   </div>
 </div>
@@ -425,11 +435,24 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <button class="nav-icon" onclick="toggleUserMenu()">♙</button>
 <div class="user-dropdown" id="userDropdown">
 <small id="userEmail">Paskyra</small>
-<button class="account-action" onclick="openOrders()">📦 Mano užsakymai</button><button id="adminBtn" style="display:none" onclick="openAdmin()">⚙️ Admin panelė</button><button onclick="logoutUser()">Atsijungti</button>
+<button class="account-action" onclick="openOrders()">📦 Mano užsakymai</button><button class="account-action" onclick="openAccountSettings()">⚙️ Nustatymai</button><button id="adminBtn" style="display:none" onclick="openAdmin()">⚙️ Admin panelė</button><button onclick="logoutUser()">Atsijungti</button>
 </div>
 </div>
 <button class="nav-icon">♡</button><button class="nav-icon cart" onclick="openCart()">🛒<span class="count" id="count">0</span></button>
 </div></header>
+
+
+<!-- ACCOUNT SETTINGS: personalization stays local to this browser; MFA will be enabled in a separate phase. -->
+<div id="accountSettingsModal" class="account-settings-overlay" role="dialog" aria-modal="true" aria-labelledby="accountSettingsTitle" onclick="closeAccountSettings(event)">
+  <section class="account-settings-panel" onclick="event.stopPropagation()">
+    <div class="account-settings-header"><div><h2 id="accountSettingsTitle">⚙️ Nustatymai</h2><p>Paskyra ir išvaizda</p></div><button class="close" type="button" onclick="closeAccountSettings()" aria-label="Uždaryti">✕</button></div>
+    <div class="account-settings-content">
+      <div class="account-settings-group"><h3>Kalba</h3><label for="accountLanguage">Svetainės kalba</label><select id="accountLanguage" onchange="setAccountLanguage(this.value)"><option value="lt">Lietuvių (pagrindinė)</option><option value="en">English</option><option value="ru">Русский</option></select><p id="accountLanguageNote" class="account-settings-note">Kol kas veikia nustatymų lango vertimas. Viso katalogo vertimus pridėsime kitu etapu.</p></div>
+      <div class="account-settings-group"><h3>Išvaizda</h3><label for="accountTheme">Spalvų tema</label><select id="accountTheme" onchange="setAccountTheme(this.value)"><option value="dark">Tamsi (numatytoji)</option><option value="light">Šviesi</option><option value="water">Water – mėlyna</option><option value="lava">Lava – oranžinė</option></select></div>
+      <div class="account-settings-group"><h3>Paskyros saugumas</h3><p class="account-settings-note">Dviejų veiksnių autentifikavimas („Google Authenticator“) – kitas etapas. Aktyvuosime per „Supabase“ MFA, kad jis realiai apsaugotų prisijungimą.</p><button type="button" class="account-settings-action" onclick="requestAccountPasswordReset()">Keisti slaptažodį el. paštu</button></div>
+    </div>
+  </section>
+</div>
 
 <section class="hero" id="top"><div class="hero-inner">
 <div class="side">
@@ -921,6 +944,10 @@ function showAuth(mode){
 
 function authErrorMessage(error){
   const m = String(error?.message || error || "");
+  if(m.toLowerCase().includes("for security purposes") || m.toLowerCase().includes("you can only request this after")) {
+    const seconds=m.match(/after\s+(\d+)\s+seconds?/i)?.[1];
+    return seconds?`Saugumo sumetimais bandykite dar kartą po ${seconds} sek.`:"Saugumo sumetimais šiek tiek palaukite prieš kartodami prašymą.";
+  }
   if(m.toLowerCase().includes("invalid login credentials")) return "Neteisingas el. paštas arba slaptažodis.";
   if(m.toLowerCase().includes("user already registered")) return "Šis el. paštas jau užregistruotas.";
   if(m.toLowerCase().includes("password")) return "Slaptažodis turi būti bent 6 simbolių.";
@@ -2515,6 +2542,17 @@ async function send(){
 document.getElementById("msg").addEventListener("keydown",e=>{
   if(e.key==="Enter") send();
 });
+
+// Settings are deliberately stored per-browser until account preference syncing is added.
+const ACCOUNT_THEME_KEY="ltparduotuve_theme_v1", ACCOUNT_LANGUAGE_KEY="ltparduotuve_language_v1";
+function openAccountSettings(){document.getElementById("userDropdown")?.classList.remove("open");document.getElementById("accountSettingsModal")?.classList.add("open");document.getElementById("accountTheme").value=localStorage.getItem(ACCOUNT_THEME_KEY)||"dark";document.getElementById("accountLanguage").value=localStorage.getItem(ACCOUNT_LANGUAGE_KEY)||"lt";setSettingsLanguageText(document.getElementById("accountLanguage").value)}
+function closeAccountSettings(event){if(event && event.target!==document.getElementById("accountSettingsModal"))return;document.getElementById("accountSettingsModal")?.classList.remove("open")}
+function setAccountTheme(theme){if(!["dark","light","water","lava"].includes(theme))theme="dark";document.body.classList.remove("theme-dark","theme-light","theme-water","theme-lava");document.body.classList.add("theme-"+theme);localStorage.setItem(ACCOUNT_THEME_KEY,theme)}
+function setAccountLanguage(lang){if(!["lt","en","ru"].includes(lang))lang="lt";localStorage.setItem(ACCOUNT_LANGUAGE_KEY,lang);setSettingsLanguageText(lang)}
+function setSettingsLanguageText(lang){const translations={lt:["⚙️ Nustatymai","Paskyra ir išvaizda","Kalba","Svetainės kalba","Išvaizda","Spalvų tema","Paskyros saugumas","Keisti slaptažodį el. paštu"],en:["⚙️ Settings","Account and appearance","Language","Website language","Appearance","Color theme","Account security","Reset password by email"],ru:["⚙️ Настройки","Аккаунт и оформление","Язык","Язык сайта","Оформление","Цветовая тема","Безопасность аккаунта","Сменить пароль по почте"]};const t=translations[lang]||translations.lt;const panel=document.getElementById("accountSettingsModal");if(!panel)return;const els=[panel.querySelector("h2"),panel.querySelector(".account-settings-header p"),...panel.querySelectorAll(".account-settings-group h3, .account-settings-group label"),panel.querySelector(".account-settings-action")];els.forEach((el,i)=>{if(el && t[i])el.textContent=t[i]});document.getElementById("accountLanguageNote").textContent=lang==="lt"?"Kol kas veikia nustatymų lango vertimas. Viso katalogo vertimus pridėsime kitu etapu.":lang==="en"?"Only the settings panel is translated for now. Full store translations are planned for a later phase.":"Пока переведено только окно настроек. Полный перевод магазина будет добавлен позже."}
+async function requestAccountPasswordReset(){const {data}=await supabaseClient.auth.getUser();const email=data?.user?.email;if(!email){alert("Prisijunkite prie paskyros.");return}const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname+"?reset_password=1"});alert(error?authErrorMessage(error):"Slaptažodžio keitimo nuoroda išsiųsta į jūsų el. paštą.")}
+setAccountTheme(localStorage.getItem(ACCOUNT_THEME_KEY)||"dark");
+
 restoreCartSnapshot();
 </script>
 <script>document.addEventListener("keydown",e=>{if(e.key==="Escape")closeUpdatesModal();});</script>
