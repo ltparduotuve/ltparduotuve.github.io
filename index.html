@@ -2752,7 +2752,7 @@ async function changeAccountPassword(){
 const STORE_MUSIC_MUTE_KEY='ltshop_music_muted_until', MUSIC_24H=86400000;
 const DEFAULT_SPOTIFY_URL='https://open.spotify.com/track/1wZkrdsVQ3BoFlhW4GE67W';
 let shopMusicConfig={spotify_url:DEFAULT_SPOTIFY_URL,enabled:true};
-let spotifyAPI=null,spotifyController=null,spotifyLoadedUrl='',spotifyWanted=!musicMuted();
+let spotifyAPI=null,spotifyController=null,spotifyLoadedUrl='',spotifyWanted=false;
 let spotifyIsPlaying=false,spotifyStarting=false,spotifyReady=false,shopMusicDbError='';
 let musicLoadPromise=null,musicLoaded=false,musicFallbackTimer=null;
 function spotifyEmbed(url){try{const u=new URL(url);let p=u.pathname.split('/').filter(Boolean);if(p[0]?.startsWith('intl-'))p=p.slice(1);if(u.protocol!=='https:'||u.hostname!=='open.spotify.com'||!['track','album','playlist'].includes(p[0])||!/^[a-zA-Z0-9]+$/.test(p[1]||''))return null;return 'https://open.spotify.com/embed/'+p[0]+'/'+p[1];}catch{return null}}
@@ -2820,11 +2820,10 @@ async function loadShopMusic(force=false){
   const enable=document.getElementById('adminSpotifyEnabled');if(enable)enable.checked=shopMusicConfig.enabled!==false;
   const info=document.getElementById('adminSpotifyMessage');
   if(info&&shopMusicDbError)info.textContent='Supabase muzikos klaida: '+shopMusicDbError;
-  // Išsaugoti kliento pasirinkimą; DB atsakymas neturi vėl paleisti išjungtos muzikos.
-  if(musicMuted())spotifyWanted=false;
+  // Muzika paleidžiama tik klientui paspaudus mygtuką – jokio autoplay.
   if(shopMusicConfig.enabled===false)spotifyWanted=false;
   musicLoaded=true;setMusicButton();
-  if(spotifyWanted){startShopMusic(false);queueMusicFallback();}
+  if(spotifyWanted){startShopMusic(false);}
   else {cancelMusicFallback();spotifyController?.pause();showMusicPlayerFallback(false);}
  })();
  try{await musicLoadPromise;}finally{musicLoadPromise=null;}
@@ -2839,7 +2838,7 @@ async function saveAdminMusic(){
  await loadShopMusic(true);
  out.textContent=shopMusicDbError?'Išsaugota, bet nuskaitymo klaida: '+shopMusicDbError:'Išsaugota visiems klientams.';
 }
-function toggleShopMusic(){
+async function toggleShopMusic(){
  if(spotifyWanted){
    spotifyWanted=false;spotifyIsPlaying=false;cancelMusicFallback();
    spotifyController?.pause();localStorage.setItem(STORE_MUSIC_MUTE_KEY,String(Date.now()+MUSIC_24H));
@@ -2847,7 +2846,10 @@ function toggleShopMusic(){
  }
  if(shopMusicConfig.enabled===false)return;
  localStorage.removeItem(STORE_MUSIC_MUTE_KEY);
- spotifyWanted=true;setMusicButton();startShopMusic(true);
+ spotifyWanted=true;setMusicButton();
+ // Veikiame tuo pačiu paspaudimu, nelaukdami naujos Supabase užklausos.
+ if(musicLoaded){startShopMusic(true);}
+ else {showMusicPlayerFallback(true);await loadShopMusic();if(spotifyWanted)startShopMusic(true);}
 }
 function updateAdminChatBadge(){const badge=document.getElementById('adminChatBadge');if(!badge)return;const count=[...adminUnreadChatCounts.values()].reduce((a,b)=>a+b,0);badge.hidden=count===0;const nav=document.getElementById('adminNavUnread');if(nav){nav.hidden=count===0;nav.textContent=count>99?'99+':String(count);}badge.textContent=count>99?'99+':String(count);}
 window.addEventListener('DOMContentLoaded',()=>{loadShopMusic();});
