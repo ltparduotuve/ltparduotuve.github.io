@@ -274,6 +274,8 @@ body.auth-locked{overflow:hidden}
 .shop-music-field input{min-width:0;flex:1;background:#07101f;border:1px solid #456386;border-radius:9px;padding:11px;color:white}
 .shop-music-field button{background:#214d94;color:white;border:1px solid #668fcd;border-radius:9px;padding:10px 13px;cursor:pointer}
 #shopSpotifyFrame{width:100%;border:0;border-radius:12px;min-height:152px}
+
+.account-pref-input{width:100%;padding:12px;background:#08111d;border:1px solid #46658d;border-radius:9px;color:white} .admin-chat-badge{display:inline-grid;place-items:center;background:#db354c;color:#fff;border-radius:30px;padding:3px 7px;font-size:10px;min-width:20px;margin-left:5px;box-shadow:0 0 13px #ff365177}.admin-chat-badge[hidden]{display:none} .shop-music-dock{position:fixed;top:78px;right:16px;width:min(360px,calc(100vw - 32px));z-index:1600;padding:14px;border-radius:14px;background:#0a1424;border:1px solid #456c9a;box-shadow:0 12px 45px #000c}.shop-music-dock[hidden]{display:none}.shop-music-dock iframe{display:block;width:100%;height:170px;border:none;border-radius:11px}.shop-music-toggle.muted{opacity:.6} 
 </style>
 <style id="payment-30min-style">
 .bank-pay-modal{align-items:flex-start;padding:28px 16px;overflow:auto;background:rgba(1,4,10,.96);backdrop-filter:blur(10px)}
@@ -477,8 +479,8 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <button class="account-action" onclick="openOrders()">📦 Mano užsakymai</button><button class="account-action" onclick="openAccountSettings()">⚙️ Nustatymai</button><button onclick="logoutUser()">Atsijungti</button>
 </div>
 </div>
-<button class="shop-music-toggle" onclick="openShopMusic()">♫ Muzika</button>
-<button id="adminBtn" class="admin-nav-launch" style="display:none" onclick="openAdmin()">⚙ Administravimas</button>
+<button id="shopMusicToggle" class="shop-music-toggle" onclick="toggleShopMusic()" title="Paleisti arba sustabdyti muziką">♫ Muzika</button>
+<button id="adminBtn" class="admin-nav-launch" style="display:none" onclick="openAdmin()">⚙ Administravimas <span id="adminNavUnread" class="admin-chat-badge" hidden>0</span></button>
 <button class="nav-icon">♡</button><button class="nav-icon cart" onclick="openCart()">🛒<span class="count" id="count">0</span></button>
 </div></header>
 
@@ -495,13 +497,15 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
   <section class="account-settings-panel" onclick="event.stopPropagation()">
     <div class="account-settings-header"><div><h2 id="accountSettingsTitle">⚙️ Nustatymai</h2><p>Paskyros saugumas</p></div><button class="close" type="button" onclick="closeAccountSettings()" aria-label="Uždaryti">✕</button></div>
     <div class="account-settings-content">
-      <div class="account-settings-group"><h3>Paskyros saugumas</h3>
+      <div class="account-settings-group"><h3>El. paštas</h3><label for="accountNewEmail">Naujas el. pašto adresas</label><input id="accountNewEmail" type="email" autocomplete="email" placeholder="vardas@example.com" class="account-pref-input"><button class="account-settings-action" onclick="changeAccountEmail()">Keisti el. paštą</button><p id="accountEmailMessage" role="status" class="account-settings-note"></p></div>
+<div class="account-settings-group"><h3>Keisti slaptažodį</h3><label for="accountCurrentPassword">Dabartinis slaptažodis</label><input id="accountCurrentPassword" class="account-pref-input" type="password" autocomplete="current-password"><label for="accountNewPassword">Naujas slaptažodis</label><input id="accountNewPassword" class="account-pref-input" type="password" autocomplete="new-password"><label for="accountConfirmPassword">Pakartokite naują slaptažodį</label><input id="accountConfirmPassword" class="account-pref-input" type="password" autocomplete="new-password"><button class="account-settings-action" onclick="changeAccountPassword()">Išsaugoti slaptažodį</button><p id="accountPasswordMessage" role="status" class="account-settings-note"></p></div>
+<div class="account-settings-group"><h3>Paskyros saugumas</h3>
 <p class="account-settings-note" id="mfaStatus">Tikrinama 2FA būsena...</p>
 <button type="button" class="account-settings-action" id="mfaEnableBtn" onclick="beginMfaEnroll()">Įjungti Google Authenticator (2FA)</button>
 <div id="mfaEnrollArea" style="display:none"><p class="account-settings-note">Nuskenuok QR kodą su Google Authenticator, tada įvesk programėlėje matomą 6 skaitmenų kodą. QR kodą saugok tik sau.</p><div id="mfaQr" style="width:190px;max-width:100%;margin:12px auto;background:white;padding:9px;border-radius:9px"></div><p id="mfaSecretHelp" class="account-settings-note" style="overflow-wrap:anywhere"></p><input id="mfaEnrollCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="6 skaitmenų kodas" style="width:100%;padding:12px;border-radius:8px;background:#08111d;color:white;border:1px solid #46658d"><button type="button" class="account-settings-action" onclick="completeMfaEnroll()">Patvirtinti ir įjungti 2FA</button><button type="button" class="admin-secondary" onclick="cancelMfaEnroll()">Atšaukti</button></div>
 <button type="button" id="mfaDisableBtn" class="admin-danger" style="display:none" onclick="disableMfa()">Išjungti 2FA</button>
 <p id="mfaSettingsMessage" class="account-settings-note" role="status"></p>
-<button type="button" class="account-settings-action" onclick="requestAccountPasswordReset()">Keisti slaptažodį el. paštu</button></div>
+</div>
     </div>
   </section>
 </div>
@@ -567,7 +571,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <div class="chat-input"><input id="msg" placeholder="Parašykite žinutę..."><button onclick="send()">Siųsti</button></div></div>
 
 
-<div id="shopMusicModal" class="shop-music-modal" onclick="closeShopMusic()"><div class="shop-music-box" onclick="event.stopPropagation()"><div class="shop-music-row"><h2 style="font-size:20px;font-weight:800">♫ Parduotuvės muzika</h2><button class="close" onclick="closeShopMusic()">✕</button></div><div style="font-size:12px;color:#a9bdd5">Įklijuok „Spotify“ kūrinio, albumo arba grojaraščio nuorodą. Grotuvas veikia tik paspaudus paleidimą.</div><div class="shop-music-field"><input id="shopSpotifyUrl" aria-label="Spotify nuoroda" placeholder="https://open.spotify.com/playlist/..."/><button onclick="setShopSpotify()">Atidaryti</button></div><div id="shopMusicError" style="color:#ffa8ae;font-size:11px;min-height:17px"></div><iframe id="shopSpotifyFrame" title="Spotify grotuvas" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe><div style="margin-top:12px;font-size:11px;color:#839ab8">Kai kuriems kūriniams „Spotify“ gali reikalauti prisijungimo. Grotuvas nepasileidžia automatiškai.</div></div></div>
+<aside id="shopMusicDock" class="shop-music-dock" hidden><div class="shop-music-row"><strong>♫ Parduotuvės muzika</strong><button type="button" class="close" onclick="toggleShopMusic()">✕</button></div><iframe id="shopSpotifyFrame" title="Spotify grotuvas" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe></aside>
 <div id="adminPanel">
  <div class="admin-wrap">
   <div class="admin-head"><div><h2>LT PARDUOTUVĖ <span class="admin-head-accent">/ Valdymo centras</span></h2></div><button class="admin-close" onclick="closeAdmin()">✕ Uždaryti</button></div>
@@ -581,8 +585,10 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
    <button class="admin-tab" onclick="adminTab('orders',this)">🧾 Užsakymai</button>
    <button class="admin-tab" onclick="adminTab('payments',this)">🏦 Apmokėjimai</button>
    <button class="admin-tab" onclick="adminTab('storelock',this)">🔒 Parduotuvė</button>
-   <button class="admin-tab" onclick="adminTab('chat',this)">💬 Klientų chat</button>
-  </div><div class="admin-workspace-content"><section class="admin-section active" id="admin-dashboard">
+   <button class="admin-tab" onclick="adminTab('chat',this)">💬 Klientų chat <span id="adminChatBadge" class="admin-chat-badge" hidden>0</span></button>
+   <button class="admin-tab" onclick="adminTab('music',this)">♫ Muzika</button>
+  </div><div class="admin-workspace-content"><section class="admin-section" id="admin-music"><h3>Parduotuvės muzika</h3><div class="admin-form" style="margin-top:15px"><div class="admin-field full"><label>Spotify grojaraščio arba kūrinio nuoroda</label><input id="adminSpotifyUrl" type="url" placeholder="https://open.spotify.com/playlist/..."></div><div class="admin-field full"><label><input type="checkbox" id="adminSpotifyEnabled" checked style="width:auto;margin-right:8px">Leisti lankytojams klausytis</label></div><button class="admin-primary" onclick="saveAdminMusic()">Išsaugoti</button><p class="admin-note full" id="adminSpotifyMessage"></p></div></section>
+<section class="admin-section active" id="admin-dashboard">
    <div class="admin-grid">
     <div class="admin-stat"><b id="statProducts">0</b><span>PREKIŲ DUOMENŲ BAZĖJE</span></div>
     <div class="admin-stat"><b id="statUsers">—</b><span>VARTOTOJAI</span></div>
@@ -1144,6 +1150,7 @@ async function enterStore(user){
 
   document.getElementById("storeLockOverlay")?.classList.remove("open");
   initAdmin(user);
+  loadShopMusic();
   initChat();
 }
 
@@ -2075,12 +2082,12 @@ Siuntimo numeris: ${o.tracking_number||"Dar nepriskirtas"}
 Mokėjimo paskirtis: ${o.payment_reference||"—"}`);
 }
 
-let adminChatSessionId=null,adminChatRows=[],adminChatChannel=null,adminChatNotificationSession=null;const adminUnreadChats=new Set();
-function showAdminNotification(row){if(!isAdmin||row?.sender!=="customer")return;adminChatNotificationSession=row.session_id;const n=document.getElementById("adminChatNotification");document.getElementById("adminChatNotificationTitle")?.replaceChildren(document.createTextNode("💬 Nauja kliento žinutė"));const x=document.getElementById("adminChatNotificationText");if(x)x.textContent=(row.message||"").slice(0,90);n?.classList.add("show");adminUnreadChats.add(row.session_id);refreshAdminChatUsers();}
+let adminChatSessionId=null,adminChatRows=[],adminChatChannel=null,adminChatNotificationSession=null;const adminUnreadChats=new Set(),adminUnreadChatCounts=new Map();
+function showAdminNotification(row){if(!isAdmin||row?.sender!=="customer")return;adminChatNotificationSession=row.session_id;const n=document.getElementById("adminChatNotification");document.getElementById("adminChatNotificationTitle")?.replaceChildren(document.createTextNode("💬 Nauja kliento žinutė"));const x=document.getElementById("adminChatNotificationText");if(x)x.textContent=(row.message||"").slice(0,90);n?.classList.add("show");adminUnreadChats.add(row.session_id);adminUnreadChatCounts.set(row.session_id,(adminUnreadChatCounts.get(row.session_id)||0)+1);updateAdminChatBadge();refreshAdminChatUsers();}
 function hideAdminNotification(){document.getElementById("adminChatNotification")?.classList.remove("show")}
 function openAdminFromNotification(){const sid=adminChatNotificationSession;hideAdminNotification();document.getElementById("adminPanel")?.classList.add("open");const tab=[...document.querySelectorAll(".admin-tab")].find(x=>x.textContent.includes("Klientų chat"));if(tab)adminTab("chat",tab);if(sid)openAdminChat(sid)}
 async function loadAdminChats(){if(!isAdmin)return;const {data,error}=await supabaseClient.from("chat_sessions").select("*").order("created_at",{ascending:false});if(error){console.error(error);return}window.adminChatSessions=Object.fromEntries((data||[]).map(x=>[x.thread_id,x]));const active=(data||[]).filter(x=>x.status==="open");const users=document.getElementById("adminChatUsers");if(!users)return;users.innerHTML=active.length?active.map(x=>`<div class="admin-chat-user ${x.thread_id===adminChatSessionId?"active":""} ${adminUnreadChats.has(x.thread_id)?"unread":""}" onclick="openAdminChat('${x.thread_id}')"><b>${escapeHtml(x.user_email||x.user_id.slice(0,8)+"…")}</b>${adminUnreadChats.has(x.thread_id)?'<span class="unread-dot">●</span>':''}<small>${x.status.toUpperCase()} • ${formatDate(x.last_activity||x.created_at)}</small></div>`).join(""):'<div class="admin-empty">Aktyvių klientų chatų nėra.</div>';subscribeAdminChat()}
-async function openAdminChat(sid){adminChatSessionId=sid;adminUnreadChats.delete(sid);const session=window.adminChatSessions?.[sid];const title=document.getElementById("adminChatTitle");if(title)title.innerHTML=`💬 ${escapeHtml(session?.user_email||"Klientas")} <button class="admin-secondary" style="float:right;margin-left:6px" onclick="solveAdminChat('${sid}')">✓ Uždaryti chatą</button><button class="admin-danger" style="float:right" onclick="deleteAdminChat('${sid}')">🗑️ Ištrinti chatą</button>`;const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",sid).order("created_at",{ascending:true});if(error){console.error(error);return}const body=document.getElementById("adminChatBody");body.innerHTML=(data||[]).map(m=>`<div class="admin-chat-bubble ${m.sender==="admin"?"admin":""}">${escapeHtml(m.message)}<span class="admin-chat-time">${m.sender==="admin"?"Administratorius":"Klientas"} • ${formatDate(m.created_at)}</span></div>`).join("")||'<div class="admin-empty">Žinučių nėra.</div>';body.scrollTop=body.scrollHeight;loadAdminChats()}
+async function openAdminChat(sid){adminChatSessionId=sid;adminUnreadChats.delete(sid);adminUnreadChatCounts.delete(sid);updateAdminChatBadge();const session=window.adminChatSessions?.[sid];const title=document.getElementById("adminChatTitle");if(title)title.innerHTML=`💬 ${escapeHtml(session?.user_email||"Klientas")} <button class="admin-secondary" style="float:right;margin-left:6px" onclick="solveAdminChat('${sid}')">✓ Uždaryti chatą</button><button class="admin-danger" style="float:right" onclick="deleteAdminChat('${sid}')">🗑️ Ištrinti chatą</button>`;const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",sid).order("created_at",{ascending:true});if(error){console.error(error);return}const body=document.getElementById("adminChatBody");body.innerHTML=(data||[]).map(m=>`<div class="admin-chat-bubble ${m.sender==="admin"?"admin":""}">${escapeHtml(m.message)}<span class="admin-chat-time">${m.sender==="admin"?"Administratorius":"Klientas"} • ${formatDate(m.created_at)}</span></div>`).join("")||'<div class="admin-empty">Žinučių nėra.</div>';body.scrollTop=body.scrollHeight;loadAdminChats()}
 async function solveAdminChat(sid){if(!isAdmin||!sid)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("thread_id",sid).eq("status","open");if(r.error)return alert("Nepavyko uždaryti pokalbio.");adminChatSessionId=null;await loadAdminChats();const title=document.getElementById("adminChatTitle");if(title)title.textContent="💬 Pokalbis uždarytas — klientui parodytas įvertinimas.";const body=document.getElementById("adminChatBody");if(body)body.innerHTML='<div class="admin-note">✓ Pokalbis uždarytas. Klientui parodytas įvertinimas. Jis gali pradėti naują pokalbį po įvertinimo.</div>'}
 function refreshAdminChatUsers(){loadAdminChats()}
 function subscribeAdminChat(){if(adminChatChannel||!isAdmin)return;adminChatChannel=supabaseClient.channel("admin-live-chat-v3").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},async p=>{if(p.new?.sender!=="customer")return;showAdminNotification(p.new);await loadAdminChats();if(adminChatSessionId===p.new.session_id)await openAdminChat(p.new.session_id)}).subscribe(()=>{});}
@@ -2691,5 +2698,50 @@ function setShopSpotify(){
  if(u.protocol!=='https:'||u.hostname!=='open.spotify.com'||!['track','album','playlist','episode','show'].includes(kind)||!id||!/^[A-Za-z0-9]+$/.test(id)){error.textContent='Tinka tik „Spotify“ kūrinio, albumo ar grojaraščio nuoroda.';return;}
  error.textContent='';frame.src='https://open.spotify.com/embed/'+kind+'/'+id+'?utm_source=generator';localStorage.setItem('ltshop_spotify_url',value);
 }
+</script>
+<script>
+async function changeAccountEmail(){
+ const email=document.getElementById('accountNewEmail').value.trim(),out=document.getElementById('accountEmailMessage');
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){out.textContent='Įveskite taisyklingą el. pašto adresą.';return;}
+ out.textContent='Siunčiamas patvirtinimas...';const {error}=await supabaseClient.auth.updateUser({email},{emailRedirectTo:'https://ltparduotuve.lt/'});
+ out.textContent=error?authErrorMessage(error):'Patvirtinkite el. pašto pakeitimą gautoje nuorodoje. Patikrinkite ir senąjį paštą, jei prašoma.';
+}
+async function changeAccountPassword(){
+ const curr=document.getElementById('accountCurrentPassword'),next=document.getElementById('accountNewPassword'),confirm=document.getElementById('accountConfirmPassword'),out=document.getElementById('accountPasswordMessage');
+ if(next.value.length<10){out.textContent='Slaptažodis turi būti bent 10 simbolių.';return;}
+ if(next.value!==confirm.value){out.textContent='Nauji slaptažodžiai nesutampa.';return;}
+ if(!curr.value){out.textContent='Įveskite dabartinį slaptažodį.';return;}
+ out.textContent='Keičiamas slaptažodis...';
+ const {error}=await supabaseClient.auth.updateUser({password:next.value,current_password:curr.value});
+ out.textContent=error?authErrorMessage(error):'Slaptažodis sėkmingai pakeistas.';
+ if(!error){curr.value='';next.value='';confirm.value='';}
+}
+const STORE_MUSIC_MUTE_KEY='ltshop_music_muted_until', MUSIC_24H=86400000;
+let shopMusicConfig=null,shopMusicInitialized=false;
+function spotifyEmbed(url){try{const u=new URL(url);let p=u.pathname.split('/').filter(Boolean);if(p[0]?.startsWith('intl-'))p=p.slice(1);if(u.protocol!=='https:'||u.hostname!=='open.spotify.com'||!['track','album','playlist'].includes(p[0])||!/^[a-zA-Z0-9]+$/.test(p[1]||''))return null;return 'https://open.spotify.com/embed/'+p[0]+'/'+p[1];}catch{return null}}
+async function loadShopMusic(){
+ const {data,error}=await supabaseClient.from('store_music_settings').select('spotify_url,enabled').eq('id',1).maybeSingle();
+ if(error){console.warn('Muzikos nustatymai neįdiegti',error);return;}
+ shopMusicConfig=data;
+ const urlInput=document.getElementById('adminSpotifyUrl');if(urlInput&&data)urlInput.value=data.spotify_url||'';
+ const enableInput=document.getElementById('adminSpotifyEnabled');if(enableInput&&data)enableInput.checked=data.enabled!==false;
+ const button=document.getElementById('shopMusicToggle');if(button)button.hidden=!data?.enabled||!spotifyEmbed(data?.spotify_url||'');
+}
+async function saveAdminMusic(){
+ if(!isAdmin)return;
+ const url=document.getElementById('adminSpotifyUrl').value.trim(),enabled=document.getElementById('adminSpotifyEnabled').checked,out=document.getElementById('adminSpotifyMessage');
+ if(url&&!spotifyEmbed(url)){out.textContent='Įveskite tinkamą Spotify kūrinio, albumo ar grojaraščio nuorodą.';return;}
+ const {error}=await supabaseClient.from('store_music_settings').upsert({id:1,spotify_url:url,enabled},{onConflict:'id'});
+ out.textContent=error?'Nepavyko išsaugoti: '+error.message:'Išsaugota.';if(!error){document.getElementById('shopMusicDock').hidden=true;await loadShopMusic();}
+}
+function toggleShopMusic(){
+ const dock=document.getElementById('shopMusicDock'),frame=document.getElementById('shopSpotifyFrame'),btn=document.getElementById('shopMusicToggle');
+ if(!shopMusicConfig?.enabled)return;
+ if(!dock.hidden){dock.hidden=true;frame.removeAttribute('src');localStorage.setItem(STORE_MUSIC_MUTE_KEY,String(Date.now()+MUSIC_24H));btn?.classList.add('muted');return;}
+ const url=spotifyEmbed(shopMusicConfig.spotify_url);if(!url)return;
+ localStorage.removeItem(STORE_MUSIC_MUTE_KEY);dock.hidden=false;frame.src=url;btn?.classList.remove('muted');
+}
+function updateAdminChatBadge(){const badge=document.getElementById('adminChatBadge');if(!badge)return;const count=[...adminUnreadChatCounts.values()].reduce((a,b)=>a+b,0);badge.hidden=count===0;const nav=document.getElementById('adminNavUnread');if(nav){nav.hidden=count===0;nav.textContent=count>99?'99+':String(count);}badge.textContent=count>99?'99+':String(count);}
+window.addEventListener('DOMContentLoaded',()=>{loadShopMusic();});
 </script>
 </body></html>
