@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="lt">
 <head>
-<!-- LTP-BUILD: 20261021-AI-CHAT-TURNSTILE-NOAUDIO-V1 -->
-<meta name="ltparduotuve-build" content="20261021-AI-CHAT-TURNSTILE-NOAUDIO-V1">
+<!-- LTP-BUILD: 20261021-AI-LIVE-STORE -->
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LT PARDUOTUVĖ</title>
@@ -608,6 +608,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
    <button class="admin-tab" onclick="adminTab('coupons',this)">🎟️ Kuponai</button>
    <button class="admin-tab" onclick="adminTab('bulk',this)">🛍️ Kiekio akcijos</button>
    <button class="admin-tab" onclick="adminTab('updates',this)">📰 Atnaujinimai</button>
+   <button class="admin-tab" onclick="adminTab('airules',this)">🤖 DI žinios</button>
    <button class="admin-tab" onclick="adminTab('orders',this)">🧾 Užsakymai</button>
    <button class="admin-tab" onclick="adminTab('payments',this)">🏦 Apmokėjimai</button>
    <button class="admin-tab" onclick="adminTab('storelock',this)">🔒 Parduotuvė</button>
@@ -725,6 +726,18 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     <div class="admin-actions full"><button class="admin-primary" onclick="saveCryptoSettings()">Išsaugoti kriptovaliutų nustatymus</button><button class="admin-secondary" onclick="loadCryptoSettings()">Atnaujinti</button></div>
    </div>
    <div class="admin-payment-help">Mokėjimo paskirtis kiekvienam užsakymui sugeneruojama atskirai, pvz. <b>LT-2026-A7F3K9Q2</b>. Klientas turi naudoti būtent savo užsakymo kodą.</div>
+  </section>
+  <section class="admin-section" id="admin-airules">
+   <div class="admin-note"><b>🤖 DI žinios ir taisyklės</b><p style="margin-top:6px">DI automatiškai skaito naujas prekes, kainas, likučius, kategorijas ir aktyvius parduotuvės atnaujinimus. Čia pridėk taisykles, pvz., grąžinimą, garantiją, amžiaus ribojimus ar kontaktus. Išsaugojus jos DI pasiekiamos nuo kito kliento klausimo.</p></div>
+   <div class="admin-form" id="aiRulesForm">
+    <input type="hidden" id="aiRuleEditId">
+    <div class="admin-field full"><label>TAISYKLĖS PAVADINIMAS</label><input id="aiRuleTitle" maxlength="120" placeholder="Pvz. Prekių grąžinimas"></div>
+    <div class="admin-field full"><label>TAISYKLĖS TEKSTAS</label><textarea id="aiRuleContent" rows="6" maxlength="4000" placeholder="Aprašyk tik patvirtintas parduotuvės taisykles ir sąlygas..."></textarea></div>
+    <div class="admin-field"><label>AKTYVI</label><select id="aiRuleActive"><option value="true">Taip – DI matys</option><option value="false">Ne – DI nematys</option></select></div>
+    <div class="admin-actions full"><button class="admin-primary" onclick="saveAIRule()">💾 Išsaugoti taisyklę</button><button class="admin-secondary" onclick="clearAIRuleForm()">Išvalyti</button></div>
+   </div>
+   <div class="admin-actions" style="margin-bottom:12px"><button class="admin-secondary" onclick="loadAdminAIRules()">↻ Atnaujinti</button></div>
+   <div class="admin-list" id="adminAiRuleList"><div class="admin-empty">Kraunama...</div></div>
   </section>
   <section class="admin-section" id="admin-storelock">
    <div class="admin-note"><b>🔒 Parduotuvės prieinamumas</b><br>Čia gali užrakinti parduotuvę visiems klientams. Administratoriui parduotuvė išlieka pasiekiama, todėl galėsi tvarkyti prekes, užsakymus ir kitus nustatymus.</div>
@@ -1734,8 +1747,52 @@ function closeAdmin(){document.getElementById("adminPanel").classList.remove("op
 function adminTab(name,btn){
   document.querySelectorAll(".admin-tab").forEach(x=>x.classList.remove("active"));
   document.querySelectorAll(".admin-section").forEach(x=>x.classList.remove("active"));
-  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="updates")loadAdminUpdates();if(name==="bulk")loadAdminBulkDiscounts();if(name==="payments"){loadPaymentSettings();loadCryptoSettings();}if(name==="storelock")loadStoreLockSettings();
+  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="updates")loadAdminUpdates();if(name==="bulk")loadAdminBulkDiscounts();if(name==="payments"){loadPaymentSettings();loadCryptoSettings();}if(name==="storelock")loadStoreLockSettings();if(name==="airules")loadAdminAIRules();
 }
+// DI taisykles: saugomos Supabase; klientai negali skaityti/redaguoti sios admin lenteles.
+let adminAIRules=[];
+async function loadAdminAIRules(){
+  if(!isAdmin)return;
+  const el=document.getElementById('adminAiRuleList');if(!el)return;
+  el.innerHTML='<div class="admin-empty">Kraunama...</div>';
+  const {data,error}=await supabaseClient.from('store_ai_rules').select('id,title,content,active,updated_at')
+    .order('updated_at',{ascending:false});
+  if(error){console.error('DI rules:',error);el.innerHTML='<div class="admin-empty">DI taisyklės nepasiekiamos. Pirmiausia paleisk 01_DI_TAISYKLES_SQL.sql.</div>';return}
+  adminAIRules=data||[];
+  if(!adminAIRules.length){el.innerHTML='<div class="admin-empty">Taisyklių dar nėra. Pridėk pirmą.</div>';return}
+  el.innerHTML=adminAIRules.map(r=>`<div class="admin-product"><div class="admin-product-info"><b>${escapeHtml(r.title)} • ${r.active?'🟢 Aktyvi':'🔴 Išjungta'}</b><small style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHtml(r.content.slice(0,550))}${r.content.length>550?'…':''}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick="editAIRule('${r.id}')">✏️ Redaguoti</button><button class="admin-danger" onclick="deleteAIRule('${r.id}')">🗑️ Ištrinti</button></div></div>`).join('');
+}
+function editAIRule(id){
+  if(!isAdmin)return;const r=adminAIRules.find(x=>x.id===id);if(!r)return;
+  document.getElementById('aiRuleEditId').value=r.id;
+  document.getElementById('aiRuleTitle').value=r.title;
+  document.getElementById('aiRuleContent').value=r.content;
+  document.getElementById('aiRuleActive').value=String(r.active);
+  document.getElementById('aiRulesForm').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function clearAIRuleForm(){
+  ['aiRuleEditId','aiRuleTitle','aiRuleContent'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('aiRuleActive').value='true';
+}
+async function saveAIRule(){
+  if(!isAdmin)return alert('Neturite administratoriaus teisių.');
+  const title=document.getElementById('aiRuleTitle').value.trim();
+  const content=document.getElementById('aiRuleContent').value.trim();
+  const active=document.getElementById('aiRuleActive').value==='true';
+  const id=document.getElementById('aiRuleEditId').value;
+  if(!title||!content||title.length>120||content.length>4000)return alert('Įrašyk pavadinimą (iki 120) ir tekstą (iki 4000 simbolių).');
+  const payload={title,content,active,updated_at:new Date().toISOString()};
+  const result=id?await supabaseClient.from('store_ai_rules').update(payload).eq('id',id):await supabaseClient.from('store_ai_rules').insert(payload);
+  if(result.error){console.error('Save DI rule:',result.error);return alert('Taisyklė neišsaugota. Patikrink DI SQL ir administratoriaus teises.');}
+  clearAIRuleForm();await loadAdminAIRules();toast('✓ DI taisyklė išsaugota.');
+}
+async function deleteAIRule(id){
+  if(!isAdmin||!confirm('Ištrinti DI taisyklę?'))return;
+  const {error}=await supabaseClient.from('store_ai_rules').delete().eq('id',id);
+  if(error){console.error('Delete DI rule:',error);return alert('Nepavyko ištrinti taisyklės.');}
+  clearAIRuleForm();await loadAdminAIRules();toast('✓ DI taisyklė ištrinta.');
+}
+
 async function loadAdminStats(){
   const p=await supabaseClient.from("products").select("id",{count:"exact",head:true});
   document.getElementById("statProducts").textContent=p.count??"0";
