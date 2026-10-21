@@ -571,7 +571,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <div class="chat-input"><input id="msg" placeholder="Parašykite žinutę..."><button onclick="send()">Siųsti</button></div></div>
 
 
-<aside id="shopMusicDock" class="shop-music-dock" hidden><div class="shop-music-row"><strong>♫ Parduotuvės muzika</strong><button type="button" class="close" onclick="toggleShopMusic()">✕</button></div><iframe id="shopSpotifyFrame" title="Spotify grotuvas" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe></aside>
+<aside id="shopMusicDock" class="shop-music-dock" hidden><div class="shop-music-row"><strong>♫ Parduotuvės muzika</strong><button type="button" class="close" onclick="toggleShopMusic()">✕</button></div><iframe id="shopSpotifyFrame" title="Spotify grotuvas" loading="eager" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe></aside>
 <div id="adminPanel">
  <div class="admin-wrap">
   <div class="admin-head"><div><h2>LT PARDUOTUVĖ <span class="admin-head-accent">/ Valdymo centras</span></h2></div><button class="admin-close" onclick="closeAdmin()">✕ Uždaryti</button></div>
@@ -2717,15 +2717,22 @@ async function changeAccountPassword(){
  if(!error){curr.value='';next.value='';confirm.value='';}
 }
 const STORE_MUSIC_MUTE_KEY='ltshop_music_muted_until', MUSIC_24H=86400000;
-let shopMusicConfig=null,shopMusicInitialized=false;
+let shopMusicConfig=null;
 function spotifyEmbed(url){try{const u=new URL(url);let p=u.pathname.split('/').filter(Boolean);if(p[0]?.startsWith('intl-'))p=p.slice(1);if(u.protocol!=='https:'||u.hostname!=='open.spotify.com'||!['track','album','playlist'].includes(p[0])||!/^[a-zA-Z0-9]+$/.test(p[1]||''))return null;return 'https://open.spotify.com/embed/'+p[0]+'/'+p[1];}catch{return null}}
+function musicMuted(){const until=Number(localStorage.getItem(STORE_MUSIC_MUTE_KEY)||0);if(until>Date.now())return true;if(until)localStorage.removeItem(STORE_MUSIC_MUTE_KEY);return false;}
+function showSpotifyPlayer(){const url=spotifyEmbed(shopMusicConfig?.spotify_url||'');if(!shopMusicConfig?.enabled||!url)return;const dock=document.getElementById('shopMusicDock'),frame=document.getElementById('shopSpotifyFrame');if(!dock||!frame)return;dock.hidden=false;frame.src=url+'?autoplay=1';document.getElementById('shopMusicToggle')?.classList.remove('muted');}
 async function loadShopMusic(){
  const {data,error}=await supabaseClient.from('store_music_settings').select('spotify_url,enabled').eq('id',1).maybeSingle();
  if(error){console.warn('Muzikos nustatymai neįdiegti',error);return;}
  shopMusicConfig=data;
  const urlInput=document.getElementById('adminSpotifyUrl');if(urlInput&&data)urlInput.value=data.spotify_url||'';
  const enableInput=document.getElementById('adminSpotifyEnabled');if(enableInput&&data)enableInput.checked=data.enabled!==false;
- const button=document.getElementById('shopMusicToggle');if(button)button.hidden=!data?.enabled||!spotifyEmbed(data?.spotify_url||'');
+ const button=document.getElementById('shopMusicToggle');
+ const available=!!data?.enabled&&!!spotifyEmbed(data?.spotify_url||'');
+ if(button){button.hidden=!available;button.classList.toggle('muted',musicMuted());}
+ if(!available){const dock=document.getElementById('shopMusicDock'),frame=document.getElementById('shopSpotifyFrame');if(dock)dock.hidden=true;if(frame)frame.removeAttribute('src');return;}
+ // Bandome paleisti automatiškai, tik jeigu lankytojas nebuvo išjungęs muzikos.
+ if(!musicMuted())showSpotifyPlayer();
 }
 async function saveAdminMusic(){
  if(!isAdmin)return;
@@ -2739,7 +2746,7 @@ function toggleShopMusic(){
  if(!shopMusicConfig?.enabled)return;
  if(!dock.hidden){dock.hidden=true;frame.removeAttribute('src');localStorage.setItem(STORE_MUSIC_MUTE_KEY,String(Date.now()+MUSIC_24H));btn?.classList.add('muted');return;}
  const url=spotifyEmbed(shopMusicConfig.spotify_url);if(!url)return;
- localStorage.removeItem(STORE_MUSIC_MUTE_KEY);dock.hidden=false;frame.src=url;btn?.classList.remove('muted');
+ localStorage.removeItem(STORE_MUSIC_MUTE_KEY);showSpotifyPlayer();
 }
 function updateAdminChatBadge(){const badge=document.getElementById('adminChatBadge');if(!badge)return;const count=[...adminUnreadChatCounts.values()].reduce((a,b)=>a+b,0);badge.hidden=count===0;const nav=document.getElementById('adminNavUnread');if(nav){nav.hidden=count===0;nav.textContent=count>99?'99+':String(count);}badge.textContent=count>99?'99+':String(count);}
 window.addEventListener('DOMContentLoaded',()=>{loadShopMusic();});
