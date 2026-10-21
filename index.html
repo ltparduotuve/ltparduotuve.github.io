@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="lt">
 <head>
-<!-- LTP-BUILD: 20261021-AI-LIVE-STORE -->
+<!-- LTP-BUILD: 20261021-AI-VISIBLE-CHAT -->
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -288,6 +288,11 @@ body.auth-locked{overflow:hidden}
 .turnstile-container{min-height:66px;margin:12px 0 7px;display:flex;align-items:center;justify-content:center}
 .turnstile-container:empty{min-height:0}
 
+/* Matomas DI pagalbos mygtukas */
+#aiChatLaunch{width:auto;min-width:165px;height:53px;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 17px;font-size:20px;font-weight:900;white-space:nowrap;letter-spacing:.3px}
+#aiChatLaunch span{font-size:12px;line-height:1.1}
+#aiChatLaunch:focus-visible{outline:3px solid #d3e7ff;outline-offset:3px}
+@media(max-width:450px){#aiChatLaunch{right:12px;bottom:12px;min-width:144px;height:51px;padding:0 13px}#aiChatLaunch span{font-size:11px}}
 /* DI pokalbis – administratoriaus mygtukas pasirodo tik DI režime */
 .chat-human-btn{display:block;width:calc(100% - 20px);margin:6px 10px 2px;padding:10px 12px;
   border:1px solid #5c8cda;border-radius:9px;background:#132a4c;color:#e7f1ff;
@@ -587,10 +592,10 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 </main>
 <footer>© 2026 LT PARDUOTUVĖ • Pagalba 24/7</footer>
 
-<button class="chat-launch" onclick="toggleChat()">💬</button>
-<div class="chat" id="chat"><div class="chat-head"><div><strong id="chatAssistantTitle">LT Parduotuvė • DI pagalba</strong><small>● Kraunama...</small></div><button class="chat-close" onclick="toggleChat()">✕</button></div>
+<button id="aiChatLaunch" class="chat-launch" type="button" onclick="toggleChat()" aria-controls="chat" aria-label="Atidaryti DI pagalbą" title="Klauskite DI apie prekes, kainas, pristatymą ir užsakymus">🤖 <span>DI PAGALBA</span></button>
+<div class="chat" id="chat"><div class="chat-head"><div><strong id="chatAssistantTitle">🤖 LT Parduotuvė • DI pagalba</strong><small>● Jungiamasi prie DI...</small></div><button class="chat-close" onclick="toggleChat()">✕</button></div>
 <div class="chat-body" id="chatBody">
-<div class="bubble">Sveiki! 👋 Kaip galime padėti?</div>
+<div class="bubble">Sveiki! Esu LT PARDUOTUVĖ DI pagalbininkas. Klauskite apie prekes, kainas ir pristatymą.</div>
 <div class="bubble">DI pokalbis privatus. Administratorius jį pamatys tik jums paprašius perdavimo.</div>
 </div>
 
@@ -995,7 +1000,7 @@ function syncChatModeUI(){
   const btn=document.getElementById("chatHumanBtn");
   if(btn)btn.hidden=aiChatMode!=="ai";
   const title=document.getElementById("chatAssistantTitle");
-  if(title)title.textContent=aiChatMode==="human"?"LT Parduotuvė • Administratorius":"LT Parduotuvė • DI pagalba";
+  if(title)title.textContent=aiChatMode==="human"?"LT Parduotuvė • Administratorius":"🤖 LT Parduotuvė • DI pagalba";
 }
 function aiHumanStoreKey(){return AI_HUMAN_STORAGE_PREFIX+(chatUser?.id||"")}
 function formatAIError(error){
