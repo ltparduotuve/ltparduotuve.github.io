@@ -343,7 +343,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
         <small id="authHeading">PRISIJUNK PRIE SAVO PASKYROS</small>
       </div>
 
-      <div class="auth-tabs">
+      <div class="auth-tabs" id="authTabBar">
         <button type="button" class="auth-tab active" id="loginTab" onclick="showAuth('login')">PRISIJUNGTI</button>
         <button type="button" class="auth-tab" id="registerTab" onclick="showAuth('register')">REGISTRUOTIS</button>
       </div>
@@ -394,6 +394,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
         <div class="auth-field"><label>PAKARTOK SLAPTAŽODĮ</label><input id="confirmRecoveryPassword" type="password" minlength="8" autocomplete="new-password" required></div>
         <button class="auth-submit" type="submit">IŠSAUGOTI NAUJĄ SLAPTAŽODĮ</button>
         <div id="newPasswordMsg" class="auth-msg" role="status"></div>
+        <button id="newPasswordRetry" type="button" class="auth-link-button" style="display:none" onclick="restartPasswordRecovery()">Prašyti naujos atkūrimo nuorodos</button>
       </form>
       <div class="auth-note">Sukūrę paskyrą galėsite naudotis katalogu, krepšeliu ir klientų pagalba.</div>
     </div>
@@ -895,7 +896,13 @@ initAuth();
 loadRememberedLogin();
 
 
+let passwordRecoveryActive = new URLSearchParams(window.location.search).has('reset_password') ||
+  /(?:^|[&#])type=recovery(?:&|$)/.test(window.location.hash);
+let passwordRecoveryVerified = false;
 function showAuth(mode){
+  if(passwordRecoveryActive && mode!=="newPassword")return;
+  const tabs=document.getElementById("authTabBar");
+  if(tabs)tabs.style.display=mode==="newPassword"?"none":"";
   document.getElementById("forgotForm").classList.toggle("active",mode==="forgot");
   document.getElementById("newPasswordForm").classList.toggle("active",mode==="newPassword");
   document.getElementById("authGate").style.display="flex";
@@ -924,7 +931,7 @@ async function sendPasswordReset(event){
   const msg=document.getElementById("recoveryMsg");
   msg.textContent="Siunčiama...";
   const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{
-    redirectTo:window.location.origin+window.location.pathname
+    redirectTo:window.location.origin+window.location.pathname+"?reset_password=1"
   });
   msg.textContent=error?authErrorMessage(error):"Jei toks el. paštas užregistruotas, gausi slaptažodžio atkūrimo nuorodą.";
 }
@@ -935,12 +942,16 @@ async function saveNewPassword(event){
   const msg=document.getElementById("newPasswordMsg");
   if(p!==confirmP){msg.textContent="Slaptažodžiai nesutampa.";return}
   if(p.length<8){msg.textContent="Naudok bent 8 simbolius.";return}
+  if(!passwordRecoveryActive || !passwordRecoveryVerified){msg.textContent="Atkūrimo nuoroda negalioja. Paprašyk naujos.";return;}
   msg.textContent="Saugoma...";
   const {error}=await supabaseClient.auth.updateUser({password:p});
   if(error){msg.textContent=authErrorMessage(error);return}
   document.getElementById("newRecoveryPassword").value="";
   document.getElementById("confirmRecoveryPassword").value="";
   await supabaseClient.auth.signOut({scope:"local"});
+  passwordRecoveryActive=false;
+  passwordRecoveryVerified=false;
+  history.replaceState(null,"",window.location.pathname);
   showAuth("login");
   document.getElementById("loginMsg").textContent="Slaptažodis pakeistas. Prisijunk su nauju slaptažodžiu.";
 }
@@ -1031,6 +1042,7 @@ async function loginUser(event){
 async function enterStore(user){
   const lock=await getStoreLock();
   const admin=await checkAdmin(user);
+  if(passwordRecoveryActive)return;
   document.getElementById("authGate").style.display="none";
   document.body.classList.remove("auth-locked");
   document.getElementById("userEmail").textContent=user?.email || "Paskyra";
@@ -1095,12 +1107,52 @@ function startAuthExpiry(){
   authExpiryTimer=setTimeout(()=>logoutAndLock("Sesija baigėsi po 24 valandų. Prisijunkite iš naujo."),left);
 }
 
+function restartPasswordRecovery(){
+  passwordRecoveryActive=false;
+  passwordRecoveryVerified=false;
+  history.replaceState(null,"",window.location.pathname);
+  showAuth("forgot");
+}
+
 async function initAuth(){
+  // Atkūrimo nuoroda neturi atidaryti parduotuvės net jei Supabase sukuria sesiją.
+  if(passwordRecoveryActive)showAuth("newPassword");
+  supabaseClient.auth.onAuthStateChange((event, session)=>{
+    if(event==="PASSWORD_RECOVERY"){
+      passwordRecoveryActive=true;
+      passwordRecoveryVerified=!!session?.user;
+      showAuth("newPassword");
+      return;
+    }
+    if(passwordRecoveryActive){
+      if(session?.user){
+        passwordRecoveryVerified=true;
+        showAuth("newPassword");
+      }
+      return;
+    }
+    if(session?.user){
+      enterStore(session.user);
+      startAuthExpiry();
+    }else{
+      clearAuthExpiry();
+      document.getElementById("authGate").style.display="flex";
+      document.body.classList.add("auth-locked");
+    }
+  });
   const {data,error}=await supabaseClient.auth.getSession();
+  if(passwordRecoveryActive){
+    showAuth("newPassword");
+    passwordRecoveryVerified=!!data?.session?.user;
+    if(!passwordRecoveryVerified){
+      document.getElementById("newPasswordMsg").textContent="Atkūrimo nuoroda negalioja arba baigėsi jos galiojimas. Paprašyk naujos nuorodos.";
+      document.getElementById("newPasswordRetry").style.display="block";
+    }
+    return;
+  }
   if(error){console.error("Auth error:",error);return;}
   let session=data.session;
   if(session?.user){
-    // Refresh nekeičia sesijos. Logout įvyksta tik tada, kai įkeliamas kitas HTML build.
     const previousBuild=localStorage.getItem("ltparduotuve_html_build");
     if(previousBuild && previousBuild!==AUTH_SESSION_VERSION){
       try{await supabaseClient.auth.signOut({scope:"local"});}catch(e){console.error(e)}
@@ -1109,7 +1161,7 @@ async function initAuth(){
       session=null;
     }else{
       localStorage.setItem("ltparduotuve_html_build",AUTH_SESSION_VERSION);
-      enterStore(session.user);
+      await enterStore(session.user);
       startAuthExpiry();
     }
   }else{
@@ -1117,22 +1169,7 @@ async function initAuth(){
     document.getElementById("authGate").style.display="flex";
     document.body.classList.add("auth-locked");
   }
-  supabaseClient.auth.onAuthStateChange((_event,nextSession)=>{
-    if(_event==="PASSWORD_RECOVERY"){
-      showAuth("newPassword");
-      return;
-    }
-    if(nextSession?.user){
-      enterStore(nextSession.user);
-      startAuthExpiry();
-    }else{
-      clearAuthExpiry();
-      document.getElementById("authGate").style.display="flex";
-      document.body.classList.add("auth-locked");
-    }
-  });
 }
-
 
 const ADMIN_EMAIL="nedasliubinas4@gmail.com";
 let isAdmin=false;
