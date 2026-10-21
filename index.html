@@ -281,6 +281,10 @@ body.auth-locked{overflow:hidden}
 .delivery-estimate-step b{font-size:11px}.delivery-estimate-step small{font-size:10px;color:#bbcee5;line-height:1.45;overflow-wrap:anywhere}
 .delivery-estimate-caption{margin-top:17px;color:#91a6be;font-size:10px;line-height:1.6}
 @media(max-width:700px){.product-modal-info{padding:20px}.delivery-estimate{padding:15px 9px}.delivery-estimate-step b{font-size:10px}}
+
+/* Tikra Cloudflare Turnstile CAPTCHA (ne imitacinė varnelė) */
+.turnstile-container{min-height:66px;margin:12px 0 7px;display:flex;align-items:center;justify-content:center}
+.turnstile-container:empty{min-height:0}
 </style>
 <style id="payment-30min-style">
 .bank-pay-modal{align-items:flex-start;padding:28px 16px;overflow:auto;background:rgba(1,4,10,.96);backdrop-filter:blur(10px)}
@@ -417,6 +421,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
           <input id="rememberLoginEmail" type="checkbox" onchange="toggleRememberLogin(this.checked)">
           <span>💾 Išsaugoti prisijungimo duomenis šiame įrenginyje</span>
         </label>
+        <div class="turnstile-container" id="turnstile-login"></div>
         <button class="auth-submit" type="submit">PRISIJUNGTI →</button>
         <button type="button" class="auth-link-button" onclick="showAuth('forgot')">Pamiršai slaptažodį?</button>
         <div class="auth-msg" id="loginMsg"></div>
@@ -435,12 +440,14 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
           <label>PAKARTOK SLAPTAŽODĮ</label>
           <input id="registerPassword2" type="password" minlength="6" autocomplete="new-password" required>
         </div>
+        <div class="turnstile-container" id="turnstile-register"></div>
         <button class="auth-submit" type="submit">SUKURTI PASKYRĄ →</button>
         <div class="auth-msg" id="registerMsg"></div>
       </form>
 
       <form id="forgotForm" class="auth-form" onsubmit="sendPasswordReset(event)">
         <div class="auth-field"><label>EL. PAŠTAS</label><input id="recoveryEmail" type="email" autocomplete="email" required></div>
+        <div class="turnstile-container" id="turnstile-forgot"></div>
         <button type="submit" class="auth-submit">SIŲSTI ATKŪRIMO NUORODĄ</button>
         <button type="button" class="auth-link-button" onclick="showAuth('login')">← Grįžti į prisijungimą</button>
         <div id="recoveryMsg" class="auth-msg" role="status"></div>
@@ -917,6 +924,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onLTShopTurnstileReady&render=explicit" async defer></script>
 <script>
 const SUPABASE_URL = "https://ibeumlqcrjxafnatlhtx.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3SNNvvuBtT4waMTznfCjnA_xYJZANED";
@@ -994,6 +1002,34 @@ const recoveryHash = new URLSearchParams(window.location.hash.replace(/^#/,''));
 let passwordRecoveryActive = recoverySearch.has('reset_password') ||
   recoverySearch.get('type')==='recovery' || recoveryHash.get('type')==='recovery';
 let passwordRecoveryVerified = false;
+
+const TURNSTILE_SITE_KEY = "0x4AAAAAAFfLd-BXfiYVoYF8";
+const turnstileWidgets = Object.create(null);
+function renderAuthTurnstile(mode){
+  if(!['login','register','forgot'].includes(mode) || !window.turnstile)return;
+  const el=document.getElementById('turnstile-'+mode);
+  if(!el || turnstileWidgets[mode]!==undefined)return;
+  try{
+    turnstileWidgets[mode]=window.turnstile.render(el,{
+      sitekey:TURNSTILE_SITE_KEY,
+      theme:'dark',
+      'response-field':false,
+      'expired-callback':()=>{const m=document.getElementById(mode==='forgot'?'recoveryMsg':mode+'Msg');if(m)m.textContent='Saugumo patvirtinimo laikas baigėsi. Patvirtinkite dar kartą.';}
+    });
+  }catch(e){console.error('Turnstile:',e)}
+}
+window.onLTShopTurnstileReady=function(){
+  const active=document.querySelector('#loginForm.active, #registerForm.active, #forgotForm.active');
+  renderAuthTurnstile(active?.id==='registerForm'?'register':active?.id==='forgotForm'?'forgot':'login');
+};
+function getAuthCaptchaToken(mode){
+  if(!window.turnstile || turnstileWidgets[mode]===undefined){renderAuthTurnstile(mode);return null;}
+  return window.turnstile.getResponse(turnstileWidgets[mode])||null;
+}
+function resetAuthCaptcha(mode){
+  if(window.turnstile && turnstileWidgets[mode]!==undefined){try{window.turnstile.reset(turnstileWidgets[mode])}catch(e){console.warn(e)}}
+}
+
 function showAuth(mode){
   if(passwordRecoveryActive && mode!=="newPassword")return;
   const tabs=document.getElementById("authTabBar");
@@ -1008,6 +1044,7 @@ function showAuth(mode){
   document.getElementById("registerTab").classList.toggle("active", mode==="register");
   document.getElementById("loginMsg").textContent="";
   document.getElementById("registerMsg").textContent="";
+  renderAuthTurnstile(mode);
   document.getElementById("authHeading").textContent =
     mode==="login" ? "PRISIJUNK PRIE SAVO PASKYROS" : mode==="register" ? "SUKURK SAVO PASKYRĄ" : mode==="forgot" ? "SLAPTAŽODŽIO ATKŪRIMAS" : "NAUJAS SLAPTAŽODIS";
 }
@@ -1028,10 +1065,14 @@ async function sendPasswordReset(event){
   event.preventDefault();
   const email=document.getElementById("recoveryEmail").value.trim();
   const msg=document.getElementById("recoveryMsg");
+  const captchaToken=getAuthCaptchaToken("forgot");
+  if(!captchaToken){msg.textContent="Patvirtinkite, kad nesate robotas.";return;}
   msg.textContent="Siunčiama...";
   const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{
+    captchaToken,
     redirectTo:window.location.origin+window.location.pathname+"?reset_password=1"
   });
+  resetAuthCaptcha("forgot");
   msg.textContent=error?authErrorMessage(error):"Jei toks el. paštas užregistruotas, gausi slaptažodžio atkūrimo nuorodą.";
 }
 async function saveNewPassword(event){
@@ -1073,13 +1114,16 @@ async function registerUser(event){
     return;
   }
 
+  const captchaToken=getAuthCaptchaToken("register");
+  if(!captchaToken){msg.textContent="Patvirtinkite, kad nesate robotas.";return;}
   msg.textContent="Kuriama paskyra...";
 
   const {data,error}=await supabaseClient.auth.signUp({
     email,
     password,
-    options:{emailRedirectTo:window.location.origin}
+    options:{emailRedirectTo:window.location.origin,captchaToken}
   });
+  resetAuthCaptcha("register");
 
   if(error){
     msg.textContent=authErrorMessage(error);
@@ -1116,6 +1160,8 @@ async function loginUser(event){
   if(rememberEmail) localStorage.setItem("ltparduotuve_login_email",email);
   else localStorage.removeItem("ltparduotuve_login_email");
 
+  const captchaToken=getAuthCaptchaToken("login");
+  if(!captchaToken){msg.textContent="Patvirtinkite, kad nesate robotas.";return;}
   msg.textContent="Jungiamasi...";
 
   const lock=await getStoreLock();
@@ -1127,8 +1173,10 @@ async function loginUser(event){
 
   const {data,error}=await supabaseClient.auth.signInWithPassword({
     email,
-    password
+    password,
+    options:{captchaToken}
   });
+  resetAuthCaptcha("login");
 
   if(error){
     msg.textContent=authErrorMessage(error);
