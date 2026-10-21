@@ -2,30 +2,31 @@ body {
     min-height: 100vh;
     margin: 0;
     color: #fff;
-
     background:
         linear-gradient(
             135deg,
-            rgba(3, 7, 18, 0.90),
-            rgba(7, 15, 32, 0.78)
+            rgba(3, 7, 18, 0.88),
+            rgba(7, 15, 32, 0.82)
         ),
         url("background.png") center / cover no-repeat fixed;
-
     background-color: #050914;
 }
 
-/* Švelnus mėlynas apšvietimas */
+/* Švelnus apšvietimas */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
+    background: radial-gradient(
+        circle at 50% 10%,
+        rgba(49, 105, 220, 0.12),
+        transparent 45%
+    );
+}
 
-    background:
-        radial-gradient(
-            circle at 50% 10%,
-            rgba(49, 105, 220, 0.15),
-            transparent 45%
-        );
+/* Pašaliname seną taškuotą foną */
+body::after {
+    display: none;
 }
