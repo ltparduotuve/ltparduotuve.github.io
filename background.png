@@ -1,6 +1,32 @@
+
 body {
-    background-image: url("background.png");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    min-height: 100vh;
+    margin: 0;
+    color: #fff;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(3, 7, 18, 0.90),
+            rgba(7, 15, 32, 0.78)
+        ),
+        url("background.png") center / cover no-repeat fixed;
+
+    background-color: #050914;
+}
+
+/* Švelnus mėlynas apšvietimas */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at 50% 10%,
+            rgba(49, 105, 220, 0.15),
+            transparent 45%
+        );
 }
