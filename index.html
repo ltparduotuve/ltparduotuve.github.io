@@ -231,10 +231,28 @@ body.auth-locked{overflow:hidden}
 .account-settings-overlay.open{display:flex}.account-settings-panel{width:min(600px,100%);max-height:90vh;overflow:auto;border-radius:18px;border:1px solid #46658d;background:linear-gradient(155deg,#101d32,#080e19);box-shadow:0 25px 90px #000b;color:#fff}
 .account-settings-header{display:flex;justify-content:space-between;align-items:center;padding:23px 25px;border-bottom:1px solid #263b55}.account-settings-header h2{font-size:21px}.account-settings-header p{font-size:11px;color:#91a5c2;margin-top:5px}
 .account-settings-content{padding:23px;display:grid;gap:14px}.account-settings-group{background:#0b1525;border:1px solid #304665;border-radius:13px;padding:18px;display:grid;gap:9px}.account-settings-group h3{font-size:14px}.account-settings-group label{font-size:11px;color:#abc0d8}.account-settings-group select{padding:11px;border:1px solid #4a6284;border-radius:9px;background:#0a1323;color:#fff;width:100%}.account-settings-note{font-size:11px;color:#90a6c0;line-height:1.6}.account-settings-action{padding:11px;border:1px solid #5f92f5;border-radius:9px;background:#173c78;color:#fff;cursor:pointer;font-weight:700}
-body.theme-water{--blue:#12b8ed;--green:#53e6d6}body.theme-water:before{background:radial-gradient(circle at 50% 20%,#008fbd65,transparent 38%),radial-gradient(circle at 80% 60%,#1259bb44,transparent 50%),#031326}body.theme-water .hero{background:radial-gradient(circle,#007eac55,transparent 55%),#061c2c}
-body.theme-lava{--blue:#fa794b;--green:#ffbb6b}body.theme-lava:before{background:radial-gradient(circle at 50% 20%,#cb461b5c,transparent 35%),radial-gradient(circle at 80% 65%,#a72b2044,transparent 48%),#170807}body.theme-lava .hero{background:radial-gradient(circle,#ed60264a,transparent 55%),#1b0b0b}
-body.theme-light{--blue:#2769c9;--green:#007c65;background:#ecf2fa;color:#17263c}body.theme-light:before{background:linear-gradient(140deg,#e8f3ff,#f7faff)}body.theme-light header{background:#edf4fbf2}body.theme-light .nav a,body.theme-light .logo,body.theme-light .nav-icon{color:#173352}body.theme-light .product,body.theme-light .cat,body.theme-light .contact-card{background:#fff;color:#182b45}body.theme-light .hero{background:linear-gradient(130deg,#bdd7f7,#eff6ff);color:#183050}body.theme-light .hero .sub{color:#385572}
 
+
+/* Streamlined dark admin workspace and account menu */
+.admin-nav-launch{border:1px solid #426dba;background:linear-gradient(135deg,#142d53,#11203a);border-radius:10px;padding:10px 15px;color:#e6f1ff;white-space:nowrap;font-size:11px;font-weight:800;cursor:pointer;box-shadow:0 0 18px #3679eb1c}
+.admin-nav-launch:hover{border-color:#79afff;box-shadow:0 0 25px #337eff36}
+.user-dropdown{width:225px;padding:10px;border-color:#345073;background:linear-gradient(145deg,#0c182b,#060c17);z-index:1000}
+.user-dropdown button{display:block;margin-top:5px;padding:11px 12px;text-align:left;font-size:11px!important;background:#0f1c30;border-radius:9px;transition:background .2s,border-color .2s}
+.user-dropdown button:hover{background:#162c4e;border-color:#507bc0}
+#adminPanel{padding:14px;background:#020713f5}
+.admin-wrap{max-width:1700px;min-height:calc(100vh - 28px);border-radius:18px;background:#07101e}
+.admin-head{padding:22px 27px;background:linear-gradient(100deg,#0c1c32,#08111f);border-bottom:1px solid #294266}
+.admin-head h2{font-size:19px;letter-spacing:.2px}.admin-head-accent{color:#85b9ff;font-weight:600}
+.admin-workspace{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:calc(100vh - 105px)}
+.admin-nav{display:flex;flex-direction:column;align-items:stretch;gap:7px;padding:24px 13px;background:#091524;border-bottom:0;border-right:1px solid #253a55;overflow:visible}
+.admin-nav-caption{font-size:10px;letter-spacing:2px;color:#607c9e;font-weight:800;padding:3px 12px 10px}
+.admin-nav .admin-tab{padding:13px 14px;text-align:left;font-size:12px;font-weight:650;background:transparent;border:1px solid transparent;border-radius:10px;color:#a2b3cd}
+.admin-nav .admin-tab:hover{background:#14263d;color:#fff}
+.admin-nav .admin-tab.active{background:linear-gradient(95deg,#17427c,#142e50);border-color:#3975ca;color:#fff;box-shadow:inset 3px 0 #69a4ff}
+.admin-workspace-content{min-width:0;padding:10px 18px 30px;background:radial-gradient(circle at 85% 0%,#102b4d40,transparent 32%),#07101e}
+.admin-section{padding:20px 8px}.admin-section.active{animation:adminSectionEnter .22s ease-out}
+@keyframes adminSectionEnter{from{opacity:.45;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(max-width:800px){#adminPanel{padding:5px}.admin-wrap{min-height:calc(100vh - 10px);border-radius:12px}.admin-workspace{grid-template-columns:1fr}.admin-nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid #253a55;padding:11px;gap:6px}.admin-nav-caption{display:none}.admin-nav .admin-tab{white-space:nowrap;padding:10px;font-size:10px}.admin-workspace-content{padding:4px 10px 24px}.admin-head{padding:15px}.admin-head h2{font-size:14px}.admin-nav-launch{font-size:10px;padding:8px}}
 </style>
 <style id="payment-30min-style">
 .bank-pay-modal{align-items:flex-start;padding:28px 16px;overflow:auto;background:rgba(1,4,10,.96);backdrop-filter:blur(10px)}
@@ -435,9 +453,10 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <button class="nav-icon" onclick="toggleUserMenu()">♙</button>
 <div class="user-dropdown" id="userDropdown">
 <small id="userEmail">Paskyra</small>
-<button class="account-action" onclick="openOrders()">📦 Mano užsakymai</button><button class="account-action" onclick="openAccountSettings()">⚙️ Nustatymai</button><button id="adminBtn" style="display:none" onclick="openAdmin()">⚙️ Admin panelė</button><button onclick="logoutUser()">Atsijungti</button>
+<button class="account-action" onclick="openOrders()">📦 Mano užsakymai</button><button class="account-action" onclick="openAccountSettings()">⚙️ Nustatymai</button><button onclick="logoutUser()">Atsijungti</button>
 </div>
 </div>
+<button id="adminBtn" class="admin-nav-launch" style="display:none" onclick="openAdmin()">⚙ Administravimas</button>
 <button class="nav-icon">♡</button><button class="nav-icon cart" onclick="openCart()">🛒<span class="count" id="count">0</span></button>
 </div></header>
 
@@ -452,10 +471,8 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <!-- ACCOUNT SETTINGS: preferences are local; TOTP verification is handled by Supabase MFA. -->
 <div id="accountSettingsModal" class="account-settings-overlay" role="dialog" aria-modal="true" aria-labelledby="accountSettingsTitle" onclick="closeAccountSettings(event)">
   <section class="account-settings-panel" onclick="event.stopPropagation()">
-    <div class="account-settings-header"><div><h2 id="accountSettingsTitle">⚙️ Nustatymai</h2><p>Paskyra ir išvaizda</p></div><button class="close" type="button" onclick="closeAccountSettings()" aria-label="Uždaryti">✕</button></div>
+    <div class="account-settings-header"><div><h2 id="accountSettingsTitle">⚙️ Nustatymai</h2><p>Paskyros saugumas</p></div><button class="close" type="button" onclick="closeAccountSettings()" aria-label="Uždaryti">✕</button></div>
     <div class="account-settings-content">
-      <div class="account-settings-group"><h3>Kalba</h3><label for="accountLanguage">Svetainės kalba</label><select id="accountLanguage" onchange="setAccountLanguage(this.value)"><option value="lt">Lietuvių (pagrindinė)</option><option value="en">English</option><option value="ru">Русский</option></select><p id="accountLanguageNote" class="account-settings-note">Kol kas veikia nustatymų lango vertimas. Viso katalogo vertimus pridėsime kitu etapu.</p></div>
-      <div class="account-settings-group"><h3>Išvaizda</h3><label for="accountTheme">Spalvų tema</label><select id="accountTheme" onchange="setAccountTheme(this.value)"><option value="dark">Tamsi (numatytoji)</option><option value="light">Šviesi</option><option value="water">Water – mėlyna</option><option value="lava">Lava – oranžinė</option></select></div>
       <div class="account-settings-group"><h3>Paskyros saugumas</h3>
 <p class="account-settings-note" id="mfaStatus">Tikrinama 2FA būsena...</p>
 <button type="button" class="account-settings-action" id="mfaEnableBtn" onclick="beginMfaEnroll()">Įjungti Google Authenticator (2FA)</button>
@@ -530,8 +547,8 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 
 <div id="adminPanel">
  <div class="admin-wrap">
-  <div class="admin-head"><div><h2>⚙️ LT PARDUOTUVĖ — ADMIN</h2><small>Administratoriaus režimas</small></div><button class="admin-close" onclick="closeAdmin()">✕ Uždaryti</button></div>
-  <div class="admin-nav">
+  <div class="admin-head"><div><h2>LT PARDUOTUVĖ <span class="admin-head-accent">/ Valdymo centras</span></h2></div><button class="admin-close" onclick="closeAdmin()">✕ Uždaryti</button></div>
+  <div class="admin-workspace"><div class="admin-nav"><div class="admin-nav-caption">VALDYMAS</div>
    <button class="admin-tab active" onclick="adminTab('dashboard',this)">📊 Apžvalga</button>
    <button class="admin-tab" onclick="adminTab('products',this)">📦 Prekės</button>
    <button class="admin-tab" onclick="adminTab('categories',this)">🏷️ Kategorijos</button>
@@ -543,7 +560,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
    <button class="admin-tab" onclick="adminTab('storelock',this)">🔒 Parduotuvė</button>
    <button class="admin-tab" onclick="adminTab('chat',this)">💬 Klientų chat</button>
   </div>
-  <section class="admin-section active" id="admin-dashboard">
+  </div><div class="admin-workspace-content"><section class="admin-section active" id="admin-dashboard">
    <div class="admin-grid">
     <div class="admin-stat"><b id="statProducts">0</b><span>PREKIŲ DUOMENŲ BAZĖJE</span></div>
     <div class="admin-stat"><b id="statUsers">—</b><span>VARTOTOJAI</span></div>
@@ -679,6 +696,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     </div>
    </div>
   </section>
+  </div></div>
  </div>
 </div>
 <div id="adminChatNotification" class="admin-chat-notification" onclick="openAdminFromNotification()">
@@ -2036,14 +2054,14 @@ Mokėjimo paskirtis: ${o.payment_reference||"—"}`);
 }
 
 let adminChatSessionId=null,adminChatRows=[],adminChatChannel=null,adminChatNotificationSession=null;const adminUnreadChats=new Set();
-function showAdminNotification(row){if(!isAdmin||row?.sender!=="customer")return;adminChatNotificationSession=row.session_id;const n=document.getElementById("adminChatNotification");document.getElementById("adminChatNotificationTitle")?.replaceChildren(document.createTextNode("💬 Nauja kliento žinutė"));const x=document.getElementById("adminChatNotificationText");if(x)x.textContent=(row.message||"").slice(0,90);n?.classList.add("show");adminUnreadChats.add(row.session_id);refreshAdminChatUsers();if("Notification"in window&&Notification.permission==="granted")new Notification("LT Parduotuvė — nauja žinutė",{body:row.message||"Klientas parašė."})}
+function showAdminNotification(row){if(!isAdmin||row?.sender!=="customer")return;adminChatNotificationSession=row.session_id;const n=document.getElementById("adminChatNotification");document.getElementById("adminChatNotificationTitle")?.replaceChildren(document.createTextNode("💬 Nauja kliento žinutė"));const x=document.getElementById("adminChatNotificationText");if(x)x.textContent=(row.message||"").slice(0,90);n?.classList.add("show");adminUnreadChats.add(row.session_id);refreshAdminChatUsers();}
 function hideAdminNotification(){document.getElementById("adminChatNotification")?.classList.remove("show")}
 function openAdminFromNotification(){const sid=adminChatNotificationSession;hideAdminNotification();document.getElementById("adminPanel")?.classList.add("open");const tab=[...document.querySelectorAll(".admin-tab")].find(x=>x.textContent.includes("Klientų chat"));if(tab)adminTab("chat",tab);if(sid)openAdminChat(sid)}
 async function loadAdminChats(){if(!isAdmin)return;const {data,error}=await supabaseClient.from("chat_sessions").select("*").order("created_at",{ascending:false});if(error){console.error(error);return}window.adminChatSessions=Object.fromEntries((data||[]).map(x=>[x.thread_id,x]));const active=(data||[]).filter(x=>x.status==="open");const users=document.getElementById("adminChatUsers");if(!users)return;users.innerHTML=active.length?active.map(x=>`<div class="admin-chat-user ${x.thread_id===adminChatSessionId?"active":""} ${adminUnreadChats.has(x.thread_id)?"unread":""}" onclick="openAdminChat('${x.thread_id}')"><b>${escapeHtml(x.user_email||x.user_id.slice(0,8)+"…")}</b>${adminUnreadChats.has(x.thread_id)?'<span class="unread-dot">●</span>':''}<small>${x.status.toUpperCase()} • ${formatDate(x.last_activity||x.created_at)}</small></div>`).join(""):'<div class="admin-empty">Aktyvių klientų chatų nėra.</div>';subscribeAdminChat()}
 async function openAdminChat(sid){adminChatSessionId=sid;adminUnreadChats.delete(sid);const session=window.adminChatSessions?.[sid];const title=document.getElementById("adminChatTitle");if(title)title.innerHTML=`💬 ${escapeHtml(session?.user_email||"Klientas")} <button class="admin-secondary" style="float:right;margin-left:6px" onclick="solveAdminChat('${sid}')">✓ Uždaryti chatą</button><button class="admin-danger" style="float:right" onclick="deleteAdminChat('${sid}')">🗑️ Ištrinti chatą</button>`;const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",sid).order("created_at",{ascending:true});if(error){console.error(error);return}const body=document.getElementById("adminChatBody");body.innerHTML=(data||[]).map(m=>`<div class="admin-chat-bubble ${m.sender==="admin"?"admin":""}">${escapeHtml(m.message)}<span class="admin-chat-time">${m.sender==="admin"?"Administratorius":"Klientas"} • ${formatDate(m.created_at)}</span></div>`).join("")||'<div class="admin-empty">Žinučių nėra.</div>';body.scrollTop=body.scrollHeight;loadAdminChats()}
 async function solveAdminChat(sid){if(!isAdmin||!sid)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("thread_id",sid).eq("status","open");if(r.error)return alert("Nepavyko uždaryti pokalbio.");adminChatSessionId=null;await loadAdminChats();const title=document.getElementById("adminChatTitle");if(title)title.textContent="💬 Pokalbis uždarytas — klientui parodytas įvertinimas.";const body=document.getElementById("adminChatBody");if(body)body.innerHTML='<div class="admin-note">✓ Pokalbis uždarytas. Klientui parodytas įvertinimas. Jis gali pradėti naują pokalbį po įvertinimo.</div>'}
 function refreshAdminChatUsers(){loadAdminChats()}
-function subscribeAdminChat(){if(adminChatChannel||!isAdmin)return;adminChatChannel=supabaseClient.channel("admin-live-chat-v3").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},async p=>{if(p.new?.sender!=="customer")return;showAdminNotification(p.new);await loadAdminChats();if(adminChatSessionId===p.new.session_id)await openAdminChat(p.new.session_id)}).subscribe(()=>{});if("Notification"in window&&Notification.permission==="default")Notification.requestPermission().catch(()=>{})}
+function subscribeAdminChat(){if(adminChatChannel||!isAdmin)return;adminChatChannel=supabaseClient.channel("admin-live-chat-v3").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},async p=>{if(p.new?.sender!=="customer")return;showAdminNotification(p.new);await loadAdminChats();if(adminChatSessionId===p.new.session_id)await openAdminChat(p.new.session_id)}).subscribe(()=>{});}
 async function sendAdminChat(){if(!isAdmin||!adminChatSessionId)return alert("Pasirink klientą.");const session=window.adminChatSessions?.[adminChatSessionId];if(!session||session.status!=="open")return alert("Šis pokalbis jau uždarytas.");const input=document.getElementById("adminChatInput"),message=input.value.trim();if(!message)return;const {error}=await supabaseClient.from("messages").insert({session_id:adminChatSessionId,sender:"admin",message});if(error)return alert("Nepavyko išsiųsti atsakymo. Patikrink RLS SQL.");input.value="";await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("thread_id",adminChatSessionId);await openAdminChat(adminChatSessionId)}
 async function deleteAdminChat(sid){if(!isAdmin||!confirm("Ištrinti šį chatą visam laikui?"))return;const r=await supabaseClient.from("messages").delete().eq("session_id",sid);if(r.error)return alert("Nepavyko ištrinti žinučių.");const ss=await supabaseClient.from("chat_sessions").delete().eq("thread_id",sid);if(ss.error)return alert("Nepavyko ištrinti chat sesijos.");adminChatSessionId=null;await loadAdminChats();document.getElementById("adminChatTitle").textContent="💬 Pasirink klientą";document.getElementById("adminChatBody").innerHTML='<div class="admin-empty">Chat ištrintas.</div>'}
 
@@ -2633,14 +2651,10 @@ async function disableMfa(){
   mfaMessage('mfaSettingsMessage',error?'2FA išjungti nepavyko: '+error.message:'2FA išjungta.');await refreshMfaSettings();
 }
 // Settings are deliberately stored per-browser until account preference syncing is added.
-const ACCOUNT_THEME_KEY="ltparduotuve_theme_v1", ACCOUNT_LANGUAGE_KEY="ltparduotuve_language_v1";
-function openAccountSettings(){document.getElementById("userDropdown")?.classList.remove("open");document.getElementById("accountSettingsModal")?.classList.add("open");document.getElementById("accountTheme").value=localStorage.getItem(ACCOUNT_THEME_KEY)||"dark";document.getElementById("accountLanguage").value=localStorage.getItem(ACCOUNT_LANGUAGE_KEY)||"lt";setSettingsLanguageText(document.getElementById("accountLanguage").value);refreshMfaSettings()}
+function openAccountSettings(){document.getElementById("userDropdown")?.classList.remove("open");document.getElementById("accountSettingsModal")?.classList.add("open");refreshMfaSettings()}
 function closeAccountSettings(event){if(event && event.target!==document.getElementById("accountSettingsModal"))return;document.getElementById("accountSettingsModal")?.classList.remove("open")}
-function setAccountTheme(theme){if(!["dark","light","water","lava"].includes(theme))theme="dark";document.body.classList.remove("theme-dark","theme-light","theme-water","theme-lava");document.body.classList.add("theme-"+theme);localStorage.setItem(ACCOUNT_THEME_KEY,theme)}
-function setAccountLanguage(lang){if(!["lt","en","ru"].includes(lang))lang="lt";localStorage.setItem(ACCOUNT_LANGUAGE_KEY,lang);setSettingsLanguageText(lang)}
-function setSettingsLanguageText(lang){const translations={lt:["⚙️ Nustatymai","Paskyra ir išvaizda","Kalba","Svetainės kalba","Išvaizda","Spalvų tema","Paskyros saugumas","Keisti slaptažodį el. paštu"],en:["⚙️ Settings","Account and appearance","Language","Website language","Appearance","Color theme","Account security","Reset password by email"],ru:["⚙️ Настройки","Аккаунт и оформление","Язык","Язык сайта","Оформление","Цветовая тема","Безопасность аккаунта","Сменить пароль по почте"]};const t=translations[lang]||translations.lt;const panel=document.getElementById("accountSettingsModal");if(!panel)return;const els=[panel.querySelector("h2"),panel.querySelector(".account-settings-header p"),panel.querySelectorAll(".account-settings-group")[0]?.querySelector("h3"),panel.querySelector("label[for=accountLanguage]"),panel.querySelectorAll(".account-settings-group")[1]?.querySelector("h3"),panel.querySelector("label[for=accountTheme]"),panel.querySelectorAll(".account-settings-group")[2]?.querySelector("h3"),panel.querySelector(".account-settings-group .account-settings-action:last-child")];els.forEach((el,i)=>{if(el && t[i])el.textContent=t[i]});document.getElementById("accountLanguageNote").textContent=lang==="lt"?"Kol kas veikia nustatymų lango vertimas. Viso katalogo vertimus pridėsime kitu etapu.":lang==="en"?"Only the settings panel is translated for now. Full store translations are planned for a later phase.":"Пока переведено только окно настроек. Полный перевод магазина будет добавлен позже."}
 async function requestAccountPasswordReset(){const {data}=await supabaseClient.auth.getUser();const email=data?.user?.email;if(!email){alert("Prisijunkite prie paskyros.");return}const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname+"?reset_password=1"});alert(error?authErrorMessage(error):"Slaptažodžio keitimo nuoroda išsiųsta į jūsų el. paštą.")}
-setAccountTheme(localStorage.getItem(ACCOUNT_THEME_KEY)||"dark");
+document.body.classList.remove("theme-water","theme-lava","theme-light");
 
 restoreCartSnapshot();
 </script>
