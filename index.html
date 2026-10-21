@@ -6,6 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LT PARDUOTUVĖ</title>
+<meta name="lt-chat-version" content="AI-CHAT-20261021-FIX3">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 :root{--bg:#050914;--card:#0a111d;--line:#263650;--blue:#4389ff;--green:#22e5a0;--muted:#8290a8}
@@ -300,6 +301,17 @@ body.auth-locked{overflow:hidden}
 .chat-human-btn:hover{border-color:#8ab5ff;background:#1d3d68}
 .chat-human-btn[hidden]{display:none!important}
 .chat-human-btn:disabled,.chat-input button:disabled{opacity:.55;cursor:wait}
+/* DI pagalbos langas: matoma aktyvios versijos žyma */
+#chat{width:min(440px,calc(100vw - 24px));height:min(610px,calc(100vh - 105px));border-color:#4a7bc0}
+#chat .chat-head{background:linear-gradient(120deg,#102547,#081222);padding:17px}
+#chat .chat-head strong{font-size:14px}
+#chat .chat-body{padding:17px;display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+#chat .bubble{font-size:12px;line-height:1.55;padding:11px 13px;max-width:94%}
+#chat .bubble.user{align-self:flex-end}
+#chat .chat-input{padding:13px}
+#chat .chat-input input{font-size:12px;height:42px}
+#chat .chat-input button{padding:10px 16px}
+#chat .ai-version{display:block;margin-top:6px;font-size:8px;letter-spacing:.5px;color:#718aa9}
 /* Išsaugomas naudotojo pageidautas background.png fonas */
 body{min-height:100vh;margin:0;color:#fff;background:linear-gradient(135deg,rgba(3,7,18,.88),rgba(7,15,32,.82)),url("background.png") center / cover no-repeat fixed;background-color:#050914}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 10%,rgba(49,105,220,.12),transparent 45%)}
@@ -593,14 +605,14 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <footer>© 2026 LT PARDUOTUVĖ • Pagalba 24/7</footer>
 
 <button id="aiChatLaunch" class="chat-launch" type="button" onclick="toggleChat()" aria-controls="chat" aria-label="Atidaryti DI pagalbą" title="Klauskite DI apie prekes, kainas, pristatymą ir užsakymus">🤖 <span>DI PAGALBA</span></button>
-<div class="chat" id="chat"><div class="chat-head"><div><strong id="chatAssistantTitle">🤖 LT Parduotuvė • DI pagalba</strong><small>● Jungiamasi prie DI...</small></div><button class="chat-close" onclick="toggleChat()">✕</button></div>
+<div class="chat" id="chat"><div class="chat-head"><div><strong id="chatAssistantTitle">🤖 DI klientų pagalba</strong><small>● Jungiamasi prie DI...</small><span class="ai-version">AI-CHAT-20261021-FIX3</span></div><button class="chat-close" onclick="toggleChat()">✕</button></div>
 <div class="chat-body" id="chatBody">
-<div class="bubble">Sveiki! Esu LT PARDUOTUVĖ DI pagalbininkas. Klauskite apie prekes, kainas ir pristatymą.</div>
-<div class="bubble">DI pokalbis privatus. Administratorius jį pamatys tik jums paprašius perdavimo.</div>
+<div class="bubble">Parašykite savo žinutę. Pirmiausia su jumis bandys kalbėtis DI.</div>
+<div class="bubble">Jeigu DI negalės padėti, sujungsime su administracija. Pokalbis perduodamas tik jums pasirinkus.</div>
 </div>
 
-<button id="chatHumanBtn" class="chat-human-btn" onclick="requestChatAdmin()">Kviesti administratorių</button>
-<div class="chat-input"><input id="msg" maxlength="800" placeholder="Parašykite žinutę..."><button onclick="send()">Siųsti</button></div></div>
+<button id="chatHumanBtn" class="chat-human-btn" onclick="requestChatAdmin()">Susisiekti su administratoriumi</button>
+<div class="chat-input"><input id="msg" maxlength="800" placeholder="Parašykite savo klausimą DI..."><button onclick="send()">Siųsti</button></div></div>
 
 
 <div id="adminPanel">
@@ -1000,12 +1012,14 @@ function syncChatModeUI(){
   const btn=document.getElementById("chatHumanBtn");
   if(btn)btn.hidden=aiChatMode!=="ai";
   const title=document.getElementById("chatAssistantTitle");
-  if(title)title.textContent=aiChatMode==="human"?"LT Parduotuvė • Administratorius":"🤖 LT Parduotuvė • DI pagalba";
+  if(title)title.textContent=aiChatMode==="human"?"LT Parduotuvė • Administratorius":"🤖 DI klientų pagalba";
 }
 function aiHumanStoreKey(){return AI_HUMAN_STORAGE_PREFIX+(chatUser?.id||"")}
 function formatAIError(error){
   const details=error?.context;
-  if(details?.status===401)return "Prisijungimas nebegalioja. Prisijunkite iš naujo.";
+  if(details?.status===401)return "HTTP 401: funkcija nepriima prisijungimo žetono. Patikrinkite Supabase JWT nustatymus ir prisijungimą.";
+  if(details?.status===404)return "HTTP 404: ai-chat funkcija nerasta šiame Supabase projekte.";
+  if(details?.status===500)return "HTTP 500: DI serverio klaida. Tikrinkite Edge Functions → ai-chat → Logs.";
   return error?.message||"DI funkcija šiuo metu nepasiekiama.";
 }
 async function callAIChat(action,values={}){
@@ -1020,8 +1034,8 @@ function renderAIHistory(messages){
   body.replaceChildren();
   for(const msg of (messages||[]))bubble(msg.content,msg.role==="customer"?"user":"");
   if(!messages?.length){
-    bubble("Sveiki! Esu LT PARDUOTUVĖ DI pagalbininkas. Kuo galiu padėti?");
-    bubble("Jei reikės žmogaus, spauskite „Kviesti administratorių“.");
+    bubble("Parašykite savo žinutę – pirmiausia su jumis bandys kalbėtis DI.");
+    bubble("Jeigu nepavyks padėti, galėsite susisiekti su administracija.");
   }
 }
 async function ensureChatThread(threadId){
@@ -1098,9 +1112,9 @@ async function initChat(){
     }catch(e){
       console.error("AI chat initialization error:",e);
       chatInitDone=false;chatReady=false;
-      setChatStatus("DI nepasiekiamas");
+      setChatStatus("DI ryšio klaida – tikrinkite Supabase Logs");
       const body=document.getElementById("chatBody");if(body)body.replaceChildren();
-      bubble("Nepavyko prisijungti prie DI: "+formatAIError(e));
+      bubble("DI ryšio klaida: "+formatAIError(e)+". Parduotuvės administratoriui: Supabase → Edge Functions → ai-chat → Logs. Jei klaida 401, prisijunkite iš naujo.");
     }
   })();
   try{return await chatInitPromise}finally{chatInitPromise=null}
