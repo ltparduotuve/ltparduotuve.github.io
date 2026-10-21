@@ -276,6 +276,21 @@ body.auth-locked{overflow:hidden}
 #shopSpotifyFrame{width:100%;border:0;border-radius:12px;min-height:152px}
 
 .account-pref-input{width:100%;padding:12px;background:#08111d;border:1px solid #46658d;border-radius:9px;color:white} .admin-chat-badge{display:inline-grid;place-items:center;background:#db354c;color:#fff;border-radius:30px;padding:3px 7px;font-size:10px;min-width:20px;margin-left:5px;box-shadow:0 0 13px #ff365177}.admin-chat-badge[hidden]{display:none} .shop-music-dock{position:fixed;top:78px;right:16px;width:min(360px,calc(100vw - 32px));z-index:1600;padding:14px;border-radius:14px;background:#0a1424;border:1px solid #456c9a;box-shadow:0 12px 45px #000c}.shop-music-dock[hidden]{display:none}.shop-music-dock iframe{display:block;width:100%;height:170px;border:none;border-radius:11px}.shop-music-toggle.muted{opacity:.6} #shopMusicDock{position:fixed;left:-9999px;top:0;width:340px;height:180px;opacity:.01;pointer-events:none;z-index:-1} #shopSpotifyFrame{height:160px} #shopSpotifyFrame iframe{height:152px!important;width:100%!important} #shopMusicDock.needs-play{left:auto;right:16px;top:78px;opacity:1;pointer-events:auto;z-index:1600;width:min(360px,calc(100vw - 32px));height:auto} 
+
+/* Product detail delivery timeline */
+.product-modal-info{display:flex;flex-direction:column;gap:10px}
+.product-modal-info h2,.product-modal-cat,.product-modal-desc{margin-bottom:0}
+.product-modal-info h2{letter-spacing:-.7px}
+.delivery-estimate{margin:10px 0 2px;padding:17px 15px;background:#101c2a;border:1px solid #35475e;border-radius:15px}
+.delivery-estimate-title{font-size:10px;letter-spacing:1.2px;color:#b9c9dc;font-weight:800;margin-bottom:16px}
+.delivery-estimate-track{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));position:relative;gap:6px}
+.delivery-estimate-track:before{content:"";position:absolute;left:16.5%;right:16.5%;top:17px;height:2px;background:#4b688c}
+.delivery-estimate-step{text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0}
+.delivery-step-icon{display:grid;place-items:center;background:#0b1724;border:2px solid #6b8eb9;border-radius:50%;height:36px;width:36px;color:#dfebfa;font-size:16px}
+.delivery-estimate-step:first-child .delivery-step-icon{background:#28634e;border-color:#3dbd8b}
+.delivery-estimate-step b{font-size:11px}.delivery-estimate-step small{font-size:10px;color:#bbcee5;line-height:1.45;overflow-wrap:anywhere}
+.delivery-estimate-caption{margin-top:17px;color:#91a6be;font-size:10px;line-height:1.6}
+@media(max-width:700px){.product-modal-info{padding:20px}.delivery-estimate{padding:15px 9px}.delivery-estimate-step b{font-size:10px}}
 </style>
 <style id="payment-30min-style">
 .bank-pay-modal{align-items:flex-start;padding:28px 16px;overflow:auto;background:rgba(1,4,10,.96);backdrop-filter:blur(10px)}
@@ -759,6 +774,15 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <div id="modalDescription" class="product-modal-desc"></div>
 <div id="modalStock" class="product-modal-stock"></div>
 <div id="modalPrice"></div>
+<div class="delivery-estimate" aria-label="Numatomas pristatymas Lietuvoje">
+ <div class="delivery-estimate-title">PRISTATYMAS LIETUVOJE</div>
+ <div class="delivery-estimate-track">
+  <div class="delivery-estimate-step"><span class="delivery-step-icon">✓</span><b>Užsakymas</b><small id="deliveryOrdered">—</small></div>
+  <div class="delivery-estimate-step"><span class="delivery-step-icon">↗</span><b>Išsiunčiama</b><small id="deliveryShipped">—</small></div>
+  <div class="delivery-estimate-step"><span class="delivery-step-icon">▣</span><b>Gaunate</b><small id="deliveryArrival">—</small></div>
+ </div>
+ <p class="delivery-estimate-caption">Išsiunčiame kitą darbo dieną. Pristatymas per 1–3 darbo dienas nuo išsiuntimo. Savaitgaliais siuntos neruošiamos ir nepristatomos.</p>
+</div>
 <div class="modal-actions"><div class="modal-qty"><button onclick="changeModalQty(-1)">−</button><span id="modalQty">1</span><button onclick="changeModalQty(1)">+</button></div><button class="modal-add" onclick="addModalToCart()">🛒 Į KREPŠELĮ</button></div>
 </div></div></div>
 
@@ -2541,8 +2565,28 @@ function renderCart(){
 function openCart(){document.getElementById("userDropdown")?.classList.remove("open");document.getElementById("cartBg").style.display="block";renderCart()}
 function closeCart(){document.getElementById("cartBg").style.display="none"}
 
+function vilniusBusinessDate(){
+  const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Vilnius',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const item=x=>Number(parts.find(p=>p.type===x)?.value);
+  return new Date(Date.UTC(item('year'),item('month')-1,item('day'),12));
+}
+function nextBusinessDay(date){
+  const d=new Date(date);
+  do{d.setUTCDate(d.getUTCDate()+1);}while(d.getUTCDay()===0||d.getUTCDay()===6);
+  return d;
+}
+function ltDay(date){return new Intl.DateTimeFormat('lt-LT',{timeZone:'UTC',day:'numeric',month:'long'}).format(date);}
+function updateProductDeliveryEstimate(){
+  const ordered=vilniusBusinessDate(), shipped=nextBusinessDay(ordered);
+  const earliest=nextBusinessDay(shipped);
+  const latest=nextBusinessDay(nextBusinessDay(earliest));
+  document.getElementById('deliveryOrdered').textContent=ltDay(ordered);
+  document.getElementById('deliveryShipped').textContent=ltDay(shipped);
+  document.getElementById('deliveryArrival').textContent=ltDay(earliest)+' – '+ltDay(latest);
+}
 function openProductModal(p){
   modalProduct=p; modalQty=1;
+  updateProductDeliveryEstimate();
   const d=Math.min(100,Math.max(0,Number(p.discount_percent||0)));
   const finalPrice=salePrice(p);
   const stockLabel=productStockLabel(p);
@@ -2706,7 +2750,7 @@ async function changeAccountPassword(){
  if(!error){curr.value='';next.value='';confirm.value='';}
 }
 const STORE_MUSIC_MUTE_KEY='ltshop_music_muted_until', MUSIC_24H=86400000;
-const DEFAULT_SPOTIFY_URL='https://open.spotify.com/playlist/6890V3eBbQzXaumrodFhEg';
+const DEFAULT_SPOTIFY_URL='https://open.spotify.com/track/1wZkrdsVQ3BoFlhW4GE67W';
 let shopMusicConfig={spotify_url:DEFAULT_SPOTIFY_URL,enabled:true};
 let spotifyAPI=null,spotifyController=null,spotifyLoadedUrl='',spotifyWanted=!musicMuted();
 let spotifyIsPlaying=false,spotifyStarting=false,spotifyReady=false,shopMusicDbError='';
@@ -2736,8 +2780,8 @@ function startShopMusic(fromClick=false){
  if(!spotifyEmbed(url)||!mount)return;
  if(!spotifyWanted)return;
  setMusicButton();
- if(fromClick)queueMusicFallback();
- if(!spotifyAPI)return; // API pasikraus ir sukurs vienintelį grotuvą.
+ if(fromClick){showMusicPlayerFallback(true);queueMusicFallback();}
+ if(!spotifyAPI){if(fromClick)showMusicPlayerFallback(true);return;} // API pasikraus ir sukurs vienintelį grotuvą.
  if(spotifyController){
    if(spotifyLoadedUrl!==url){spotifyLoadedUrl=url;spotifyIsPlaying=false;spotifyReady=false;spotifyController.loadEntity(url);return;}
    if(spotifyReady&&!spotifyIsPlaying)spotifyController.play();
@@ -2780,7 +2824,7 @@ async function loadShopMusic(force=false){
   if(musicMuted())spotifyWanted=false;
   if(shopMusicConfig.enabled===false)spotifyWanted=false;
   musicLoaded=true;setMusicButton();
-  if(spotifyWanted)startShopMusic(false);
+  if(spotifyWanted){startShopMusic(false);queueMusicFallback();}
   else {cancelMusicFallback();spotifyController?.pause();showMusicPlayerFallback(false);}
  })();
  try{await musicLoadPromise;}finally{musicLoadPromise=null;}
