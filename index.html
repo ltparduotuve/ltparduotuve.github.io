@@ -924,7 +924,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3SNNvvuBtT4waMTznfCjnA_xYJZANED
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY,
-  { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage } }
+  { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.sessionStorage } }
 );
 
 let chatUser=null,chatThread=null,chatChannel=null,chatReady=false;const renderedMessageIds=new Set();
@@ -1173,41 +1173,76 @@ async function logoutUser(){
   await logoutAndLock("Atsijungta.");
 }
 
-const AUTH_SESSION_VERSION="2026-09-29-build-4";
-const AUTH_SESSION_MAX_MS=24*60*60*1000;
+const AUTH_SESSION_VERSION="2026-10-21-idle-1h";
+const AUTH_IDLE_MAX_MS=60*60*1000;
+const AUTH_ACTIVITY_KEY="ltparduotuve_last_activity";
 let authExpiryTimer=null;
+let authActivityLastWrite=0;
+let authExpiryInProgress=false;
 
 function clearAuthExpiry(){
   if(authExpiryTimer){clearTimeout(authExpiryTimer);authExpiryTimer=null;}
-  localStorage.removeItem("ltparduotuve_auth_started_at");
+  sessionStorage.removeItem(AUTH_ACTIVITY_KEY);
+  authActivityLastWrite=0;
 }
 
 async function logoutAndLock(message="Sesija baigėsi. Prisijunkite iš naujo."){
-  document.getElementById("mfaChallengeGate")?.classList.remove("open");
-  mfaPendingFactor=null;
-  clearAuthExpiry();
-  chatUser=null;chatThread=null;chatThreadPromise=null;chatInitPromise=null;chatReady=false;
-  if(chatChannel){try{supabaseClient.removeChannel(chatChannel)}catch(e){} chatChannel=null;}
-  try{await supabaseClient.auth.signOut({scope:"local"});}catch(e){console.error(e)}
-  document.getElementById("userDropdown")?.classList.remove("open");
-  document.getElementById("adminPanel")?.classList.remove("open");
-  document.getElementById("authGate").style.display="flex";
-  document.body.classList.add("auth-locked");
-  showAuth("login");
-  const msg=document.getElementById("loginMsg");if(msg)msg.textContent=message;
+  if(authExpiryInProgress)return;
+  authExpiryInProgress=true;
+  try{
+    document.getElementById("mfaChallengeGate")?.classList.remove("open");
+    mfaPendingFactor=null;
+    clearAuthExpiry();
+    chatUser=null;chatThread=null;chatThreadPromise=null;chatInitPromise=null;chatReady=false;
+    if(chatChannel){try{supabaseClient.removeChannel(chatChannel)}catch(e){} chatChannel=null;}
+    try{await supabaseClient.auth.signOut({scope:"local"});}catch(e){console.error(e)}
+    document.getElementById("userDropdown")?.classList.remove("open");
+    document.getElementById("adminPanel")?.classList.remove("open");
+    document.getElementById("authGate").style.display="flex";
+    document.body.classList.add("auth-locked");
+    showAuth("login");
+    const msg=document.getElementById("loginMsg");if(msg)msg.textContent=message;
+  }finally{authExpiryInProgress=false;}
+}
+
+function scheduleAuthIdleCheck(){
+  if(authExpiryTimer)clearTimeout(authExpiryTimer);
+  const last=Number(sessionStorage.getItem(AUTH_ACTIVITY_KEY)||0);
+  if(!last)return;
+  const remaining=AUTH_IDLE_MAX_MS-(Date.now()-last);
+  if(remaining<=0){void logoutAndLock("Atsijungta po 1 valandos neveiklumo.");return;}
+  authExpiryTimer=setTimeout(scheduleAuthIdleCheck,Math.min(remaining,2147483647));
 }
 
 function startAuthExpiry(){
-  if(authExpiryTimer)clearTimeout(authExpiryTimer);
-  let started=Number(localStorage.getItem("ltparduotuve_auth_started_at")||0);
-  if(!started){
-    started=Date.now();
-    localStorage.setItem("ltparduotuve_auth_started_at",String(started));
+  // Atkūrimo nuorodai ir neužbaigtai MFA patikrai taikoma atskira eiga.
+  if(passwordRecoveryActive)return;
+  if(!sessionStorage.getItem(AUTH_ACTIVITY_KEY)){
+    sessionStorage.setItem(AUTH_ACTIVITY_KEY,String(Date.now()));
   }
-  const left=AUTH_SESSION_MAX_MS-(Date.now()-started);
-  if(left<=0){logoutAndLock();return;}
-  authExpiryTimer=setTimeout(()=>logoutAndLock("Sesija baigėsi po 24 valandų. Prisijunkite iš naujo."),left);
+  scheduleAuthIdleCheck();
 }
+
+function registerAuthActivity(){
+  if(passwordRecoveryActive || authExpiryInProgress || !sessionStorage.getItem(AUTH_ACTIVITY_KEY))return;
+  const last=Number(sessionStorage.getItem(AUTH_ACTIVITY_KEY)||0);
+  if(Date.now()-last>=AUTH_IDLE_MAX_MS){scheduleAuthIdleCheck();return;}
+  // Throttle: nedarome įrašo dėl kiekvieno pelės judesio.
+  if(Date.now()-authActivityLastWrite<15000)return;
+  authActivityLastWrite=Date.now();
+  sessionStorage.setItem(AUTH_ACTIVITY_KEY,String(authActivityLastWrite));
+  scheduleAuthIdleCheck();
+}
+
+["pointerdown","keydown","scroll","touchstart"].forEach(type=>
+  window.addEventListener(type,registerAuthActivity,{passive:true})
+);
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden && sessionStorage.getItem(AUTH_ACTIVITY_KEY))scheduleAuthIdleCheck();
+});
+window.addEventListener("focus",()=>{
+  if(sessionStorage.getItem(AUTH_ACTIVITY_KEY))scheduleAuthIdleCheck();
+});
 
 function restartPasswordRecovery(){
   passwordRecoveryActive=false;
@@ -1266,7 +1301,7 @@ async function initAuth(){
     if(previousBuild && previousBuild!==AUTH_SESSION_VERSION){
       try{await supabaseClient.auth.signOut({scope:"local"});}catch(e){console.error(e)}
       localStorage.setItem("ltparduotuve_html_build",AUTH_SESSION_VERSION);
-      localStorage.removeItem("ltparduotuve_auth_started_at");
+      sessionStorage.removeItem(AUTH_ACTIVITY_KEY);
       session=null;
     }else{
       localStorage.setItem("ltparduotuve_html_build",AUTH_SESSION_VERSION);
@@ -1274,7 +1309,7 @@ async function initAuth(){
       startAuthExpiry();
     }
   }else{
-    localStorage.removeItem("ltparduotuve_auth_started_at");
+    sessionStorage.removeItem(AUTH_ACTIVITY_KEY);
     document.getElementById("authGate").style.display="flex";
     document.body.classList.add("auth-locked");
   }
