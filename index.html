@@ -104,7 +104,7 @@ overflow:hidden;animation:introOut .9s ease 3.2s forwards}
 .auth-card{width:min(430px,100%);background:#080f1aee;border:1px solid #365277;border-radius:20px;padding:30px;box-shadow:0 25px 100px #000d;backdrop-filter:blur(20px)}
 .auth-brand{text-align:center;margin-bottom:24px}.auth-brand b{display:block;font-size:48px;font-weight:900;text-shadow:0 0 35px #4389ff}.auth-brand strong{font-size:21px;letter-spacing:-1px}.auth-brand small{display:block;color:#8190a8;font-size:10px;margin-top:7px}
 .auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:#0b1422;border:1px solid #263950;border-radius:10px;padding:4px;margin-bottom:20px}.auth-tab{border:0;background:transparent;color:#8190a8;padding:10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer}.auth-tab.active{background:#173661;color:#fff;box-shadow:0 0 20px #397dff22}
-.auth-form{display:none}.auth-form.active{display:block}.auth-field{margin-bottom:13px}.auth-field label{display:block;color:#aebbd0;font-size:10px;margin-bottom:6px}.auth-field input{width:100%;height:43px;background:#0b1421;border:1px solid #2b3e5a;color:#fff;border-radius:9px;padding:0 12px;outline:none}.auth-field input:focus{border-color:#4c8cff;box-shadow:0 0 0 3px #4389ff12}.auth-submit{width:100%;height:44px;border:1px solid #74a4ff;border-radius:9px;background:linear-gradient(135deg,#3b83ff,#6a4cff);color:#fff;font-weight:800;font-size:11px;cursor:pointer;margin-top:4px}.auth-msg{min-height:18px;text-align:center;font-size:10px;color:#f0b44d;margin-top:11px}.auth-note{text-align:center;color:#66758d;font-size:9px;margin-top:15px;line-height:1.5}
+.auth-form{display:none}.auth-form.active{display:block}.auth-field{margin-bottom:13px}.auth-field label{display:block;color:#aebbd0;font-size:10px;margin-bottom:6px}.auth-field input{width:100%;height:43px;background:#0b1421;border:1px solid #2b3e5a;color:#fff;border-radius:9px;padding:0 12px;outline:none}.auth-field input:focus{border-color:#4c8cff;box-shadow:0 0 0 3px #4389ff12}.auth-submit{width:100%;height:44px;border:1px solid #74a4ff;border-radius:9px;background:linear-gradient(135deg,#3b83ff,#6a4cff);color:#fff;font-weight:800;font-size:11px;cursor:pointer;margin-top:4px}.auth-msg{min-height:18px;text-align:center;font-size:10px;color:#f0b44d;margin-top:11px}.auth-link-button{display:block;margin:12px auto 0;border:0;background:transparent;color:#8fb8ff;font-size:11px;cursor:pointer;text-decoration:underline}.auth-link-button:hover{color:#fff}.auth-note{text-align:center;color:#66758d;font-size:9px;margin-top:15px;line-height:1.5}
 body.auth-locked{overflow:hidden}
 .user-menu{position:relative}.user-menu button{border:0;background:none;color:#dce6f8;font-size:20px;cursor:pointer}.user-dropdown{display:none;position:absolute;right:0;top:34px;width:190px;background:#080f1a;border:1px solid #314968;border-radius:11px;padding:8px;box-shadow:0 20px 60px #000b}.user-dropdown.open{display:block}.user-dropdown small{display:block;color:#7f8ea5;padding:7px;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.user-dropdown button{width:100%;border:1px solid #273a54;background:#0c1727;color:#fff;border-radius:7px;padding:8px;font-size:10px;cursor:pointer}
 
@@ -362,6 +362,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
           <span>💾 Išsaugoti prisijungimo duomenis šiame įrenginyje</span>
         </label>
         <button class="auth-submit" type="submit">PRISIJUNGTI →</button>
+        <button type="button" class="auth-link-button" onclick="showAuth('forgot')">Pamiršai slaptažodį?</button>
         <div class="auth-msg" id="loginMsg"></div>
       </form>
 
@@ -382,6 +383,18 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
         <div class="auth-msg" id="registerMsg"></div>
       </form>
 
+      <form id="forgotForm" class="auth-form" onsubmit="sendPasswordReset(event)">
+        <div class="auth-field"><label>EL. PAŠTAS</label><input id="recoveryEmail" type="email" autocomplete="email" required></div>
+        <button type="submit" class="auth-submit">SIŲSTI ATKŪRIMO NUORODĄ</button>
+        <button type="button" class="auth-link-button" onclick="showAuth('login')">← Grįžti į prisijungimą</button>
+        <div id="recoveryMsg" class="auth-msg" role="status"></div>
+      </form>
+      <form id="newPasswordForm" class="auth-form" onsubmit="saveNewPassword(event)">
+        <div class="auth-field"><label>NAUJAS SLAPTAŽODIS</label><input id="newRecoveryPassword" type="password" minlength="8" autocomplete="new-password" required></div>
+        <div class="auth-field"><label>PAKARTOK SLAPTAŽODĮ</label><input id="confirmRecoveryPassword" type="password" minlength="8" autocomplete="new-password" required></div>
+        <button class="auth-submit" type="submit">IŠSAUGOTI NAUJĄ SLAPTAŽODĮ</button>
+        <div id="newPasswordMsg" class="auth-msg" role="status"></div>
+      </form>
       <div class="auth-note">Sukūrę paskyrą galėsite naudotis katalogu, krepšeliu ir klientų pagalba.</div>
     </div>
   </div>
@@ -883,6 +896,10 @@ loadRememberedLogin();
 
 
 function showAuth(mode){
+  document.getElementById("forgotForm").classList.toggle("active",mode==="forgot");
+  document.getElementById("newPasswordForm").classList.toggle("active",mode==="newPassword");
+  document.getElementById("authGate").style.display="flex";
+  document.body.classList.add("auth-locked");
   document.getElementById("loginForm").classList.toggle("active", mode==="login");
   document.getElementById("registerForm").classList.toggle("active", mode==="register");
   document.getElementById("loginTab").classList.toggle("active", mode==="login");
@@ -890,7 +907,7 @@ function showAuth(mode){
   document.getElementById("loginMsg").textContent="";
   document.getElementById("registerMsg").textContent="";
   document.getElementById("authHeading").textContent =
-    mode==="login" ? "PRISIJUNK PRIE SAVO PASKYROS" : "SUKURK SAVO PASKYRĄ";
+    mode==="login" ? "PRISIJUNK PRIE SAVO PASKYROS" : mode==="register" ? "SUKURK SAVO PASKYRĄ" : mode==="forgot" ? "SLAPTAŽODŽIO ATKŪRIMAS" : "NAUJAS SLAPTAŽODIS";
 }
 
 function authErrorMessage(error){
@@ -901,6 +918,32 @@ function authErrorMessage(error){
   return m || "Įvyko klaida. Bandykite dar kartą.";
 }
 
+async function sendPasswordReset(event){
+  event.preventDefault();
+  const email=document.getElementById("recoveryEmail").value.trim();
+  const msg=document.getElementById("recoveryMsg");
+  msg.textContent="Siunčiama...";
+  const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{
+    redirectTo:window.location.origin+window.location.pathname
+  });
+  msg.textContent=error?authErrorMessage(error):"Jei toks el. paštas užregistruotas, gausi slaptažodžio atkūrimo nuorodą.";
+}
+async function saveNewPassword(event){
+  event.preventDefault();
+  const p=document.getElementById("newRecoveryPassword").value;
+  const confirmP=document.getElementById("confirmRecoveryPassword").value;
+  const msg=document.getElementById("newPasswordMsg");
+  if(p!==confirmP){msg.textContent="Slaptažodžiai nesutampa.";return}
+  if(p.length<8){msg.textContent="Naudok bent 8 simbolius.";return}
+  msg.textContent="Saugoma...";
+  const {error}=await supabaseClient.auth.updateUser({password:p});
+  if(error){msg.textContent=authErrorMessage(error);return}
+  document.getElementById("newRecoveryPassword").value="";
+  document.getElementById("confirmRecoveryPassword").value="";
+  await supabaseClient.auth.signOut({scope:"local"});
+  showAuth("login");
+  document.getElementById("loginMsg").textContent="Slaptažodis pakeistas. Prisijunk su nauju slaptažodžiu.";
+}
 async function registerUser(event){
   event.preventDefault();
   const email=document.getElementById("registerEmail").value.trim();
@@ -1075,6 +1118,10 @@ async function initAuth(){
     document.body.classList.add("auth-locked");
   }
   supabaseClient.auth.onAuthStateChange((_event,nextSession)=>{
+    if(_event==="PASSWORD_RECOVERY"){
+      showAuth("newPassword");
+      return;
+    }
     if(nextSession?.user){
       enterStore(nextSession.user);
       startAuthExpiry();
