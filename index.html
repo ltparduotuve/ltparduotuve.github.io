@@ -442,14 +442,27 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 </div></header>
 
 
-<!-- ACCOUNT SETTINGS: personalization stays local to this browser; MFA will be enabled in a separate phase. -->
+<div id="mfaChallengeGate" class="account-settings-overlay" style="z-index:9999998" role="dialog" aria-modal="true">
+  <section class="account-settings-panel" style="max-width:450px"><div class="account-settings-header"><div><h2>Patvirtink prisijungimą</h2><p>Google Authenticator · 2FA</p></div></div>
+  <div class="account-settings-content"><p class="account-settings-note">Įvesk 6 skaitmenų kodą iš autentifikavimo programėlės.</p>
+  <input id="mfaLoginCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000" style="width:100%;padding:13px;background:#08111d;border:1px solid #46658d;border-radius:9px;color:#fff">
+  <button type="button" class="account-settings-action" onclick="submitMfaLogin()">Patvirtinti</button>
+  <button type="button" class="admin-secondary" onclick="logoutAndLock('Atsijungta.')">Atsijungti</button><p id="mfaLoginMsg" class="account-settings-note" role="status"></p></div></section>
+</div>
+<!-- ACCOUNT SETTINGS: preferences are local; TOTP verification is handled by Supabase MFA. -->
 <div id="accountSettingsModal" class="account-settings-overlay" role="dialog" aria-modal="true" aria-labelledby="accountSettingsTitle" onclick="closeAccountSettings(event)">
   <section class="account-settings-panel" onclick="event.stopPropagation()">
     <div class="account-settings-header"><div><h2 id="accountSettingsTitle">⚙️ Nustatymai</h2><p>Paskyra ir išvaizda</p></div><button class="close" type="button" onclick="closeAccountSettings()" aria-label="Uždaryti">✕</button></div>
     <div class="account-settings-content">
       <div class="account-settings-group"><h3>Kalba</h3><label for="accountLanguage">Svetainės kalba</label><select id="accountLanguage" onchange="setAccountLanguage(this.value)"><option value="lt">Lietuvių (pagrindinė)</option><option value="en">English</option><option value="ru">Русский</option></select><p id="accountLanguageNote" class="account-settings-note">Kol kas veikia nustatymų lango vertimas. Viso katalogo vertimus pridėsime kitu etapu.</p></div>
       <div class="account-settings-group"><h3>Išvaizda</h3><label for="accountTheme">Spalvų tema</label><select id="accountTheme" onchange="setAccountTheme(this.value)"><option value="dark">Tamsi (numatytoji)</option><option value="light">Šviesi</option><option value="water">Water – mėlyna</option><option value="lava">Lava – oranžinė</option></select></div>
-      <div class="account-settings-group"><h3>Paskyros saugumas</h3><p class="account-settings-note">Dviejų veiksnių autentifikavimas („Google Authenticator“) – kitas etapas. Aktyvuosime per „Supabase“ MFA, kad jis realiai apsaugotų prisijungimą.</p><button type="button" class="account-settings-action" onclick="requestAccountPasswordReset()">Keisti slaptažodį el. paštu</button></div>
+      <div class="account-settings-group"><h3>Paskyros saugumas</h3>
+<p class="account-settings-note" id="mfaStatus">Tikrinama 2FA būsena...</p>
+<button type="button" class="account-settings-action" id="mfaEnableBtn" onclick="beginMfaEnroll()">Įjungti Google Authenticator (2FA)</button>
+<div id="mfaEnrollArea" style="display:none"><p class="account-settings-note">Nuskenuok QR kodą su Google Authenticator, tada įvesk programėlėje matomą 6 skaitmenų kodą. QR kodą saugok tik sau.</p><div id="mfaQr" style="width:190px;max-width:100%;margin:12px auto;background:white;padding:9px;border-radius:9px"></div><p id="mfaSecretHelp" class="account-settings-note" style="overflow-wrap:anywhere"></p><input id="mfaEnrollCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="6 skaitmenų kodas" style="width:100%;padding:12px;border-radius:8px;background:#08111d;color:white;border:1px solid #46658d"><button type="button" class="account-settings-action" onclick="completeMfaEnroll()">Patvirtinti ir įjungti 2FA</button><button type="button" class="admin-secondary" onclick="cancelMfaEnroll()">Atšaukti</button></div>
+<button type="button" id="mfaDisableBtn" class="admin-danger" style="display:none" onclick="disableMfa()">Išjungti 2FA</button>
+<p id="mfaSettingsMessage" class="account-settings-note" role="status"></p>
+<button type="button" class="account-settings-action" onclick="requestAccountPasswordReset()">Keisti slaptažodį el. paštu</button></div>
     </div>
   </section>
 </div>
@@ -1069,6 +1082,7 @@ async function loginUser(event){
 }
 
 async function enterStore(user){
+  if(!(await ensureMfaVerified()))return;
   const lock=await getStoreLock();
   const admin=await checkAdmin(user);
   if(passwordRecoveryActive)return;
@@ -1112,6 +1126,8 @@ function clearAuthExpiry(){
 }
 
 async function logoutAndLock(message="Sesija baigėsi. Prisijunkite iš naujo."){
+  document.getElementById("mfaChallengeGate")?.classList.remove("open");
+  mfaPendingFactor=null;
   clearAuthExpiry();
   chatUser=null;chatThread=null;chatThreadPromise=null;chatInitPromise=null;chatReady=false;
   if(chatChannel){try{supabaseClient.removeChannel(chatChannel)}catch(e){} chatChannel=null;}
@@ -2543,13 +2559,86 @@ document.getElementById("msg").addEventListener("keydown",e=>{
   if(e.key==="Enter") send();
 });
 
+// Supabase MFA: challenge existing TOTP factors before granting app access.
+let mfaPendingFactor=null, mfaEnrollingFactor=null, mfaGateBusy=false;
+function mfaMessage(id,msg){const x=document.getElementById(id);if(x)x.textContent=msg||''}
+async function ensureMfaVerified(){
+  if(passwordRecoveryActive)return false;
+  const {data:level,error:levelError}=await supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
+  if(levelError){mfaMessage('mfaLoginMsg','Nepavyko patikrinti 2FA: '+levelError.message);document.getElementById('mfaChallengeGate').classList.add('open');return false}
+  if(level.currentLevel==='aal2'){document.getElementById('mfaChallengeGate').classList.remove('open');return true}
+  const {data:factorList,error:factorError}=await supabaseClient.auth.mfa.listFactors();
+  if(factorError){mfaMessage('mfaLoginMsg','Nepavyko gauti 2FA nustatymų.');document.getElementById('mfaChallengeGate').classList.add('open');return false}
+  const factor=(factorList?.totp||[]).find(f=>f.status==='verified');
+  if(!factor){document.getElementById('mfaChallengeGate').classList.remove('open');return true}
+  mfaPendingFactor=factor.id;
+  document.getElementById('mfaChallengeGate').classList.add('open');
+  document.getElementById('authGate').style.display='none';
+  document.body.classList.add('auth-locked');
+  return false;
+}
+async function submitMfaLogin(){
+  if(mfaGateBusy)return;
+  const code=document.getElementById('mfaLoginCode').value.trim();
+  if(!/^\d{6}$/.test(code))return mfaMessage('mfaLoginMsg','Įvesk 6 skaitmenų kodą.');
+  mfaGateBusy=true;
+  try{
+    const {data,error}=await supabaseClient.auth.mfa.challengeAndVerify({factorId:mfaPendingFactor,code});
+    if(error)return mfaMessage('mfaLoginMsg','Kodas neteisingas arba pasibaigė jo galiojimas.');
+    document.getElementById('mfaLoginCode').value='';
+    document.getElementById('mfaChallengeGate').classList.remove('open');
+    const {data:userData}=await supabaseClient.auth.getUser();
+    if(userData?.user)await enterStore(userData.user);
+  }finally{mfaGateBusy=false}
+}
+async function refreshMfaSettings(){
+  const {data,error}=await supabaseClient.auth.mfa.listFactors();
+  const verified=(data?.totp||[]).find(f=>f.status==='verified');
+  document.getElementById('mfaEnableBtn').style.display=verified?'none':'';
+  document.getElementById('mfaDisableBtn').style.display=verified?'':'none';
+  mfaMessage('mfaStatus',error?'Nepavyko gauti 2FA būsenos.':verified?'2FA įjungta – prisijungiant reikia Google Authenticator kodo.':'2FA išjungta – gali įjungti papildomą apsaugą.');
+}
+async function beginMfaEnroll(){
+  mfaMessage('mfaSettingsMessage','Ruošiamas 2FA kodas...');
+  const {data,error}=await supabaseClient.auth.mfa.enroll({factorType:'totp',friendlyName:'LT Parduotuvė'});
+  if(error)return mfaMessage('mfaSettingsMessage',error.message);
+  mfaEnrollingFactor=data.id;
+  const svg=data.totp?.qr_code||'';
+  const qr=document.getElementById('mfaQr');qr.replaceChildren();
+  if(svg.startsWith('data:image/')){const img=document.createElement('img');img.src=svg;img.alt='Authenticator QR kodas';img.style.width='100%';qr.append(img)}
+  else if(svg.trim().startsWith('<svg')){const blob=new Blob([svg],{type:'image/svg+xml'});const img=document.createElement('img');const url=URL.createObjectURL(blob);img.src=url;img.alt='Authenticator QR kodas';img.style.width='100%';img.onload=()=>URL.revokeObjectURL(url);qr.append(img)}
+  else{qr.textContent='QR kodas nepasiekiamas';}
+  mfaMessage('mfaSecretHelp',data.totp?.secret?'Jeigu QR nenuskenuojamas, rankinis kodas: '+data.totp.secret:'');
+  document.getElementById('mfaEnrollArea').style.display='block';mfaMessage('mfaSettingsMessage','');
+}
+async function completeMfaEnroll(){
+  const code=document.getElementById('mfaEnrollCode').value.trim();if(!/^\d{6}$/.test(code))return mfaMessage('mfaSettingsMessage','Įvesk tiksliai 6 skaitmenis.');
+  const {error}=await supabaseClient.auth.mfa.challengeAndVerify({factorId:mfaEnrollingFactor,code});
+  if(error)return mfaMessage('mfaSettingsMessage','Nepavyko patvirtinti kodo: '+error.message);
+  document.getElementById('mfaEnrollArea').style.display='none';document.getElementById('mfaEnrollCode').value='';mfaEnrollingFactor=null;
+  mfaMessage('mfaSecretHelp','');mfaMessage('mfaSettingsMessage','2FA sėkmingai įjungta. Išsaugok Authenticator paskyrą.');
+  await refreshMfaSettings();
+}
+async function cancelMfaEnroll(){
+  if(mfaEnrollingFactor){await supabaseClient.auth.mfa.unenroll({factorId:mfaEnrollingFactor});mfaEnrollingFactor=null}
+  document.getElementById('mfaEnrollArea').style.display='none';mfaMessage('mfaSecretHelp','');
+}
+async function disableMfa(){
+  if(!confirm('Ar tikrai išjungti 2FA?'))return;
+  const {data}=await supabaseClient.auth.mfa.listFactors();const factor=(data?.totp||[]).find(f=>f.status==='verified');
+  if(!factor)return;
+  const {data:level}=await supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
+  if(level?.currentLevel!=='aal2')return mfaMessage('mfaSettingsMessage','Prieš išjungiant 2FA iš naujo patvirtink prisijungimą Authenticator kodu.');
+  const {error}=await supabaseClient.auth.mfa.unenroll({factorId:factor.id});
+  mfaMessage('mfaSettingsMessage',error?'2FA išjungti nepavyko: '+error.message:'2FA išjungta.');await refreshMfaSettings();
+}
 // Settings are deliberately stored per-browser until account preference syncing is added.
 const ACCOUNT_THEME_KEY="ltparduotuve_theme_v1", ACCOUNT_LANGUAGE_KEY="ltparduotuve_language_v1";
-function openAccountSettings(){document.getElementById("userDropdown")?.classList.remove("open");document.getElementById("accountSettingsModal")?.classList.add("open");document.getElementById("accountTheme").value=localStorage.getItem(ACCOUNT_THEME_KEY)||"dark";document.getElementById("accountLanguage").value=localStorage.getItem(ACCOUNT_LANGUAGE_KEY)||"lt";setSettingsLanguageText(document.getElementById("accountLanguage").value)}
+function openAccountSettings(){document.getElementById("userDropdown")?.classList.remove("open");document.getElementById("accountSettingsModal")?.classList.add("open");document.getElementById("accountTheme").value=localStorage.getItem(ACCOUNT_THEME_KEY)||"dark";document.getElementById("accountLanguage").value=localStorage.getItem(ACCOUNT_LANGUAGE_KEY)||"lt";setSettingsLanguageText(document.getElementById("accountLanguage").value);refreshMfaSettings()}
 function closeAccountSettings(event){if(event && event.target!==document.getElementById("accountSettingsModal"))return;document.getElementById("accountSettingsModal")?.classList.remove("open")}
 function setAccountTheme(theme){if(!["dark","light","water","lava"].includes(theme))theme="dark";document.body.classList.remove("theme-dark","theme-light","theme-water","theme-lava");document.body.classList.add("theme-"+theme);localStorage.setItem(ACCOUNT_THEME_KEY,theme)}
 function setAccountLanguage(lang){if(!["lt","en","ru"].includes(lang))lang="lt";localStorage.setItem(ACCOUNT_LANGUAGE_KEY,lang);setSettingsLanguageText(lang)}
-function setSettingsLanguageText(lang){const translations={lt:["⚙️ Nustatymai","Paskyra ir išvaizda","Kalba","Svetainės kalba","Išvaizda","Spalvų tema","Paskyros saugumas","Keisti slaptažodį el. paštu"],en:["⚙️ Settings","Account and appearance","Language","Website language","Appearance","Color theme","Account security","Reset password by email"],ru:["⚙️ Настройки","Аккаунт и оформление","Язык","Язык сайта","Оформление","Цветовая тема","Безопасность аккаунта","Сменить пароль по почте"]};const t=translations[lang]||translations.lt;const panel=document.getElementById("accountSettingsModal");if(!panel)return;const els=[panel.querySelector("h2"),panel.querySelector(".account-settings-header p"),...panel.querySelectorAll(".account-settings-group h3, .account-settings-group label"),panel.querySelector(".account-settings-action")];els.forEach((el,i)=>{if(el && t[i])el.textContent=t[i]});document.getElementById("accountLanguageNote").textContent=lang==="lt"?"Kol kas veikia nustatymų lango vertimas. Viso katalogo vertimus pridėsime kitu etapu.":lang==="en"?"Only the settings panel is translated for now. Full store translations are planned for a later phase.":"Пока переведено только окно настроек. Полный перевод магазина будет добавлен позже."}
+function setSettingsLanguageText(lang){const translations={lt:["⚙️ Nustatymai","Paskyra ir išvaizda","Kalba","Svetainės kalba","Išvaizda","Spalvų tema","Paskyros saugumas","Keisti slaptažodį el. paštu"],en:["⚙️ Settings","Account and appearance","Language","Website language","Appearance","Color theme","Account security","Reset password by email"],ru:["⚙️ Настройки","Аккаунт и оформление","Язык","Язык сайта","Оформление","Цветовая тема","Безопасность аккаунта","Сменить пароль по почте"]};const t=translations[lang]||translations.lt;const panel=document.getElementById("accountSettingsModal");if(!panel)return;const els=[panel.querySelector("h2"),panel.querySelector(".account-settings-header p"),panel.querySelectorAll(".account-settings-group")[0]?.querySelector("h3"),panel.querySelector("label[for=accountLanguage]"),panel.querySelectorAll(".account-settings-group")[1]?.querySelector("h3"),panel.querySelector("label[for=accountTheme]"),panel.querySelectorAll(".account-settings-group")[2]?.querySelector("h3"),panel.querySelector(".account-settings-group .account-settings-action:last-child")];els.forEach((el,i)=>{if(el && t[i])el.textContent=t[i]});document.getElementById("accountLanguageNote").textContent=lang==="lt"?"Kol kas veikia nustatymų lango vertimas. Viso katalogo vertimus pridėsime kitu etapu.":lang==="en"?"Only the settings panel is translated for now. Full store translations are planned for a later phase.":"Пока переведено только окно настроек. Полный перевод магазина будет добавлен позже."}
 async function requestAccountPasswordReset(){const {data}=await supabaseClient.auth.getUser();const email=data?.user?.email;if(!email){alert("Prisijunkite prie paskyros.");return}const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname+"?reset_password=1"});alert(error?authErrorMessage(error):"Slaptažodžio keitimo nuoroda išsiųsta į jūsų el. paštą.")}
 setAccountTheme(localStorage.getItem(ACCOUNT_THEME_KEY)||"dark");
 
