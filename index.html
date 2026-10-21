@@ -892,12 +892,14 @@ setTimeout(()=>{
   const intro=document.getElementById("authIntro");
   if(intro) intro.style.display="none";
 },3900);
-initAuth();
 loadRememberedLogin();
 
 
-let passwordRecoveryActive = new URLSearchParams(window.location.search).has('reset_password') ||
-  /(?:^|[&#])type=recovery(?:&|$)/.test(window.location.hash);
+// Atkūrimo nuorodą atpažink prieš leidžiant atidaryti parduotuvę.
+const recoverySearch = new URLSearchParams(window.location.search);
+const recoveryHash = new URLSearchParams(window.location.hash.replace(/^#/,''));
+let passwordRecoveryActive = recoverySearch.has('reset_password') ||
+  recoverySearch.get('type')==='recovery' || recoveryHash.get('type')==='recovery';
 let passwordRecoveryVerified = false;
 function showAuth(mode){
   if(passwordRecoveryActive && mode!=="newPassword")return;
@@ -1145,8 +1147,15 @@ async function initAuth(){
     showAuth("newPassword");
     passwordRecoveryVerified=!!data?.session?.user;
     if(!passwordRecoveryVerified){
-      document.getElementById("newPasswordMsg").textContent="Atkūrimo nuoroda negalioja arba baigėsi jos galiojimas. Paprašyk naujos nuorodos.";
-      document.getElementById("newPasswordRetry").style.display="block";
+      // Po grįžimo iš el. pašto Supabase dar gali apdoroti URL kodą.
+      document.getElementById("newPasswordMsg").textContent="Tikrinama atkūrimo nuoroda...";
+      setTimeout(async()=>{
+        if(!passwordRecoveryActive || passwordRecoveryVerified)return;
+        const {data:latest}=await supabaseClient.auth.getSession();
+        if(latest?.session?.user){passwordRecoveryVerified=true;document.getElementById("newPasswordMsg").textContent="";return;}
+        document.getElementById("newPasswordMsg").textContent="Atkūrimo nuoroda negalioja arba baigėsi jos galiojimas. Paprašyk naujos nuorodos.";
+        document.getElementById("newPasswordRetry").style.display="block";
+      },2200);
     }
     return;
   }
@@ -1170,6 +1179,9 @@ async function initAuth(){
     document.body.classList.add("auth-locked");
   }
 }
+
+// Registruok atkūrimo įvykių klausytoją tik po atkūrimo būsenos inicializavimo.
+initAuth();
 
 const ADMIN_EMAIL="nedasliubinas4@gmail.com";
 let isAdmin=false;
