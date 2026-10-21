@@ -2707,8 +2707,8 @@ async function changeAccountPassword(){
  if(!error){curr.value='';next.value='';confirm.value='';}
 }
 const STORE_MUSIC_MUTE_KEY='ltshop_music_muted_until', MUSIC_24H=86400000;
-const DEFAULT_SPOTIFY_URL='';
-let shopMusicConfig=null,spotifyAPI=null,spotifyController=null,spotifyLoadedUrl='',spotifyWanted=false,spotifyIsPlaying=false,spotifyStarting=false;
+const DEFAULT_SPOTIFY_URL='https://open.spotify.com/playlist/6890V3eBbQzXaumrodFhEg';
+let shopMusicConfig=null,spotifyAPI=null,spotifyController=null,spotifyLoadedUrl='',spotifyWanted=false,spotifyIsPlaying=false,spotifyStarting=false,shopMusicDbError='';
 function spotifyEmbed(url){try{const u=new URL(url);let p=u.pathname.split('/').filter(Boolean);if(p[0]?.startsWith('intl-'))p=p.slice(1);if(u.protocol!=='https:'||u.hostname!=='open.spotify.com'||!['track','album','playlist'].includes(p[0])||!/^[a-zA-Z0-9]+$/.test(p[1]||''))return null;return 'https://open.spotify.com/embed/'+p[0]+'/'+p[1];}catch{return null}}
 function musicMuted(){const until=Number(localStorage.getItem(STORE_MUSIC_MUTE_KEY)||0);if(until>Date.now())return true;if(until)localStorage.removeItem(STORE_MUSIC_MUTE_KEY);return false;}
 function musicUrl(){return shopMusicConfig?.enabled===false?'':(shopMusicConfig?.spotify_url||DEFAULT_SPOTIFY_URL);}
@@ -2731,7 +2731,7 @@ function startShopMusic(fromClick=false){
  const url=musicUrl(),embed=spotifyEmbed(url),mount=document.getElementById('shopSpotifyFrame');
  if(!embed||!mount){if(fromClick)alert('Administratorius dar neįkėlė Spotify grojaraščio.');return;}
  spotifyWanted=true;setMusicButton();
- if(!spotifyAPI){if(fromClick)showMusicPlayerFallback(true);return;}
+ if(!spotifyAPI){if(fromClick){mount.innerHTML='<iframe src=\"'+embed+'\" allow=\"autoplay; encrypted-media; fullscreen; picture-in-picture\" loading=\"eager\" title=\"Spotify grotuvas\"></iframe>';showMusicPlayerFallback(true);}return;}
  if(spotifyController){
   if(spotifyLoadedUrl!==url){spotifyLoadedUrl=url;spotifyController.loadEntity(url);}
   spotifyController.play();
@@ -2739,6 +2739,7 @@ function startShopMusic(fromClick=false){
   return;
  }
  if(spotifyStarting)return;
+ mount.replaceChildren();
  spotifyStarting=true;spotifyLoadedUrl=url;
  spotifyAPI.createController(mount,{url,width:340,height:152},controller=>{
    spotifyStarting=false;spotifyController=controller;
@@ -2753,24 +2754,38 @@ function startShopMusic(fromClick=false){
  });
 }
 async function loadShopMusic(){
+ let loaded=null;
+ shopMusicDbError='';
  try{
   const {data,error}=await supabaseClient.from('store_music_settings').select('spotify_url,enabled').eq('id',1).maybeSingle();
-  if(error)console.warn('Nepavyko nuskaityti muzikos nustatymų.',error);
-  shopMusicConfig=data||{spotify_url:'',enabled:true};
- }catch(e){console.warn('Muzikos nustatymai:',e);shopMusicConfig={spotify_url:'',enabled:true};}
- const urlInput=document.getElementById('adminSpotifyUrl');if(urlInput)urlInput.value=shopMusicConfig.spotify_url||'';
- const enableInput=document.getElementById('adminSpotifyEnabled');if(enableInput)enableInput.checked=shopMusicConfig.enabled!==false;
+  if(error){shopMusicDbError=error.message;console.warn('Nepavyko nuskaityti muzikos nustatymų:',error);}
+  else loaded=data;
+ }catch(e){shopMusicDbError=e?.message||String(e);console.warn('Muzikos nustatymai:',e);}
+ // Jei nustatymų nėra arba nuoroda tuščia, groja savininko nurodytas grojaraštis.
+ // Jei administratorius sąmoningai išjungė muziką, jo pasirinkimas išsaugomas.
+ shopMusicConfig=loaded||{spotify_url:DEFAULT_SPOTIFY_URL,enabled:true};
+ const urlInput=document.getElementById('adminSpotifyUrl');
+ if(urlInput)urlInput.value=shopMusicConfig.spotify_url||DEFAULT_SPOTIFY_URL;
+ const enableInput=document.getElementById('adminSpotifyEnabled');
+ if(enableInput)enableInput.checked=shopMusicConfig.enabled!==false;
+ const info=document.getElementById('adminSpotifyMessage');
+ if(info && shopMusicDbError)info.textContent='Supabase muzikos nustatymų klaida: '+shopMusicDbError+' (kol kas naudojamas atsarginis grojaraštis).';
  spotifyWanted=!musicMuted()&&!!spotifyEmbed(musicUrl());setMusicButton();
- if(spotifyWanted)startShopMusic(false);else{spotifyController?.pause();showMusicPlayerFallback(false);}
+ if(spotifyWanted)startShopMusic(false);
+ else {spotifyController?.pause();showMusicPlayerFallback(false);}
 }
 async function saveAdminMusic(){
  if(!isAdmin)return;
  const url=document.getElementById('adminSpotifyUrl').value.trim(),enabled=document.getElementById('adminSpotifyEnabled').checked,out=document.getElementById('adminSpotifyMessage');
  if(url&&!spotifyEmbed(url)){out.textContent='Įveskite tinkamą Spotify kūrinio, albumo ar grojaraščio nuorodą.';return;}
+ out.textContent='Saugoma...';
  const {error}=await supabaseClient.from('store_music_settings').upsert({id:1,spotify_url:url,enabled},{onConflict:'id'});
- out.textContent=error?'Nepavyko išsaugoti: '+error.message:'Išsaugota.';
- if(!error){spotifyController?.pause();spotifyIsPlaying=false;showMusicPlayerFallback(false);await loadShopMusic();}
+ if(error){out.textContent='Nepavyko išsaugoti Supabase: '+error.message;return;}
+ spotifyController?.pause();spotifyIsPlaying=false;showMusicPlayerFallback(false);
+ await loadShopMusic();
+ out.textContent=shopMusicDbError?'Išsaugota, bet nuskaitymo klaida: '+shopMusicDbError:'Išsaugota visiems klientams.';
 }
+
 function toggleShopMusic(){
  if(spotifyWanted){
    spotifyWanted=false;spotifyIsPlaying=false;spotifyController?.pause();
