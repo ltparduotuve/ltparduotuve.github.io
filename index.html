@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="lt">
 <head>
-<!-- LTP-BUILD: 20261021-AI-VISIBLE-CHAT -->
-
+<!-- LTP-BUILD: 20261021-HUMAN-CHAT-NOAI-V1 -->
+<meta name="ltparduotuve-build" content="20261021-HUMAN-CHAT-NOAI-V1">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LT PARDUOTUVĖ</title>
-<meta name="lt-chat-version" content="AI-CHAT-20261021-FIX3">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 :root{--bg:#050914;--card:#0a111d;--line:#263650;--blue:#4389ff;--green:#22e5a0;--muted:#8290a8}
@@ -289,34 +288,25 @@ body.auth-locked{overflow:hidden}
 .turnstile-container{min-height:66px;margin:12px 0 7px;display:flex;align-items:center;justify-content:center}
 .turnstile-container:empty{min-height:0}
 
-/* Matomas DI pagalbos mygtukas */
-#aiChatLaunch{width:auto;min-width:165px;height:53px;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 17px;font-size:20px;font-weight:900;white-space:nowrap;letter-spacing:.3px}
-#aiChatLaunch span{font-size:12px;line-height:1.1}
-#aiChatLaunch:focus-visible{outline:3px solid #d3e7ff;outline-offset:3px}
-@media(max-width:450px){#aiChatLaunch{right:12px;bottom:12px;min-width:144px;height:51px;padding:0 13px}#aiChatLaunch span{font-size:11px}}
-/* DI pokalbis – administratoriaus mygtukas pasirodo tik DI režime */
-.chat-human-btn{display:block;width:calc(100% - 20px);margin:6px 10px 2px;padding:10px 12px;
-  border:1px solid #5c8cda;border-radius:9px;background:#132a4c;color:#e7f1ff;
-  font-size:11px;font-weight:750;cursor:pointer}
-.chat-human-btn:hover{border-color:#8ab5ff;background:#1d3d68}
-.chat-human-btn[hidden]{display:none!important}
-.chat-human-btn:disabled,.chat-input button:disabled{opacity:.55;cursor:wait}
-/* DI pagalbos langas: matoma aktyvios versijos žyma */
-#chat{width:min(440px,calc(100vw - 24px));height:min(610px,calc(100vh - 105px));border-color:#4a7bc0}
-#chat .chat-head{background:linear-gradient(120deg,#102547,#081222);padding:17px}
-#chat .chat-head strong{font-size:14px}
-#chat .chat-body{padding:17px;display:flex;flex-direction:column;align-items:flex-start;gap:5px}
-#chat .bubble{font-size:12px;line-height:1.55;padding:11px 13px;max-width:94%}
-#chat .bubble.user{align-self:flex-end}
-#chat .chat-input{padding:13px}
-#chat .chat-input input{font-size:12px;height:42px}
-#chat .chat-input button{padding:10px 16px}
-#chat .ai-version{display:block;margin-top:6px;font-size:8px;letter-spacing:.5px;color:#718aa9}
-/* Išsaugomas naudotojo pageidautas background.png fonas */
-body{min-height:100vh;margin:0;color:#fff;background:linear-gradient(135deg,rgba(3,7,18,.88),rgba(7,15,32,.82)),url("background.png") center / cover no-repeat fixed;background-color:#050914}
-body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 10%,rgba(49,105,220,.12),transparent 45%)}
-body::after{display:none}
-
+/* Puslapio fonas: background.png */
+body {
+    min-height: 100vh;
+    margin: 0;
+    color: #fff;
+    background:
+        linear-gradient(135deg, rgba(3, 7, 18, 0.88), rgba(7, 15, 32, 0.82)),
+        url("background.png") center / cover no-repeat fixed;
+    background-color: #050914;
+}
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 10%, rgba(49, 105, 220, 0.12), transparent 45%);
+}
+body::after { display: none; }
 </style>
 <style id="payment-30min-style">
 .bank-pay-modal{align-items:flex-start;padding:28px 16px;overflow:auto;background:rgba(1,4,10,.96);backdrop-filter:blur(10px)}
@@ -602,17 +592,16 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 
 <div class="contact"><div class="contact-card"><h3>✉️ El. paštas</h3><p>Klausimams ir pagalbai.</p><a class="contact-btn" href="mailto:Geriaunepazink@gmail.com">RAŠYTI EL. PAŠTU →</a></div><div class="contact-card"><h3>💬 Discord / Ticket</h3><p>Prisijunk ir susisiek per ticket.</p><a class="contact-btn" href="https://discord.gg/FGsRsNNBuQ" target="_blank" rel="noopener">ATIDARYTI DISCORD →</a></div></div>
 </main>
-<footer>© 2026 LT PARDUOTUVĖ • Pagalba 24/7</footer>
+<footer>© 2026 LT PARDUOTUVĖ • Klientų pagalba</footer>
 
-<button id="aiChatLaunch" class="chat-launch" type="button" onclick="toggleChat()" aria-controls="chat" aria-label="Atidaryti DI pagalbą" title="Klauskite DI apie prekes, kainas, pristatymą ir užsakymus">🤖 <span>DI PAGALBA</span></button>
-<div class="chat" id="chat"><div class="chat-head"><div><strong id="chatAssistantTitle">🤖 DI klientų pagalba</strong><small>● Jungiamasi prie DI...</small><span class="ai-version">AI-CHAT-20261021-FIX3</span></div><button class="chat-close" onclick="toggleChat()">✕</button></div>
+<button class="chat-launch" type="button" onclick="toggleChat()" aria-label="Klientų pagalba" title="Parašyti administratoriui">💬</button>
+<div class="chat" id="chat"><div class="chat-head"><div><strong>LT Parduotuvė • Susisiekti su mumis</strong><small>● Parašykite administratoriui</small></div><button class="chat-close" type="button" onclick="toggleChat()">✕</button></div>
 <div class="chat-body" id="chatBody">
-<div class="bubble">Parašykite savo žinutę. Pirmiausia su jumis bandys kalbėtis DI.</div>
-<div class="bubble">Jeigu DI negalės padėti, sujungsime su administracija. Pokalbis perduodamas tik jums pasirinkus.</div>
+<div class="bubble">Sveiki! Parašykite savo klausimą.</div>
+<div class="bubble">Žinutę matys parduotuvės administratorius ir atsakys, kai galės.</div>
 </div>
 
-<button id="chatHumanBtn" class="chat-human-btn" onclick="requestChatAdmin()">Susisiekti su administratoriumi</button>
-<div class="chat-input"><input id="msg" maxlength="800" placeholder="Parašykite savo klausimą DI..."><button onclick="send()">Siųsti</button></div></div>
+<div class="chat-input"><input id="msg" placeholder="Parašykite žinutę..." autocomplete="off"><button id="chatSendButton" type="button" onclick="send()">Siųsti</button></div></div>
 
 
 <div id="adminPanel">
@@ -625,7 +614,6 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
    <button class="admin-tab" onclick="adminTab('coupons',this)">🎟️ Kuponai</button>
    <button class="admin-tab" onclick="adminTab('bulk',this)">🛍️ Kiekio akcijos</button>
    <button class="admin-tab" onclick="adminTab('updates',this)">📰 Atnaujinimai</button>
-   <button class="admin-tab" onclick="adminTab('airules',this)">🤖 DI žinios</button>
    <button class="admin-tab" onclick="adminTab('orders',this)">🧾 Užsakymai</button>
    <button class="admin-tab" onclick="adminTab('payments',this)">🏦 Apmokėjimai</button>
    <button class="admin-tab" onclick="adminTab('storelock',this)">🔒 Parduotuvė</button>
@@ -743,18 +731,6 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     <div class="admin-actions full"><button class="admin-primary" onclick="saveCryptoSettings()">Išsaugoti kriptovaliutų nustatymus</button><button class="admin-secondary" onclick="loadCryptoSettings()">Atnaujinti</button></div>
    </div>
    <div class="admin-payment-help">Mokėjimo paskirtis kiekvienam užsakymui sugeneruojama atskirai, pvz. <b>LT-2026-A7F3K9Q2</b>. Klientas turi naudoti būtent savo užsakymo kodą.</div>
-  </section>
-  <section class="admin-section" id="admin-airules">
-   <div class="admin-note"><b>🤖 DI žinios ir taisyklės</b><p style="margin-top:6px">DI automatiškai skaito naujas prekes, kainas, likučius, kategorijas ir aktyvius parduotuvės atnaujinimus. Čia pridėk taisykles, pvz., grąžinimą, garantiją, amžiaus ribojimus ar kontaktus. Išsaugojus jos DI pasiekiamos nuo kito kliento klausimo.</p></div>
-   <div class="admin-form" id="aiRulesForm">
-    <input type="hidden" id="aiRuleEditId">
-    <div class="admin-field full"><label>TAISYKLĖS PAVADINIMAS</label><input id="aiRuleTitle" maxlength="120" placeholder="Pvz. Prekių grąžinimas"></div>
-    <div class="admin-field full"><label>TAISYKLĖS TEKSTAS</label><textarea id="aiRuleContent" rows="6" maxlength="4000" placeholder="Aprašyk tik patvirtintas parduotuvės taisykles ir sąlygas..."></textarea></div>
-    <div class="admin-field"><label>AKTYVI</label><select id="aiRuleActive"><option value="true">Taip – DI matys</option><option value="false">Ne – DI nematys</option></select></div>
-    <div class="admin-actions full"><button class="admin-primary" onclick="saveAIRule()">💾 Išsaugoti taisyklę</button><button class="admin-secondary" onclick="clearAIRuleForm()">Išvalyti</button></div>
-   </div>
-   <div class="admin-actions" style="margin-bottom:12px"><button class="admin-secondary" onclick="loadAdminAIRules()">↻ Atnaujinti</button></div>
-   <div class="admin-list" id="adminAiRuleList"><div class="admin-empty">Kraunama...</div></div>
   </section>
   <section class="admin-section" id="admin-storelock">
    <div class="admin-note"><b>🔒 Parduotuvės prieinamumas</b><br>Čia gali užrakinti parduotuvę visiems klientams. Administratoriui parduotuvė išlieka pasiekiama, todėl galėsi tvarkyti prekes, užsakymus ir kitus nustatymus.</div>
@@ -981,229 +957,76 @@ const supabaseClient = window.supabase.createClient(
   { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.sessionStorage } }
 );
 
-// DI pagalba: privatus dialogas iki tikslinio perdavimo administratoriui.
-let chatUser=null,chatThread=null,chatChannel=null,chatReady=false;
-let chatThreadPromise=null,chatInitPromise=null,chatInitDone=false;
-let aiConversationId=null,aiChatMode="ai",aiChatBusy=false;
-const renderedMessageIds=new Set();
-const AI_HUMAN_STORAGE_PREFIX="ltp_ai_human_thread_";
-async function ensureChatUser(){
-  if(chatUser)return chatUser;
-  const {data,error}=await supabaseClient.auth.getSession();
-  if(error)throw error;
-  if(!data.session?.user)throw new Error("Reikia prisijungti prie paskyros.");
-  chatUser=data.session.user;
-  return chatUser;
-}
-function setChatStatus(text,online=false){
-  const s=document.querySelector(".chat-head small");
-  if(s){s.textContent="● "+text;s.style.color=online?"#20e5a0":"#f0b44d"}
-}
-function setChatBusy(isBusy){
-  aiChatBusy=!!isBusy;
-  const input=document.getElementById("msg");
-  const sendBtn=document.querySelector("#chat .chat-input button");
-  const handoff=document.getElementById("chatHumanBtn");
-  if(input)input.disabled=aiChatBusy;
-  if(sendBtn)sendBtn.disabled=aiChatBusy;
-  if(handoff)handoff.disabled=aiChatBusy;
-}
-function syncChatModeUI(){
-  const btn=document.getElementById("chatHumanBtn");
-  if(btn)btn.hidden=aiChatMode!=="ai";
-  const title=document.getElementById("chatAssistantTitle");
-  if(title)title.textContent=aiChatMode==="human"?"LT Parduotuvė • Administratorius":"🤖 DI klientų pagalba";
-}
-function aiHumanStoreKey(){return AI_HUMAN_STORAGE_PREFIX+(chatUser?.id||"")}
-function formatAIError(error){
-  const details=error?.context;
-  if(details?.status===401)return "HTTP 401: funkcija nepriima prisijungimo žetono. Patikrinkite Supabase JWT nustatymus ir prisijungimą.";
-  if(details?.status===404)return "HTTP 404: ai-chat funkcija nerasta šiame Supabase projekte.";
-  if(details?.status===500)return "HTTP 500: DI serverio klaida. Tikrinkite Edge Functions → ai-chat → Logs.";
-  return error?.message||"DI funkcija šiuo metu nepasiekiama.";
-}
-async function callAIChat(action,values={}){
-  const {data,error}=await supabaseClient.functions.invoke("ai-chat",{body:{action,...values}});
-  if(error)throw new Error(formatAIError(error));
-  if(data?.error)throw new Error(data.error);
-  return data;
-}
-function renderAIHistory(messages){
-  const body=document.getElementById("chatBody");
-  if(!body)return;
-  body.replaceChildren();
-  for(const msg of (messages||[]))bubble(msg.content,msg.role==="customer"?"user":"");
-  if(!messages?.length){
-    bubble("Parašykite savo žinutę – pirmiausia su jumis bandys kalbėtis DI.");
-    bubble("Jeigu nepavyks padėti, galėsite susisiekti su administracija.");
-  }
-}
-async function ensureChatThread(threadId){
+let chatUser=null,chatThread=null,chatChannel=null,chatReady=false;const renderedMessageIds=new Set();
+async function ensureChatUser(){if(chatUser)return chatUser;const {data,error}=await supabaseClient.auth.getSession();if(error)throw error;if(!data.session?.user)throw new Error("Reikia prisijungti prie paskyros.");chatUser=data.session.user;return chatUser}
+function setChatStatus(text,online=false){const s=document.querySelector(".chat-head small");if(s){s.textContent="● "+text;s.style.color=online?"#20e5a0":"#f0b44d"}}
+let chatThreadPromise=null;
+async function ensureChatThread(){
   const user=await ensureChatUser();
-  if(chatThread?.user_id===user.id && chatThread.thread_id===threadId)return chatThread;
+  if(chatThread?.user_id===user.id && (chatThread.status==="open" || (chatThread.status==="solved"&&!chatThread.rating)))return chatThread;
   if(chatThreadPromise)return chatThreadPromise;
   chatThreadPromise=(async()=>{
-    const {data,error}=await supabaseClient.from("chat_sessions").select("*")
-      .eq("user_id",user.id).eq("thread_id",threadId).maybeSingle();
+    // Iš naujo prisijungus naudojama ta pati aktyvi sesija, nepriklausomai nuo jos amžiaus.
+    const {data,error}=await supabaseClient.from("chat_sessions").select("*").eq("user_id",user.id).in("status",["open","solved"]).order("created_at",{ascending:false});
     if(error)throw error;
-    if(!data)throw new Error("Administratoriaus pokalbis nerastas.");
-    chatThread=data;
-    return data;
+    const existing=(data||[]).find(x=>x.status==="open")||(data||[]).find(x=>x.status==="solved"&&!x.rating);
+    if(existing){chatThread=existing;return existing}
+    const thread={user_id:user.id,user_email:user.email||"",thread_id:crypto.randomUUID(),status:"open",last_activity:new Date().toISOString()};
+    const ins=await supabaseClient.from("chat_sessions").insert(thread).select("*").single();
+    if(ins.error){
+      // Jei pokalbis vienu metu jau buvo sukurtas kitame skirtuke, naudojame jį.
+      const retry=await supabaseClient.from("chat_sessions").select("*").eq("user_id",user.id).eq("status","open").order("created_at",{ascending:false}).limit(1).maybeSingle();
+      if(retry.error||!retry.data)throw ins.error;
+      chatThread=retry.data;return retry.data;
+    }
+    chatThread=ins.data;return ins.data;
   })();
   try{return await chatThreadPromise}finally{chatThreadPromise=null}
 }
-function renderChatMessage(row){
-  if(!row||renderedMessageIds.has(row.id))return;
-  renderedMessageIds.add(row.id);
-  bubble(row.message,row.sender==="customer"?"user":"");
-}
-async function loadChatMessages(){
-  if(!chatThread)return;
+async function loadChatMessages(){await ensureChatThread();const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",chatThread.thread_id).order("created_at",{ascending:true});if(error)throw error;const body=document.getElementById("chatBody");body.innerHTML="";renderedMessageIds.clear();(data||[]).forEach(renderChatMessage);if(chatThread.status==="solved"&&!chatThread.rating){showChatRating();return}if(!data?.length){bubble("Sveiki! Parašykite savo klausimą.");bubble("Žinutę matys parduotuvės administratorius ir atsakys, kai galės.")}}
+function renderChatMessage(row){if(!row||renderedMessageIds.has(row.id))return;renderedMessageIds.add(row.id);bubble(row.message,row.sender==="customer"?"user":"")}
+function subscribeToChat(){if(chatChannel||!chatThread)return;chatChannel=supabaseClient.channel("customer-live-"+chatThread.thread_id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"session_id=eq."+chatThread.thread_id},p=>renderChatMessage(p.new)).on("postgres_changes",{event:"UPDATE",schema:"public",table:"chat_sessions",filter:"id=eq."+chatThread.id},p=>{chatThread=p.new;if(p.new.status==="solved"&&!p.new.rating)showChatRating()}).subscribe(st=>{if(st==="SUBSCRIBED"){chatReady=true;setChatStatus("Ryšys veikia • rašykite administratoriui",true)}})}
+// Fallback if Supabase Realtime events aren't enabled on the messages table.
+async function pollCustomerChatMessages(){
+  if(!chatThread?.thread_id)return;
   const {data,error}=await supabaseClient.from("messages")
     .select("id,session_id,sender,message,created_at")
     .eq("session_id",chatThread.thread_id).order("created_at",{ascending:true});
   if(error)throw error;
-  const body=document.getElementById("chatBody");
-  body.replaceChildren();renderedMessageIds.clear();
-  (data||[]).forEach(renderChatMessage);
-  if(chatThread.status==="solved"&&!chatThread.rating){showChatRating();return}
-  if(!data?.length)bubble("Pokalbis perduotas administratoriui. Laukite atsakymo.");
+  for(const row of data||[])renderChatMessage(row);
 }
-function subscribeToChat(){
-  if(chatChannel||!chatThread)return;
-  chatChannel=supabaseClient.channel("customer-live-"+chatThread.thread_id)
-    .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"session_id=eq."+chatThread.thread_id},p=>renderChatMessage(p.new))
-    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"chat_sessions",filter:"id=eq."+chatThread.id},p=>{
-      chatThread=p.new;
-      if(p.new.status==="solved"&&!p.new.rating)showChatRating();
-    }).subscribe(st=>{
-      if(st==="SUBSCRIBED"){
-        chatReady=true;
-        setChatStatus("Pokalbis perduotas administratoriui",true);
-      }
-    });
-}
+window.setInterval(()=>{
+  if(document.visibilityState==="visible" && document.getElementById("chat")?.classList.contains("open") && chatThread?.thread_id){
+    pollCustomerChatMessages().catch(e=>console.warn("Chat atnaujinimas:",e));
+  }
+},12000);
+let chatInitPromise=null;
 async function initChat(){
-  if(chatInitDone)return;
+  if(chatReady)return;
   if(chatInitPromise)return chatInitPromise;
-  chatInitPromise=(async()=>{
-    setChatStatus("Jungiamasi prie DI...");
-    try{
-      const user=await ensureChatUser();
-      const savedThread=sessionStorage.getItem(aiHumanStoreKey());
-      if(savedThread){
-        try{
-          await ensureChatThread(savedThread);
-          if(chatThread.status==="open" || (chatThread.status==="solved"&&!chatThread.rating)){
-            aiChatMode="human";aiConversationId=null;
-            syncChatModeUI();await loadChatMessages();subscribeToChat();
-            setChatStatus("Pokalbis su administratoriumi",true);
-            chatInitDone=true;return;
-          }
-        }catch(e){console.warn("Previous chat unavailable:",e)}
-        sessionStorage.removeItem(aiHumanStoreKey());chatThread=null;
-      }
-      const ai=await callAIChat("start");
-      aiConversationId=ai.conversationId;
-      aiChatMode="ai";chatReady=true;
-      syncChatModeUI();renderAIHistory(ai.messages);
-      setChatStatus("DI pagalba • privatus pokalbis",true);
-      chatInitDone=true;
-    }catch(e){
-      console.error("AI chat initialization error:",e);
-      chatInitDone=false;chatReady=false;
-      setChatStatus("DI ryšio klaida – tikrinkite Supabase Logs");
-      const body=document.getElementById("chatBody");if(body)body.replaceChildren();
-      bubble("DI ryšio klaida: "+formatAIError(e)+". Parduotuvės administratoriui: Supabase → Edge Functions → ai-chat → Logs. Jei klaida 401, prisijunkite iš naujo.");
-    }
-  })();
-  try{return await chatInitPromise}finally{chatInitPromise=null}
+  chatInitPromise=(async()=>{setChatStatus("Jungiamasi...");try{await ensureChatUser();await ensureChatThread();await loadChatMessages();subscribeToChat()}catch(e){console.error(e);setChatStatus("Nepavyko prisijungti");bubble("Nepavyko prisijungti prie pokalbio. Pabandykite perkrauti puslapį.")}})();
+  try{await chatInitPromise}finally{chatInitPromise=null}
 }
 async function sendChatMessage(text){
   const message=String(text||"").trim();
-  if(!message || aiChatBusy)return;
-  if(message.length>800){bubble("Žinutė negali viršyti 800 simbolių.");return}
-  setChatBusy(true);
+  if(!message)return false;
   try{
     await initChat();
-    if(!chatInitDone)return;
-    if(aiChatMode==="ai"){
-      if(!aiConversationId)throw new Error("DI pokalbis nesukurtas.");
-      bubble(message,"user");
-      setChatStatus("DI rašo atsakymą...");
-      const data=await callAIChat("send",{conversationId:aiConversationId,message});
-      bubble(data.reply||"Atsakymas negautas.");
-      setChatStatus("DI pagalba • privatus pokalbis",true);
-    }else{
-      if(!chatThread)throw new Error("Nėra aktyvaus pokalbio.");
-      if(chatThread.status==="solved"){showChatRating();return}
-      const {error}=await supabaseClient.from("messages")
-        .insert({session_id:chatThread.thread_id,sender:"customer",message});
-      if(error)throw error;
-      await supabaseClient.from("chat_sessions")
-        .update({last_activity:new Date().toISOString()}).eq("id",chatThread.id);
-    }
-  }catch(e){
-    console.error("AI chat message error:",e);
-    bubble("Nepavyko išsiųsti žinutės: "+formatAIError(e));
-    if(aiChatMode==="ai")setChatStatus("DI pagalba • privatus pokalbis",true);
-  }finally{setChatBusy(false)}
+    if(!chatThread)throw new Error("Pokalbis neprijungtas");
+    if(chatThread.status==="solved"){showChatRating();return false}
+    const {error}=await supabaseClient.from("messages").insert({session_id:chatThread.thread_id,sender:"customer",message});
+    if(error)throw error;
+    await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("id",chatThread.id);
+    // Patvirtintas išsiuntimas neturi būti laikomas klaida, jei tik nepavyko atnaujinti istorijos.
+    try{await pollCustomerChatMessages()}catch(refreshError){console.warn("Pokalbio istorijos atnaujinimas:",refreshError);toast("Žinutė išsiųsta")}
+    return true;
+  }catch(e){console.error("Pokalbio žinutė:",e);bubble("Žinutės išsiųsti nepavyko. Bandykite dar kartą.");return false}
 }
-async function requestChatAdmin(){
-  if(aiChatBusy||aiChatMode!=="ai")return;
-  setChatBusy(true);
-  try{
-    await initChat();
-    if(!aiConversationId)throw new Error("Pokalbis dar neužkrautas.");
-    setChatStatus("Perduodama administratoriui...");
-    const result=await callAIChat("handoff",{conversationId:aiConversationId});
-    const threadId=result.humanThreadId;
-    if(!threadId)throw new Error("Negrąžintas administratoriaus pokalbio ID.");
-    await ensureChatThread(threadId);
-    sessionStorage.setItem(aiHumanStoreKey(),threadId);
-    aiChatMode="human";aiConversationId=null;
-    syncChatModeUI();
-    const {data}=await supabaseClient.from("messages").select("id")
-      .eq("session_id",threadId).order("created_at",{ascending:true});
-    (data||[]).forEach(m=>renderedMessageIds.add(m.id));
-    bubble("✓ Pokalbis perduotas administratoriui. Jis matys ankstesnę DI pokalbio istoriją.");
-    subscribeToChat();
-    setChatStatus("Pokalbis perduotas administratoriui",true);
-  }catch(e){
-    console.error("AI chat handoff error:",e);
-    bubble("Nepavyko perduoti pokalbio: "+formatAIError(e));
-    setChatStatus("DI pagalba • privatus pokalbis",true);
-  }finally{setChatBusy(false)}
-}
-async function solveChat(){
-  if(!chatThread)return;
-  const r=await supabaseClient.from("chat_sessions")
-    .update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()})
-    .eq("id",chatThread.id).eq("status","open");
-  if(r.error)return alert("Nepavyko uždaryti pokalbio.");
-  chatThread={...chatThread,status:"solved"};showChatRating();
-}
-function showChatRating(){
-  const body=document.getElementById("chatBody");
-  body.innerHTML=`<div class="chat-solved"><b>✓ Pokalbis uždarytas</b><p>Įvertinkite administratoriaus pagalbą nuo 1 iki 5</p><div class="rating-stars">${[1,2,3,4,5].map(n=>`<button id="ratingStar${n}" onclick="selectChatRating(${n})">☆</button>`).join("")}</div><input id="ratingText" placeholder="Komentaras (nebūtina)"><button class="chat-rate-submit" onclick="rateChat()">Pateikti įvertinimą</button><button class="chat-rate-submit" style="margin-top:6px;border-color:#33465f;background:#0d1726" onclick="closeChatWithoutRating()">Uždaryti</button></div>`;
-  window.selectedChatRating=0;
-}
+async function solveChat(){if(!chatThread)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("id",chatThread.id).eq("status","open");if(r.error)return alert("Nepavyko uždaryti pokalbio.");chatThread={...chatThread,status:"solved"};showChatRating()}
+function showChatRating(){const body=document.getElementById("chatBody");body.innerHTML=`<div class="chat-solved"><b>✓ Pokalbis uždarytas</b><p>Jeigu nori, gali įvertinti administratoriaus pagalbą nuo 1 iki 5 ⭐</p><div class="rating-stars">${[1,2,3,4,5].map(n=>`<button id="ratingStar${n}" onclick="selectChatRating(${n})">☆</button>`).join("")}</div><input id="ratingText" placeholder="Komentaras (nebūtina)"><button class="chat-rate-submit" onclick="rateChat()">⭐ Pateikti įvertinimą</button><button class="chat-rate-submit" style="margin-top:6px;border-color:#33465f;background:#0d1726" onclick="closeChatWithoutRating()">Uždaryti</button></div>`;window.selectedChatRating=0}
 function selectChatRating(star){window.selectedChatRating=star;for(let i=1;i<=5;i++){const b=document.getElementById("ratingStar"+i);if(b)b.textContent=i<=star?"★":"☆"}}
 function closeChatWithoutRating(){document.getElementById("chat").classList.remove("open")}
-async function rateChat(){
-  const star=Number(window.selectedChatRating||0);
-  if(!chatThread)return;
-  if(!star)return alert("Pirmiausia pasirinkite 1–5 žvaigždutes.");
-  const comment=document.getElementById("ratingText")?.value.trim()||null;
-  const {error}=await supabaseClient.from("chat_sessions").update({rating:star,rating_comment:comment,rated_at:new Date().toISOString(),status:"rated",closed_at:new Date().toISOString()}).eq("id",chatThread.id);
-  if(error)return alert("Nepavyko išsaugoti įvertinimo.");
-  sessionStorage.removeItem(aiHumanStoreKey());
-  if(chatChannel){supabaseClient.removeChannel(chatChannel);chatChannel=null}
-  chatReady=false;chatInitDone=false;chatThread=null;chatUser=null;aiChatMode="ai";aiConversationId=null;
-  renderedMessageIds.clear();window.selectedChatRating=0;
-  document.getElementById("chat").classList.remove("open");
-  toast("✓ Ačiū už įvertinimą!");
-}
+async function rateChat(){const star=Number(window.selectedChatRating||0);if(!chatThread)return;if(!star)return alert("Pirmiausia pasirink 1–5 žvaigždutes.");const comment=document.getElementById("ratingText")?.value.trim()||null;const {error}=await supabaseClient.from("chat_sessions").update({rating:star,rating_comment:comment,rated_at:new Date().toISOString(),status:"rated",closed_at:new Date().toISOString()}).eq("id",chatThread.id);if(error)return alert("Nepavyko išsaugoti įvertinimo.");if(chatChannel){supabaseClient.removeChannel(chatChannel);chatChannel=null}chatReady=false;chatThread=null;renderedMessageIds.clear();window.selectedChatRating=0;document.getElementById("chat").classList.remove("open");toast("✓ Ačiū už įvertinimą!")}
 
 setTimeout(()=>{const intro=document.getElementById("intro"); if(intro) intro.remove()},4300);
 
@@ -1468,7 +1291,7 @@ async function logoutAndLock(message="Sesija baigėsi. Prisijunkite iš naujo.")
     document.getElementById("mfaChallengeGate")?.classList.remove("open");
     mfaPendingFactor=null;
     clearAuthExpiry();
-    chatUser=null;chatThread=null;chatThreadPromise=null;chatInitPromise=null;chatReady=false;chatInitDone=false;aiConversationId=null;aiChatMode="ai";aiChatBusy=false;renderedMessageIds.clear();syncChatModeUI();
+    chatUser=null;chatThread=null;chatThreadPromise=null;chatInitPromise=null;chatReady=false;
     if(chatChannel){try{supabaseClient.removeChannel(chatChannel)}catch(e){} chatChannel=null;}
     try{await supabaseClient.auth.signOut({scope:"local"});}catch(e){console.error(e)}
     document.getElementById("userDropdown")?.classList.remove("open");
@@ -1755,7 +1578,7 @@ async function refreshCartInventory(){
   if(updated)saveCartSnapshot();
 }
 function startInventoryRefresh(){if(inventoryRefreshTimer)return;inventoryRefreshTimer=window.setInterval(async()=>{if(document.visibilityState!=="hidden"){await loadStoreProducts();await refreshCartInventory();}},8000);}
-async function initAdmin(user){await checkAdmin(user);await applyStoreLock();subscribeStoreLock();startStoreLockPolling();startStoreLockCountdown();await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();startInventoryRefresh();await loadPaymentSettings();await loadPublicUpdates();subscribePublicUpdates();if(isAdmin)subscribeAdminChat();}
+async function initAdmin(user){await checkAdmin(user);await applyStoreLock();subscribeStoreLock();startStoreLockPolling();startStoreLockCountdown();await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();startInventoryRefresh();await loadPaymentSettings();await loadPublicUpdates();subscribePublicUpdates();if(isAdmin){subscribeAdminChat();startAdminChatPolling();}}
 async function openAdmin(){
   document.getElementById("userDropdown")?.classList.remove("open");
   if(!isAdmin)return alert("Neturite administratoriaus teisių.");
@@ -1766,52 +1589,8 @@ function closeAdmin(){document.getElementById("adminPanel").classList.remove("op
 function adminTab(name,btn){
   document.querySelectorAll(".admin-tab").forEach(x=>x.classList.remove("active"));
   document.querySelectorAll(".admin-section").forEach(x=>x.classList.remove("active"));
-  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="updates")loadAdminUpdates();if(name==="bulk")loadAdminBulkDiscounts();if(name==="payments"){loadPaymentSettings();loadCryptoSettings();}if(name==="storelock")loadStoreLockSettings();if(name==="airules")loadAdminAIRules();
+  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="updates")loadAdminUpdates();if(name==="bulk")loadAdminBulkDiscounts();if(name==="payments"){loadPaymentSettings();loadCryptoSettings();}if(name==="storelock")loadStoreLockSettings();
 }
-// DI taisykles: saugomos Supabase; klientai negali skaityti/redaguoti sios admin lenteles.
-let adminAIRules=[];
-async function loadAdminAIRules(){
-  if(!isAdmin)return;
-  const el=document.getElementById('adminAiRuleList');if(!el)return;
-  el.innerHTML='<div class="admin-empty">Kraunama...</div>';
-  const {data,error}=await supabaseClient.from('store_ai_rules').select('id,title,content,active,updated_at')
-    .order('updated_at',{ascending:false});
-  if(error){console.error('DI rules:',error);el.innerHTML='<div class="admin-empty">DI taisyklės nepasiekiamos. Pirmiausia paleisk 01_DI_TAISYKLES_SQL.sql.</div>';return}
-  adminAIRules=data||[];
-  if(!adminAIRules.length){el.innerHTML='<div class="admin-empty">Taisyklių dar nėra. Pridėk pirmą.</div>';return}
-  el.innerHTML=adminAIRules.map(r=>`<div class="admin-product"><div class="admin-product-info"><b>${escapeHtml(r.title)} • ${r.active?'🟢 Aktyvi':'🔴 Išjungta'}</b><small style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHtml(r.content.slice(0,550))}${r.content.length>550?'…':''}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick="editAIRule('${r.id}')">✏️ Redaguoti</button><button class="admin-danger" onclick="deleteAIRule('${r.id}')">🗑️ Ištrinti</button></div></div>`).join('');
-}
-function editAIRule(id){
-  if(!isAdmin)return;const r=adminAIRules.find(x=>x.id===id);if(!r)return;
-  document.getElementById('aiRuleEditId').value=r.id;
-  document.getElementById('aiRuleTitle').value=r.title;
-  document.getElementById('aiRuleContent').value=r.content;
-  document.getElementById('aiRuleActive').value=String(r.active);
-  document.getElementById('aiRulesForm').scrollIntoView({behavior:'smooth',block:'center'});
-}
-function clearAIRuleForm(){
-  ['aiRuleEditId','aiRuleTitle','aiRuleContent'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('aiRuleActive').value='true';
-}
-async function saveAIRule(){
-  if(!isAdmin)return alert('Neturite administratoriaus teisių.');
-  const title=document.getElementById('aiRuleTitle').value.trim();
-  const content=document.getElementById('aiRuleContent').value.trim();
-  const active=document.getElementById('aiRuleActive').value==='true';
-  const id=document.getElementById('aiRuleEditId').value;
-  if(!title||!content||title.length>120||content.length>4000)return alert('Įrašyk pavadinimą (iki 120) ir tekstą (iki 4000 simbolių).');
-  const payload={title,content,active,updated_at:new Date().toISOString()};
-  const result=id?await supabaseClient.from('store_ai_rules').update(payload).eq('id',id):await supabaseClient.from('store_ai_rules').insert(payload);
-  if(result.error){console.error('Save DI rule:',result.error);return alert('Taisyklė neišsaugota. Patikrink DI SQL ir administratoriaus teises.');}
-  clearAIRuleForm();await loadAdminAIRules();toast('✓ DI taisyklė išsaugota.');
-}
-async function deleteAIRule(id){
-  if(!isAdmin||!confirm('Ištrinti DI taisyklę?'))return;
-  const {error}=await supabaseClient.from('store_ai_rules').delete().eq('id',id);
-  if(error){console.error('Delete DI rule:',error);return alert('Nepavyko ištrinti taisyklės.');}
-  clearAIRuleForm();await loadAdminAIRules();toast('✓ DI taisyklė ištrinta.');
-}
-
 async function loadAdminStats(){
   const p=await supabaseClient.from("products").select("id",{count:"exact",head:true});
   document.getElementById("statProducts").textContent=p.count??"0";
@@ -2447,13 +2226,47 @@ Mokėjimo paskirtis: ${o.payment_reference||"—"}`);
 }
 
 let adminChatSessionId=null,adminChatRows=[],adminChatChannel=null,adminChatNotificationSession=null;const adminUnreadChats=new Set(),adminUnreadChatCounts=new Map();
-function showAdminNotification(row){if(!isAdmin||row?.sender!=="customer")return;adminChatNotificationSession=row.session_id;const n=document.getElementById("adminChatNotification");document.getElementById("adminChatNotificationTitle")?.replaceChildren(document.createTextNode("💬 Nauja kliento žinutė"));const x=document.getElementById("adminChatNotificationText");if(x)x.textContent=(row.message||"").slice(0,90);n?.classList.add("show");adminUnreadChats.add(row.session_id);adminUnreadChatCounts.set(row.session_id,(adminUnreadChatCounts.get(row.session_id)||0)+1);updateAdminChatBadge();refreshAdminChatUsers();}
+const adminKnownCustomerMessageIds=new Set();
+let adminInboxPollPrimed=false;
+function showAdminNotification(row){if(!isAdmin||row?.sender!=="customer")return;if(row.id&&adminKnownCustomerMessageIds.has(row.id))return;if(row.id)adminKnownCustomerMessageIds.add(row.id);adminChatNotificationSession=row.session_id;const n=document.getElementById("adminChatNotification");document.getElementById("adminChatNotificationTitle")?.replaceChildren(document.createTextNode("💬 Nauja kliento žinutė"));const x=document.getElementById("adminChatNotificationText");if(x)x.textContent=(row.message||"").slice(0,90);n?.classList.add("show");adminUnreadChats.add(row.session_id);adminUnreadChatCounts.set(row.session_id,(adminUnreadChatCounts.get(row.session_id)||0)+1);updateAdminChatBadge();refreshAdminChatUsers();}
 function hideAdminNotification(){document.getElementById("adminChatNotification")?.classList.remove("show")}
 function openAdminFromNotification(){const sid=adminChatNotificationSession;hideAdminNotification();document.getElementById("adminPanel")?.classList.add("open");const tab=[...document.querySelectorAll(".admin-tab")].find(x=>x.textContent.includes("Klientų chat"));if(tab)adminTab("chat",tab);if(sid)openAdminChat(sid)}
 async function loadAdminChats(){if(!isAdmin)return;const {data,error}=await supabaseClient.from("chat_sessions").select("*").order("created_at",{ascending:false});if(error){console.error(error);return}window.adminChatSessions=Object.fromEntries((data||[]).map(x=>[x.thread_id,x]));const active=(data||[]).filter(x=>x.status==="open");const users=document.getElementById("adminChatUsers");if(!users)return;users.innerHTML=active.length?active.map(x=>`<div class="admin-chat-user ${x.thread_id===adminChatSessionId?"active":""} ${adminUnreadChats.has(x.thread_id)?"unread":""}" onclick="openAdminChat('${x.thread_id}')"><b>${escapeHtml(x.user_email||x.user_id.slice(0,8)+"…")}</b>${adminUnreadChats.has(x.thread_id)?'<span class="unread-dot">●</span>':''}<small>${x.status.toUpperCase()} • ${formatDate(x.last_activity||x.created_at)}</small></div>`).join(""):'<div class="admin-empty">Aktyvių klientų chatų nėra.</div>';subscribeAdminChat()}
 async function openAdminChat(sid){adminChatSessionId=sid;adminUnreadChats.delete(sid);adminUnreadChatCounts.delete(sid);updateAdminChatBadge();const session=window.adminChatSessions?.[sid];const title=document.getElementById("adminChatTitle");if(title)title.innerHTML=`💬 ${escapeHtml(session?.user_email||"Klientas")} <button class="admin-secondary" style="float:right;margin-left:6px" onclick="solveAdminChat('${sid}')">✓ Uždaryti chatą</button><button class="admin-danger" style="float:right" onclick="deleteAdminChat('${sid}')">🗑️ Ištrinti chatą</button>`;const {data,error}=await supabaseClient.from("messages").select("id,session_id,sender,message,created_at").eq("session_id",sid).order("created_at",{ascending:true});if(error){console.error(error);return}const body=document.getElementById("adminChatBody");body.innerHTML=(data||[]).map(m=>`<div class="admin-chat-bubble ${m.sender==="admin"?"admin":""}">${escapeHtml(m.message)}<span class="admin-chat-time">${m.sender==="admin"?"Administratorius":"Klientas"} • ${formatDate(m.created_at)}</span></div>`).join("")||'<div class="admin-empty">Žinučių nėra.</div>';body.scrollTop=body.scrollHeight;loadAdminChats()}
 async function solveAdminChat(sid){if(!isAdmin||!sid)return;const r=await supabaseClient.from("chat_sessions").update({status:"solved",solved_at:new Date().toISOString(),last_activity:new Date().toISOString()}).eq("thread_id",sid).eq("status","open");if(r.error)return alert("Nepavyko uždaryti pokalbio.");adminChatSessionId=null;await loadAdminChats();const title=document.getElementById("adminChatTitle");if(title)title.textContent="💬 Pokalbis uždarytas — klientui parodytas įvertinimas.";const body=document.getElementById("adminChatBody");if(body)body.innerHTML='<div class="admin-note">✓ Pokalbis uždarytas. Klientui parodytas įvertinimas. Jis gali pradėti naują pokalbį po įvertinimo.</div>'}
 function refreshAdminChatUsers(){loadAdminChats()}
+// Pranešti apie naujas klientų žinutes ir be Supabase Realtime.
+async function pollAdminInbox(){
+  if(!isAdmin)return;
+  const {data,error}=await supabaseClient.from("messages")
+    .select("id,session_id,sender,message,created_at")
+    .eq("sender","customer").order("created_at",{ascending:false}).limit(60);
+  if(error)throw error;
+  const rows=(data||[]).reverse();
+  if(!adminInboxPollPrimed){
+    for(const row of rows){if(row.id)adminKnownCustomerMessageIds.add(row.id)}
+    adminInboxPollPrimed=true;
+    return;
+  }
+  for(const row of rows){if(row.id&&!adminKnownCustomerMessageIds.has(row.id))showAdminNotification(row)}
+}
+// Keep the admin inbox up to date if the browser missed a Realtime event.
+let adminChatPollingHandle=null;
+function startAdminChatPolling(){
+  if(adminChatPollingHandle)return;
+  pollAdminInbox().catch(e=>console.warn("Naujų žinučių patikra:",e));
+  adminChatPollingHandle=window.setInterval(()=>{
+    if(!isAdmin||document.visibilityState!=="visible")return;
+    pollAdminInbox().catch(e=>console.warn("Naujų žinučių patikra:",e));
+    const pane=document.getElementById("adminPanel");
+    if(pane?.classList.contains("open")){
+      loadAdminChats().catch(e=>console.warn("Chat sąrašas:",e));
+      if(adminChatSessionId && document.getElementById("admin-chat")?.classList.contains("active")){
+        openAdminChat(adminChatSessionId).catch(e=>console.warn("Chat žinutės:",e));
+      }
+    }
+  },15000);
+}
 function subscribeAdminChat(){if(adminChatChannel||!isAdmin)return;adminChatChannel=supabaseClient.channel("admin-live-chat-v3").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},async p=>{if(p.new?.sender!=="customer")return;showAdminNotification(p.new);await loadAdminChats();if(adminChatSessionId===p.new.session_id)await openAdminChat(p.new.session_id)}).subscribe(()=>{});}
 async function sendAdminChat(){if(!isAdmin||!adminChatSessionId)return alert("Pasirink klientą.");const session=window.adminChatSessions?.[adminChatSessionId];if(!session||session.status!=="open")return alert("Šis pokalbis jau uždarytas.");const input=document.getElementById("adminChatInput"),message=input.value.trim();if(!message)return;const {error}=await supabaseClient.from("messages").insert({session_id:adminChatSessionId,sender:"admin",message});if(error)return alert("Nepavyko išsiųsti atsakymo. Patikrink RLS SQL.");input.value="";await supabaseClient.from("chat_sessions").update({last_activity:new Date().toISOString()}).eq("thread_id",adminChatSessionId);await openAdminChat(adminChatSessionId)}
 async function deleteAdminChat(sid){if(!isAdmin||!confirm("Ištrinti šį chatą visam laikui?"))return;const r=await supabaseClient.from("messages").delete().eq("session_id",sid);if(r.error)return alert("Nepavyko ištrinti žinučių.");const ss=await supabaseClient.from("chat_sessions").delete().eq("thread_id",sid);if(ss.error)return alert("Nepavyko ištrinti chat sesijos.");adminChatSessionId=null;await loadAdminChats();document.getElementById("adminChatTitle").textContent="💬 Pasirink klientą";document.getElementById("adminChatBody").innerHTML='<div class="admin-empty">Chat ištrintas.</div>'}
@@ -2982,8 +2795,17 @@ function bubble(t,who){
   b.scrollTop=b.scrollHeight;
 }
 
+let sendingHumanChat=false;
 async function send(){
-  const i=document.getElementById("msg"); const t=i.value.trim(); if(!t)return; i.value=""; await sendChatMessage(t);
+  const i=document.getElementById("msg"),btn=document.getElementById("chatSendButton");
+  const t=i.value.trim();
+  if(!t||sendingHumanChat)return;
+  sendingHumanChat=true;
+  btn.disabled=true;
+  try{
+    const sent=await sendChatMessage(t);
+    if(sent){i.value="";i.focus()}
+  }finally{sendingHumanChat=false;btn.disabled=false}
 }
 
 document.getElementById("msg").addEventListener("keydown",e=>{
