@@ -323,6 +323,23 @@ body::after { display: none; }
 .product-media-preview-item{position:relative;flex:0 0 78px}
 .product-media-preview img{width:78px;height:73px;object-fit:cover;border:1px solid #385274;border-radius:9px;background:#111e30}
 .product-media-preview small{display:block;text-align:center;color:#8ea3bf;font-size:9px;padding-top:3px}
+
+/* ADMIN: PREKĖS NUOTRAUKŲ EILIŠKUMAS */
+.product-photo-order-help{margin:9px 0 0;color:#93a9c7;font-size:11px;line-height:1.55}
+.product-media-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:11px;overflow:visible;align-items:start;margin-top:12px}
+.product-media-preview-item{min-width:0;position:relative;padding:9px;background:#0a182a;border:1px solid #304967;border-radius:12px;box-shadow:0 5px 14px #0003}
+.product-media-preview-item.is-main{border-color:#61a0ff;background:linear-gradient(160deg,#17365b,#0a182a);box-shadow:0 0 0 1px #4389ff55}
+.product-media-preview-item img{width:100%;height:110px;object-fit:contain;border:1px solid #243e60;border-radius:8px;background:#07101e}
+.product-media-preview-item small{display:block;color:#a4b9d4;font-size:10px;line-height:1.35;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.photo-order-number{display:flex;align-items:center;justify-content:space-between;gap:5px;color:#eaf2ff;font-weight:800;font-size:11px;margin-bottom:7px}
+.photo-main-badge{font-size:9px;color:#75f0c8;background:#10362f;border:1px solid #2b9475;padding:3px 6px;border-radius:99px}
+.photo-order-actions{display:flex;gap:5px;margin-top:9px}
+.photo-order-actions button{flex:1;min-width:0;height:31px;cursor:pointer;background:#142744;border:1px solid #3e628f;color:#e2efff;border-radius:7px;font-size:12px}
+.photo-order-actions button:hover:not(:disabled){background:#214b82;border-color:#6fa7f4}
+.photo-order-actions button:disabled{opacity:.3;cursor:not-allowed}
+.photo-order-actions button.photo-main-btn{flex:2;font-size:9px;font-weight:800}
+@media(max-width:520px){.product-media-preview{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 #productImageFiles{padding:12px;background:#071222;border:1px dashed #5173a3;border-radius:9px;cursor:pointer;width:100%}
 #productImageFiles::file-selector-button{padding:8px 11px;border-radius:7px;border:1px solid #4b82d4;background:#123460;color:#fff;cursor:pointer;margin-right:10px}
 .product-modal-gallery{display:flex;flex-direction:column;background:#0d1625;min-width:0}
@@ -677,7 +694,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     <div class="admin-field"><label>KATEGORIJA</label><select id="productCategory"></select></div>
     <div class="admin-field"><label>PAGRINDINĖS NUOTRAUKOS URL (NEPRIVALOMA)</label><input id="productImage" type="url" placeholder="https://..." oninput="previewProductPhotos()"></div>
     <div class="admin-field full"><label>PAPILDOMŲ NUOTRAUKŲ NUORODOS</label><textarea id="productImagesExtra" rows="3" placeholder="Po vieną https:// nuorodą eilutėje" oninput="previewProductPhotos()"></textarea></div>
-    <div class="admin-field full"><label>ARBA ĮKELK NUOTRAUKAS IŠ ĮRENGINIO (IKI 8, PO 5 MB)</label><input id="productImageFiles" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onchange="previewProductPhotos()"><p class="admin-note" style="margin:7px 0 0">Galima naudoti ir URL, ir nuotraukų įkėlimą. Pirmoji nuotrauka rodoma kataloge, kitas klientas peržiūrės rodyklėmis.</p><div id="productMediaPreview" class="product-media-preview"></div></div>
+    <div class="admin-field full"><label>ARBA ĮKELK NUOTRAUKAS IŠ ĮRENGINIO (IKI 8, PO 5 MB)</label><input id="productImageFiles" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onchange="previewProductPhotos()"><p class="product-photo-order-help">📸 Įkelk nuotraukas bet kokia tvarka. Apačioje naudok <b>← / →</b> eiliškumui pakeisti arba <b>★ Pagrindinė</b> norimai pirmai nuotraukai pasirinkti. <b>1-oji nuotrauka</b> bus rodoma prekės kortelėje, o likusias pirkėjas peržiūrės galerijoje.</p><div id="productMediaPreview" class="product-media-preview" aria-label="Nuotraukų eiliškumo valdymas"></div></div>
     <div class="admin-field"><label>ŽENKLIUKAS</label><input id="productBadge" placeholder="Nauja / Populiarus / −20%"></div>
     <div class="admin-field"><label>NUOLAIDA (%)</label><input id="productDiscount" type="number" min="0" max="100" step="1" value="0" placeholder="10"></div>
     <div class="admin-field"><label>PREKĖS LIMITAS / KIEKIS SANDĖLYJE</label><input id="productStockLimit" type="number" min="0" step="1" placeholder="Pvz. 4 (0 = neribota)"></div>
@@ -1743,15 +1760,68 @@ function productPhotoFormUrls(){
     ...(document.getElementById("productImagesExtra")?.value||"").split(/\r?\n/)
   ]);
 }
-let productPreviewObjectUrls=[];
+// Eiliškumas keičiamas administratoriaus peržiūroje iki įkėlimo į Storage.
+// Nuotraukų indeksai saugomi image_urls masyve (be papildomų SQL laukų).
+let productPhotoOrder=[];
+const productPreviewObjectUrls=new Map();
+function getProductPhotoEntries(){
+  const urls=productPhotoFormUrls();
+  const files=[...(document.getElementById("productImageFiles")?.files||[])];
+  return [
+    ...urls.map(url=>({key:"url:"+url,type:"url",url,label:"URL"})),
+    ...files.map((file,i)=>({key:`file:${i}:${file.name}:${file.size}:${file.lastModified}`,type:"file",file,label:file.name}))
+  ];
+}
+function orderedProductPhotoEntries(){
+  const entries=getProductPhotoEntries();
+  const byKey=new Map(entries.map(item=>[item.key,item]));
+  productPhotoOrder=[...productPhotoOrder.filter(key=>byKey.has(key)),...entries.map(item=>item.key).filter(key=>!productPhotoOrder.includes(key))];
+  return productPhotoOrder.map(key=>byKey.get(key)).filter(Boolean);
+}
+function moveProductPhoto(index,step){
+  const entries=orderedProductPhotoEntries();
+  const to=index+step;
+  if(index<0||to<0||to>=entries.length)return;
+  [productPhotoOrder[index],productPhotoOrder[to]]=[productPhotoOrder[to],productPhotoOrder[index]];
+  previewProductPhotos();
+}
+function makeProductPhotoMain(index){
+  const entries=orderedProductPhotoEntries();
+  if(index<=0||index>=entries.length)return;
+  const [selected]=productPhotoOrder.splice(index,1);
+  productPhotoOrder.unshift(selected);
+  previewProductPhotos();
+}
+function resetProductPhotoOrder(){
+  productPhotoOrder=[];
+  for(const url of productPreviewObjectUrls.values())URL.revokeObjectURL(url);
+  productPreviewObjectUrls.clear();
+}
 function previewProductPhotos(){
   const area=document.getElementById("productMediaPreview");if(!area)return;
-  productPreviewObjectUrls.forEach(u=>URL.revokeObjectURL(u));productPreviewObjectUrls=[];
-  const urls=productPhotoFormUrls();
-  const files=[...(document.getElementById("productImageFiles")?.files||[])].slice(0,8);
-  const entries=urls.map(url=>({url,label:"URL"}));
-  for(const file of files){const url=URL.createObjectURL(file);productPreviewObjectUrls.push(url);entries.push({url,label:"Failas"});}
-  area.innerHTML=entries.map((x,i)=>`<div class="product-media-preview-item"><img src="${escapeHtml(x.url)}" alt="Nuotrauka ${i+1}"><small>${escapeHtml(x.label)} ${i+1}</small></div>`).join("");
+  const entries=orderedProductPhotoEntries();
+  const usedFiles=new Set(entries.filter(item=>item.type==="file").map(item=>item.key));
+  for(const [key,url] of productPreviewObjectUrls){
+    if(!usedFiles.has(key)){URL.revokeObjectURL(url);productPreviewObjectUrls.delete(key);}
+  }
+  if(!entries.length){area.innerHTML='<p class="admin-note">Įkėlus nuotraukas, čia galėsi pasirinkti jų eiliškumą.</p>';return;}
+  area.innerHTML=entries.map((item,i)=>{
+    let url=item.url;
+    if(item.type==="file"){
+      if(!productPreviewObjectUrls.has(item.key))productPreviewObjectUrls.set(item.key,URL.createObjectURL(item.file));
+      url=productPreviewObjectUrls.get(item.key);
+    }
+    return `<div class="product-media-preview-item ${i===0?'is-main':''}">
+      <div class="photo-order-number"><span>Nuotrauka #${i+1}</span>${i===0?'<span class="photo-main-badge">★ Pagrindinė</span>':''}</div>
+      <img src="${escapeHtml(url)}" alt="Prekės nuotrauka ${i+1}">
+      <small title="${escapeHtml(item.label)}">${escapeHtml(item.label)}</small>
+      <div class="photo-order-actions">
+        <button type="button" onclick="moveProductPhoto(${i},-1)" ${i===0?'disabled':''} title="Perkelti į kairę" aria-label="Perkelti nuotrauką į kairę">←</button>
+        <button type="button" onclick="moveProductPhoto(${i},1)" ${i===entries.length-1?'disabled':''} title="Perkelti į dešinę" aria-label="Perkelti nuotrauką į dešinę">→</button>
+        <button type="button" class="photo-main-btn" onclick="makeProductPhotoMain(${i})" ${i===0?'disabled':''} title="Padaryti pagrindine">★ Pagrindinė</button>
+      </div>
+    </div>`;
+  }).join("");
 }
 async function uploadProductPhotos(files){
   const urls=[];
@@ -1778,6 +1848,7 @@ function editProduct(p){
   document.getElementById("productImage").value=p.image_url||editImages[0]||"";
   document.getElementById("productImagesExtra").value=editImages.filter(u=>u!==(p.image_url||editImages[0])).join("\n");
   document.getElementById("productImageFiles").value="";
+  resetProductPhotoOrder();
   previewProductPhotos();
   document.getElementById("productBadge").value=p.badge||"";
   document.getElementById("productDiscount").value=p.discount_percent??0;
@@ -1789,6 +1860,7 @@ function editProduct(p){
 }
 function clearProductForm(){
   ["productEditId","productName","productPrice","productImage","productImagesExtra","productImageFiles","productBadge","productDescription","productStockLimit"].forEach(id=>document.getElementById(id).value="");
+  resetProductPhotoOrder();
   previewProductPhotos();
   document.getElementById("productSoldOut").value="false";
   document.getElementById("productStockLimit").value="0";
@@ -1809,12 +1881,16 @@ async function saveProduct(){
   if(urlText.some(x=>!isProductPhotoUrl(x)))return alert("Nuotraukų nuorodos turi prasidėti https:// arba http://.");
   const files=[...(document.getElementById("productImageFiles")?.files||[])];
   if(files.length+uniquePhotoUrls(urlText).length>8)return alert("Vienai prekei galima pridėti iki 8 nuotraukų.");
-  const imageUrls=uniquePhotoUrls(urlText);
-  if(files.length){
-    try{imageUrls.push(...await uploadProductPhotos(files));}
+  const sortedEntries=orderedProductPhotoEntries();
+  const sortedFiles=sortedEntries.filter(item=>item.type==="file").map(item=>item.file);
+  let uploadedUrls=[];
+  if(sortedFiles.length){
+    try{uploadedUrls=await uploadProductPhotos(sortedFiles);}
     catch(error){console.error("[PRODUCT PHOTOS]",error);return alert("Nepavyko įkelti nuotraukos: "+error.message+". Patikrink Supabase Storage SQL.");}
   }
-  if(!imageUrls.length)return alert("Įkelk bent vieną prekės nuotrauką arba įrašyk jos URL.");
+  let filePos=0;
+  const imageUrls=sortedEntries.map(item=>item.type==="url"?item.url:uploadedUrls[filePos++]);
+  if(!imageUrls.length||imageUrls.some(url=>!url))return alert("Įkelk bent vieną prekės nuotrauką arba įrašyk jos URL.");
   const payload={name:document.getElementById("productName").value.trim(),price:Number(document.getElementById("productPrice").value),category:document.getElementById("productCategory").value,image_url:imageUrls[0],image_urls:imageUrls,badge:document.getElementById("productBadge").value.trim(),discount_percent:discount,stock_limit:stockLimit,description:document.getElementById("productDescription").value.trim(),active:document.getElementById("productActive").value==="true",sold_out:document.getElementById("productSoldOut").value==="true"||(stockLimit!==null&&Number((window.__editingProduct||{}).stock_sold||0)>=stockLimit)};
   if(!payload.name||!Number.isFinite(payload.price)||payload.price<0)return alert("Įrašyk prekės pavadinimą ir teisingą kainą.");
   const id=document.getElementById("productEditId").value;
