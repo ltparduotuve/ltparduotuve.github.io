@@ -307,6 +307,45 @@ body::before {
     background: radial-gradient(circle at 50% 10%, rgba(49, 105, 220, 0.12), transparent 45%);
 }
 body::after { display: none; }
+
+/* LT PARDUOTUVĖ: Atnaujinimų skiltys, nuotraukų galerija ir paskyros nustatymai */
+.updates-modal-card{width:min(870px,100%);max-height:88vh}
+.updates-modal-body{display:grid;gap:22px;padding:20px}
+.updates-section{padding:17px;background:linear-gradient(145deg,#0e1b2d,#080f1b);border:1px solid #2b4263;border-radius:14px}
+.updates-section-discord{background:linear-gradient(145deg,#12182b,#0c1021);border-color:#444071}
+.updates-section-head{margin-bottom:15px;padding-bottom:12px;border-bottom:1px solid #293b56}
+.updates-section-head h3{font-size:14px;letter-spacing:.7px;color:#d9e9ff}
+.updates-section-discord .updates-section-head h3{color:#bfc4ff}
+.updates-section-head p{font-size:10px;color:#8294b0;margin-top:5px}
+.public-update-card{flex-wrap:wrap;gap:10px}.public-update-date{align-self:flex-start}.public-update-text{flex:1 1 180px}
+.public-update-text p{white-space:pre-wrap;overflow-wrap:anywhere}
+.product-media-preview{display:flex;gap:9px;overflow-x:auto;min-height:12px;padding-top:9px}
+.product-media-preview-item{position:relative;flex:0 0 78px}
+.product-media-preview img{width:78px;height:73px;object-fit:cover;border:1px solid #385274;border-radius:9px;background:#111e30}
+.product-media-preview small{display:block;text-align:center;color:#8ea3bf;font-size:9px;padding-top:3px}
+#productImageFiles{padding:12px;background:#071222;border:1px dashed #5173a3;border-radius:9px;cursor:pointer;width:100%}
+#productImageFiles::file-selector-button{padding:8px 11px;border-radius:7px;border:1px solid #4b82d4;background:#123460;color:#fff;cursor:pointer;margin-right:10px}
+.product-modal-gallery{display:flex;flex-direction:column;background:#0d1625;min-width:0}
+.product-modal-gallery .product-modal-image{min-height:340px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.product-modal-gallery .product-modal-image img{width:100%;height:100%;max-height:530px;min-height:340px;object-fit:contain;background:#0a1220}
+.gallery-arrow{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:40px;height:48px;border:1px solid #739bca77;border-radius:11px;background:#061020d9;color:white;font-size:31px;cursor:pointer;transition:background .2s}
+.gallery-arrow:hover{background:#1e4785}.gallery-prev{left:11px}.gallery-next{right:11px}
+.gallery-counter{position:absolute;bottom:11px;left:50%;transform:translateX(-50%);padding:5px 12px;border-radius:20px;background:#050e1aca;border:1px solid #526e94;color:#e1eeff;font-size:11px;font-weight:700}
+.gallery-thumbs{display:flex;justify-content:center;gap:8px;overflow-x:auto;padding:12px;border-top:1px solid #273c56}
+.gallery-thumb{width:65px;height:58px;flex:0 0 65px;border-radius:9px;object-fit:cover;cursor:pointer;border:2px solid #314865;opacity:.66;background:#0a1423}
+.gallery-thumb.active{border-color:#68a3ff;opacity:1;box-shadow:0 0 0 2px #68a3ff2a}
+.account-settings-panel{width:min(670px,100%);border-radius:22px;border-color:#416899;background:linear-gradient(160deg,#111f33,#070e1c 70%);box-shadow:0 32px 110px #000e,0 0 40px #4389ff16}
+.account-settings-header{padding:27px 30px;background:linear-gradient(115deg,#19396166,#10192844);border-bottom:1px solid #395273}
+.account-settings-header h2{font-size:24px;letter-spacing:-.5px}.account-settings-header p{font-size:12px}
+.account-settings-content{padding:24px;gap:15px}
+.account-settings-group{padding:21px;border-color:#314c6d;background:linear-gradient(130deg,#0c1a2c,#0a1526);border-radius:15px;gap:11px}
+.account-settings-group h3{font-size:15px;color:#f0f6ff;padding-bottom:11px;border-bottom:1px solid #253d58}
+.account-settings-group label{color:#b5c8df;font-size:11px}
+.account-settings-group .account-pref-input,.account-settings-group input{transition:border-color .2s,box-shadow .2s}
+.account-settings-group .account-pref-input:focus,.account-settings-group input:focus{outline:0;border-color:#69a8ff;box-shadow:0 0 0 3px #4289ff24}
+.account-settings-group .account-settings-action{padding:12px 14px;border-radius:10px;background:linear-gradient(110deg,#2557a1,#3c79db);border-color:#6496db;font-size:11px}
+.account-settings-group .account-settings-action:hover{filter:brightness(1.13)}
+@media(max-width:700px){.product-modal-gallery .product-modal-image,.product-modal-gallery .product-modal-image img{min-height:260px;height:290px}.gallery-arrow{width:35px;height:40px}.gallery-thumb{width:54px;height:48px;flex-basis:54px}.account-settings-content{padding:14px}.account-settings-group{padding:16px}.updates-modal-body{padding:11px}.updates-section{padding:13px}}
 </style>
 <style id="payment-30min-style">
 .bank-pay-modal{align-items:flex-start;padding:28px 16px;overflow:auto;background:rgba(1,4,10,.96);backdrop-filter:blur(10px)}
@@ -583,7 +622,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <div class="main-floaters" aria-hidden="true"><span class="main-floater">€</span><span class="main-floater">✦</span><span class="main-floater">📦</span><span class="main-floater">€</span><span class="main-floater">◆</span><span class="main-floater">✧</span></div>
 <div class="categories" id="categoryCards"></div>
 
-<div class="updates-modal" id="updatesModal" onclick="if(event.target===this)closeUpdatesModal()"><div class="updates-modal-card"><div class="updates-modal-head"><div><h2>📰 Parduotuvės atnaujinimai</h2><p>Naujausi parduotuvės pakeitimai</p></div><button class="updates-close" onclick="closeUpdatesModal()">✕</button></div><div class="updates-modal-body"><div class="update-public-list" id="publicUpdateList"><div class="admin-empty">Kraunama...</div></div></div></div></div>
+<div class="updates-modal" id="updatesModal" onclick="if(event.target===this)closeUpdatesModal()"><div class="updates-modal-card"><div class="updates-modal-head"><div><h2>📰 LT PARDUOTUVĖ · Atnaujinimai</h2><p>Svetainės ir Discord naujienos vienoje vietoje</p></div><button class="updates-close" type="button" onclick="closeUpdatesModal()" aria-label="Uždaryti">✕</button></div><div class="updates-modal-body"><section class="updates-section"><div class="updates-section-head"><h3>🌐 SVETAINĖS ATNAUJINIMAI</h3><p>Parduotuvės funkcijos, prekės ir patobulinimai</p></div><div class="update-public-list" id="publicWebsiteUpdates"><div class="admin-empty">Kraunama...</div></div></section><section class="updates-section updates-section-discord"><div class="updates-section-head"><h3>💬 DISCORD ATNAUJINIMAI</h3><p>Discord serverio, ticket sistemos ir boto naujienos</p></div><div class="update-public-list" id="publicDiscordUpdates"><div class="admin-empty">Kraunama...</div></div></section></div></div></div>
 
 <div class="products-head" id="prekes"><div><h2>🔥 Populiariausios prekės</h2><p>Peržiūrėk mūsų prekes</p></div>
 <div class="tabs" id="categoryTabs"><button class="tab active" data-cat="all">Visos</button></div></div>
@@ -636,7 +675,9 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     <div class="admin-field"><label>PAVADINIMAS</label><input id="productName" placeholder="Pvz. iPhone 17 Pro Max"></div>
     <div class="admin-field"><label>KAINA (€)</label><input id="productPrice" type="number" min="0" step="0.01" placeholder="1299.99"></div>
     <div class="admin-field"><label>KATEGORIJA</label><select id="productCategory"></select></div>
-    <div class="admin-field"><label>NUOTRAUKOS URL</label><input id="productImage" placeholder="https://..."></div>
+    <div class="admin-field"><label>PAGRINDINĖS NUOTRAUKOS URL (NEPRIVALOMA)</label><input id="productImage" type="url" placeholder="https://..." oninput="previewProductPhotos()"></div>
+    <div class="admin-field full"><label>PAPILDOMŲ NUOTRAUKŲ NUORODOS</label><textarea id="productImagesExtra" rows="3" placeholder="Po vieną https:// nuorodą eilutėje" oninput="previewProductPhotos()"></textarea></div>
+    <div class="admin-field full"><label>ARBA ĮKELK NUOTRAUKAS IŠ ĮRENGINIO (IKI 8, PO 5 MB)</label><input id="productImageFiles" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onchange="previewProductPhotos()"><p class="admin-note" style="margin:7px 0 0">Galima naudoti ir URL, ir nuotraukų įkėlimą. Pirmoji nuotrauka rodoma kataloge, kitas klientas peržiūrės rodyklėmis.</p><div id="productMediaPreview" class="product-media-preview"></div></div>
     <div class="admin-field"><label>ŽENKLIUKAS</label><input id="productBadge" placeholder="Nauja / Populiarus / −20%"></div>
     <div class="admin-field"><label>NUOLAIDA (%)</label><input id="productDiscount" type="number" min="0" max="100" step="1" value="0" placeholder="10"></div>
     <div class="admin-field"><label>PREKĖS LIMITAS / KIEKIS SANDĖLYJE</label><input id="productStockLimit" type="number" min="0" step="1" placeholder="Pvz. 4 (0 = neribota)"></div>
@@ -691,9 +732,10 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
    <div class="admin-list" id="adminBulkList"><div class="admin-empty">Kraunama...</div></div>
   </section>
   <section class="admin-section" id="admin-updates">
-   <div class="admin-note"><b>📰 Parduotuvės atnaujinimai</b><br>Čia gali skelbti, kas buvo pridėta, pašalinta ar pakeista parduotuvėje.</div>
+   <div class="admin-note"><b>📰 Svetainės ir Discord atnaujinimai</b><br>Pasirink, kur skelbiamas atnaujinimas, ir nurodyk, kas buvo pridėta (+), pakeista (~) arba pašalinta (−). Abu sąrašai svetainėje rodomi atskirai.</div>
    <div class="admin-form">
     <input type="hidden" id="updateEditId">
+    <div class="admin-field"><label>SKILTIS</label><select id="updateSection"><option value="website">🌐 SVETAINĖS ATNAUJINIMAI</option><option value="discord">💬 DISCORD ATNAUJINIMAI</option></select></div>
     <div class="admin-field"><label>TIPAS</label><select id="updateKind"><option value="added">➕ Pridėta</option><option value="removed">➖ Pašalinta</option><option value="changed">✏️ Pakeista</option></select></div>
     <div class="admin-field"><label>PAVADINIMAS</label><input id="updateTitle" placeholder="Pvz. Naujos prekės"></div>
     <div class="admin-field full"><label>APRAŠYMAS</label><textarea id="updateContent" placeholder="Kas buvo pridėta, pašalinta ar pakeista..."></textarea></div>
@@ -783,7 +825,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <div id="productModal" class="product-modal" onclick="closeProductModal()">
 <div class="product-modal-card" onclick="event.stopPropagation()">
 <button class="modal-close" onclick="closeProductModal()">✕</button>
-<div class="product-modal-image"><img id="modalImage" src="" alt=""></div>
+<div class="product-modal-gallery"><div class="product-modal-image" id="gallerySwipeArea"><img id="modalImage" src="" alt=""><button type="button" id="galleryPrev" class="gallery-arrow gallery-prev" onclick="changeGalleryImage(-1)" aria-label="Ankstesnė nuotrauka">‹</button><button type="button" id="galleryNext" class="gallery-arrow gallery-next" onclick="changeGalleryImage(1)" aria-label="Kita nuotrauka">›</button><div class="gallery-counter" id="galleryCounter" aria-live="polite"></div></div><div class="gallery-thumbs" id="galleryThumbs" aria-label="Prekės nuotraukos"></div></div>
 <div class="product-modal-info">
 <div id="modalBadge" class="modal-badge" style="display:none"></div>
 <h2 id="modalName"></h2><div id="modalCategory" class="product-modal-cat"></div>
@@ -1685,12 +1727,58 @@ async function loadAdminProducts(){
   if(!data?.length){list.innerHTML='<div class="admin-empty">Dar nėra pridėtų prekių.</div>';return}
   list.innerHTML=data.map(p=>{const d=Number(p.discount_percent||0);const price=salePrice(p);const editData=JSON.stringify(p).replace(/'/g,"&#39;");return `<div class="admin-product"><img src="${escapeHtml(p.image_url||"")}" onerror="this.style.opacity='.25'"><div class="admin-product-info"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(p.category)} • ${d?money(price)+" (−"+d+"%) • ":money(p.price)+" • "}${p.stock_limit!=null&&Number(p.stock_limit)>0?`📦 Limitas: ${Number(p.stock_limit)} • Liko: ${Math.max(0,Number(p.stock_limit)-Number(p.stock_reserved||0)-Number(p.stock_sold||0))}`:"📦 Limitas: neribotas • "}${p.sold_out?"🔴 ISPARDUOTA":""} ${p.active?"🟢 Aktyvi":"🔴 Išjungta"}${p.badge?" • 🏷️ "+escapeHtml(p.badge):""}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editProduct(${editData})'>✏️ Koreguoti</button>${p.stock_limit!=null&&Number(p.stock_limit)>0?`<button class="admin-secondary green" onclick="restockProduct('${p.id}',${Number(p.stock_limit||0)})">📦 Papildyti</button>`:""}<button class="admin-secondary ${p.active?'orange':'green'}" onclick="toggleProduct('${p.id}',${!p.active})">${p.active?'🔴 Išjungti':'🟢 Įjungti'}</button><button class="admin-danger" onclick="deleteProduct('${p.id}')">🗑️ Ištrinti</button></div></div>`}).join("");
 }
+function isProductPhotoUrl(url){
+  try {const u=new URL(String(url||"").trim());return u.protocol==="https:"||u.protocol==="http:";} catch{return false;}
+}
+function uniquePhotoUrls(urls){
+  return [...new Set((urls||[]).map(x=>String(x||"").trim()).filter(isProductPhotoUrl))].slice(0,8);
+}
+function getProductGallery(p){
+  const saved=Array.isArray(p?.image_urls)?p.image_urls:[];
+  return uniquePhotoUrls([p?.image_url||"",...saved]);
+}
+function productPhotoFormUrls(){
+  return uniquePhotoUrls([
+    document.getElementById("productImage")?.value||"",
+    ...(document.getElementById("productImagesExtra")?.value||"").split(/\r?\n/)
+  ]);
+}
+let productPreviewObjectUrls=[];
+function previewProductPhotos(){
+  const area=document.getElementById("productMediaPreview");if(!area)return;
+  productPreviewObjectUrls.forEach(u=>URL.revokeObjectURL(u));productPreviewObjectUrls=[];
+  const urls=productPhotoFormUrls();
+  const files=[...(document.getElementById("productImageFiles")?.files||[])].slice(0,8);
+  const entries=urls.map(url=>({url,label:"URL"}));
+  for(const file of files){const url=URL.createObjectURL(file);productPreviewObjectUrls.push(url);entries.push({url,label:"Failas"});}
+  area.innerHTML=entries.map((x,i)=>`<div class="product-media-preview-item"><img src="${escapeHtml(x.url)}" alt="Nuotrauka ${i+1}"><small>${escapeHtml(x.label)} ${i+1}</small></div>`).join("");
+}
+async function uploadProductPhotos(files){
+  const urls=[];
+  const {data:auth}=await supabaseClient.auth.getUser();
+  if(!auth?.user?.id)throw new Error("Prisijunk kaip administratorius.");
+  for(const file of files){
+    if(!["image/jpeg","image/png","image/webp","image/gif"].includes(file.type))throw new Error(`Netinkamas failo tipas: ${file.name}`);
+    if(file.size>5*1024*1024)throw new Error(`Failas per didelis (iki 5 MB): ${file.name}`);
+    const ext=({"image/jpeg":"jpg","image/png":"png","image/webp":"webp","image/gif":"gif"})[file.type];
+    const key=`${auth.user.id}/${crypto.randomUUID()}.${ext}`;
+    const {error}=await supabaseClient.storage.from("product-images").upload(key,file,{contentType:file.type,upsert:false,cacheControl:"3600"});
+    if(error)throw new Error(`${file.name}: ${error.message}`);
+    const {data}=supabaseClient.storage.from("product-images").getPublicUrl(key);
+    if(data?.publicUrl)urls.push(data.publicUrl);
+  }
+  return urls;
+}
 function editProduct(p){
   document.getElementById("productEditId").value=p.id||"";
   document.getElementById("productName").value=p.name||"";
   document.getElementById("productPrice").value=p.price??"";
   document.getElementById("productCategory").value=p.category||"Kita";
-  document.getElementById("productImage").value=p.image_url||"";
+  const editImages=getProductGallery(p);
+  document.getElementById("productImage").value=p.image_url||editImages[0]||"";
+  document.getElementById("productImagesExtra").value=editImages.filter(u=>u!==(p.image_url||editImages[0])).join("\n");
+  document.getElementById("productImageFiles").value="";
+  previewProductPhotos();
   document.getElementById("productBadge").value=p.badge||"";
   document.getElementById("productDiscount").value=p.discount_percent??0;
   document.getElementById("productStockLimit").value=p.stock_limit??0;
@@ -1700,7 +1788,8 @@ function editProduct(p){
   document.getElementById("productName").scrollIntoView({behavior:"smooth",block:"center"});
 }
 function clearProductForm(){
-  ["productEditId","productName","productPrice","productImage","productBadge","productDescription","productStockLimit"].forEach(id=>document.getElementById(id).value="");
+  ["productEditId","productName","productPrice","productImage","productImagesExtra","productImageFiles","productBadge","productDescription","productStockLimit"].forEach(id=>document.getElementById(id).value="");
+  previewProductPhotos();
   document.getElementById("productSoldOut").value="false";
   document.getElementById("productStockLimit").value="0";
   document.getElementById("productDiscount").value="0";
@@ -1712,7 +1801,21 @@ async function saveProduct(){
   const rawStock=document.getElementById("productStockLimit")?.value.trim()||"";
   const stockLimit=rawStock===""||Number(rawStock)===0?null:Math.max(0,Math.floor(Number(rawStock)));
   if(rawStock!==""&&!Number.isFinite(stockLimit))return alert("Įrašyk teisingą prekės kiekį.");
-  const payload={name:document.getElementById("productName").value.trim(),price:Number(document.getElementById("productPrice").value),category:document.getElementById("productCategory").value,image_url:document.getElementById("productImage").value.trim(),badge:document.getElementById("productBadge").value.trim(),discount_percent:discount,stock_limit:stockLimit,description:document.getElementById("productDescription").value.trim(),active:document.getElementById("productActive").value==="true",sold_out:document.getElementById("productSoldOut").value==="true"||(stockLimit!==null&&Number((window.__editingProduct||{}).stock_sold||0)>=stockLimit)};
+  const productName=document.getElementById("productName").value.trim();
+  const productPrice=Number(document.getElementById("productPrice").value);
+  if(!productName||!document.getElementById("productPrice").value.trim()||!Number.isFinite(productPrice)||productPrice<0)
+    return alert("Įrašyk prekės pavadinimą ir teisingą kainą.");
+  const urlText=[document.getElementById("productImage").value.trim(),...(document.getElementById("productImagesExtra").value||"").split(/\r?\n/)].map(s=>s.trim()).filter(Boolean);
+  if(urlText.some(x=>!isProductPhotoUrl(x)))return alert("Nuotraukų nuorodos turi prasidėti https:// arba http://.");
+  const files=[...(document.getElementById("productImageFiles")?.files||[])];
+  if(files.length+uniquePhotoUrls(urlText).length>8)return alert("Vienai prekei galima pridėti iki 8 nuotraukų.");
+  const imageUrls=uniquePhotoUrls(urlText);
+  if(files.length){
+    try{imageUrls.push(...await uploadProductPhotos(files));}
+    catch(error){console.error("[PRODUCT PHOTOS]",error);return alert("Nepavyko įkelti nuotraukos: "+error.message+". Patikrink Supabase Storage SQL.");}
+  }
+  if(!imageUrls.length)return alert("Įkelk bent vieną prekės nuotrauką arba įrašyk jos URL.");
+  const payload={name:document.getElementById("productName").value.trim(),price:Number(document.getElementById("productPrice").value),category:document.getElementById("productCategory").value,image_url:imageUrls[0],image_urls:imageUrls,badge:document.getElementById("productBadge").value.trim(),discount_percent:discount,stock_limit:stockLimit,description:document.getElementById("productDescription").value.trim(),active:document.getElementById("productActive").value==="true",sold_out:document.getElementById("productSoldOut").value==="true"||(stockLimit!==null&&Number((window.__editingProduct||{}).stock_sold||0)>=stockLimit)};
   if(!payload.name||!Number.isFinite(payload.price)||payload.price<0)return alert("Įrašyk prekės pavadinimą ir teisingą kainą.");
   const id=document.getElementById("productEditId").value;
   if(id){
@@ -1789,14 +1892,58 @@ async function loadStoreProducts(){
 
 
 const updateKindLabel={added:"➕ Pridėta",removed:"➖ Pašalinta",changed:"✏️ Pakeista"};
-function clearUpdateForm(){["updateEditId","updateTitle","updateContent"].forEach(id=>{const e=document.getElementById(id);if(e)e.value=""});const k=document.getElementById("updateKind");if(k)k.value="added";}
-function editStoreUpdate(u){document.getElementById("updateEditId").value=u.id||"";document.getElementById("updateKind").value=u.kind||"added";document.getElementById("updateTitle").value=u.title||"";document.getElementById("updateContent").value=u.content||"";}
+const updateSectionLabel={website:"🌐 Svetainė",discord:"💬 Discord"};
+function clearUpdateForm(){
+  ["updateEditId","updateTitle","updateContent"].forEach(id=>{const e=document.getElementById(id);if(e)e.value=""});
+  document.getElementById("updateKind").value="added";
+  document.getElementById("updateSection").value="website";
+}
+function editStoreUpdate(u){
+  document.getElementById("updateEditId").value=u.id||"";
+  document.getElementById("updateKind").value=u.kind||"added";
+  document.getElementById("updateSection").value=u.section==="discord"?"discord":"website";
+  document.getElementById("updateTitle").value=u.title||"";
+  document.getElementById("updateContent").value=u.content||"";
+  document.getElementById("updateSection").scrollIntoView({behavior:"smooth",block:"center"});
+}
 function openUpdatesModal(){document.getElementById("updatesModal")?.classList.add("open");loadPublicUpdates();}
 function closeUpdatesModal(){document.getElementById("updatesModal")?.classList.remove("open");}
-async function loadPublicUpdates(){const list=document.getElementById("publicUpdateList");if(!list)return;const {data,error}=await supabaseClient.from("store_updates").select("id,kind,title,content,created_at").eq("active",true).order("created_at",{ascending:false}).limit(20);if(error){console.error(error);list.innerHTML='<div class="admin-empty">Atnaujinimai šiuo metu neįkelti.</div>';return}if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas naujų atnaujinimų nėra.</div>';return}list.innerHTML=data.map(u=>`<article class="public-update-card ${escapeHtml(u.kind||"added")}"><span class="public-update-badge">${escapeHtml(updateKindLabel[u.kind]||"Atnaujinimas")}</span><div class="public-update-text"><b>${escapeHtml(u.title||"")}</b><p>${escapeHtml(u.content||"")}</p></div><span class="public-update-date">${formatDate(u.created_at)}</span></article>`).join("");}
-async function publishStoreUpdate(){if(!isAdmin)return alert("Neturite administratoriaus teisių.");const id=document.getElementById("updateEditId")?.value.trim();const payload={kind:document.getElementById("updateKind")?.value||"added",title:document.getElementById("updateTitle")?.value.trim()||"",content:document.getElementById("updateContent")?.value.trim()||"",active:true};if(!payload.title||!payload.content)return alert("Įrašyk pavadinimą ir aprašymą.");const r=id?await supabaseClient.from("store_updates").update(payload).eq("id",id):await supabaseClient.from("store_updates").insert(payload);if(r.error){console.error(r.error);return alert("Nepavyko paskelbti atnaujinimo. Paleisk naują SQL: LT_PARDUOTUVE_ATNAUJINIMAI_V2.sql");}clearUpdateForm();await loadAdminUpdates();await loadPublicUpdates();toast(id?"✓ Atnaujinimas pakeistas":"✓ Atnaujinimas paskelbtas");}
-async function loadAdminUpdates(){if(!isAdmin)return;const list=document.getElementById("adminUpdateList");if(!list)return;list.innerHTML='<div class="admin-empty">Kraunama...</div>';const {data,error}=await supabaseClient.from("store_updates").select("*").order("created_at",{ascending:false});if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti atnaujinimų. Paleisk LT_PARDUOTUVE_ATNAUJINIMAI_V2.sql.</div>';return}if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas atnaujinimų nėra.</div>';return}list.innerHTML=data.map(u=>`<div class="admin-product"><div class="admin-product-info"><b>${escapeHtml(updateKindLabel[u.kind]||u.kind||"Atnaujinimas")} • ${escapeHtml(u.title||"")}</b><small>${escapeHtml(u.content||"")} • ${formatDate(u.created_at)}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editStoreUpdate(${JSON.stringify(u).replace(/'/g,"&#39;")})'>✏️ Koreguoti</button><button class="admin-danger" onclick="deleteStoreUpdate('${u.id}')">🗑️ Ištrinti</button></div></div>`).join("");}
-async function deleteStoreUpdate(id){if(!isAdmin||!confirm("Ar tikrai ištrinti šį atnaujinimą?"))return;const {error}=await supabaseClient.from("store_updates").delete().eq("id",id);if(error){console.error(error);return alert("Nepavyko ištrinti atnaujinimo. Paleisk LT_PARDUOTUVE_ATNAUJINIMAI_V2.sql.");}await loadAdminUpdates();await loadPublicUpdates();toast("✓ Atnaujinimas ištrintas");}
+async function loadPublicUpdates(){
+  const website=document.getElementById("publicWebsiteUpdates"),discord=document.getElementById("publicDiscordUpdates");
+  if(!website||!discord)return;
+  const {data,error}=await supabaseClient.from("store_updates").select("id,section,kind,title,content,created_at").eq("active",true).order("created_at",{ascending:false}).limit(100);
+  if(error){console.error(error);website.innerHTML='<div class="admin-empty">Nepavyko įkelti atnaujinimų.</div>';discord.innerHTML=website.innerHTML;return;}
+  function render(entries){
+    if(!entries.length)return '<div class="admin-empty">Kol kas atnaujinimų nėra.</div>';
+    return entries.map(u=>`<article class="public-update-card ${escapeHtml(u.kind||"added")}"><span class="public-update-badge">${escapeHtml(updateKindLabel[u.kind]||"Atnaujinimas")}</span><div class="public-update-text"><b>${escapeHtml(u.title||"")}</b><p>${escapeHtml(u.content||"")}</p></div><span class="public-update-date">${formatDate(u.created_at)}</span></article>`).join("");
+  }
+  website.innerHTML=render((data||[]).filter(u=>u.section!=="discord"));
+  discord.innerHTML=render((data||[]).filter(u=>u.section==="discord"));
+}
+async function publishStoreUpdate(){
+  if(!isAdmin)return alert("Neturite administratoriaus teisių.");
+  const id=document.getElementById("updateEditId")?.value.trim();
+  const payload={section:document.getElementById("updateSection")?.value==="discord"?"discord":"website",kind:document.getElementById("updateKind")?.value||"added",title:document.getElementById("updateTitle")?.value.trim()||"",content:document.getElementById("updateContent")?.value.trim()||"",active:true};
+  if(!payload.title||!payload.content)return alert("Įrašyk pavadinimą ir aprašymą.");
+  const r=id?await supabaseClient.from("store_updates").update(payload).eq("id",id):await supabaseClient.from("store_updates").insert(payload);
+  if(r.error){console.error(r.error);return alert("Nepavyko paskelbti atnaujinimo. Patikrink naują Supabase SQL.");}
+  clearUpdateForm();await loadAdminUpdates();await loadPublicUpdates();toast(id?"✓ Atnaujinimas pakeistas":"✓ Atnaujinimas paskelbtas");
+}
+async function loadAdminUpdates(){
+  if(!isAdmin)return;
+  const list=document.getElementById("adminUpdateList");if(!list)return;
+  list.innerHTML='<div class="admin-empty">Kraunama...</div>';
+  const {data,error}=await supabaseClient.from("store_updates").select("*").order("created_at",{ascending:false});
+  if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti atnaujinimų. Patikrink Supabase SQL.</div>';return;}
+  if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas atnaujinimų nėra.</div>';return;}
+  list.innerHTML=data.map(u=>`<div class="admin-product"><div class="admin-product-info"><b>${escapeHtml(updateSectionLabel[u.section]||updateSectionLabel.website)} • ${escapeHtml(updateKindLabel[u.kind]||u.kind||"Atnaujinimas")} • ${escapeHtml(u.title||"")}</b><small>${escapeHtml(u.content||"")} • ${formatDate(u.created_at)}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editStoreUpdate(${JSON.stringify(u).replace(/'/g,"&#39;")})'>✏️ Koreguoti</button><button class="admin-danger" onclick="deleteStoreUpdate('${u.id}')">🗑️ Ištrinti</button></div></div>`).join("");
+}
+async function deleteStoreUpdate(id){
+  if(!isAdmin||!confirm("Ar tikrai ištrinti šį atnaujinimą?"))return;
+  const {error}=await supabaseClient.from("store_updates").delete().eq("id",id);
+  if(error){console.error(error);return alert("Nepavyko ištrinti atnaujinimo.");}
+  await loadAdminUpdates();await loadPublicUpdates();toast("✓ Atnaujinimas ištrintas");
+}
 
 let adminOrdersChannel=null;
 function subscribeAdminOrders(){if(adminOrdersChannel||!isAdmin)return;adminOrdersChannel=supabaseClient.channel("admin-live-orders").on("postgres_changes",{event:"*",schema:"public",table:"orders"},()=>{loadAdminOrders();loadAdminStats()}).subscribe()}
@@ -2738,6 +2885,24 @@ function updateProductDeliveryEstimate(){
   document.getElementById('deliveryShipped').textContent=ltDay(shipped);
   document.getElementById('deliveryArrival').textContent=ltDay(earliest)+' – '+ltDay(latest);
 }
+let modalGalleryImages=[],modalGalleryIndex=0;
+function renderProductGallery(){
+  const image=document.getElementById("modalImage");if(!image)return;
+  image.src=modalGalleryImages[modalGalleryIndex]||"";
+  image.alt=(modalProduct?.name||"Prekė")+` – nuotrauka ${modalGalleryIndex+1}`;
+  const multiple=modalGalleryImages.length>1;
+  for(const id of ["galleryPrev","galleryNext","galleryCounter","galleryThumbs"]){
+    const node=document.getElementById(id);if(node)node.style.display=multiple?(id==="galleryThumbs"?"flex":"block"):"none";
+  }
+  const counter=document.getElementById("galleryCounter");if(counter)counter.textContent=`${modalGalleryIndex+1} / ${modalGalleryImages.length}`;
+  const thumbs=document.getElementById("galleryThumbs");if(thumbs)thumbs.innerHTML=multiple?modalGalleryImages.map((url,i)=>`<img role="button" tabindex="0" class="gallery-thumb ${i===modalGalleryIndex?"active":""}" src="${escapeHtml(url)}" alt="Nuotrauka ${i+1}" onclick="selectGalleryImage(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectGalleryImage(${i})}">`).join(""):"";
+}
+function selectGalleryImage(index){if(!modalGalleryImages.length)return;modalGalleryIndex=Math.min(modalGalleryImages.length-1,Math.max(0,index));renderProductGallery();}
+function changeGalleryImage(delta){if(!modalGalleryImages.length)return;selectGalleryImage((modalGalleryIndex+delta+modalGalleryImages.length)%modalGalleryImages.length);}
+let gallerySwipeX=null;
+document.addEventListener("touchstart",e=>{if(e.target.closest?.("#gallerySwipeArea"))gallerySwipeX=e.changedTouches[0].screenX;},{passive:true});
+document.addEventListener("touchend",e=>{if(gallerySwipeX===null)return;const delta=e.changedTouches[0].screenX-gallerySwipeX;gallerySwipeX=null;if(Math.abs(delta)>40&&document.getElementById("productModal")?.classList.contains("open"))changeGalleryImage(delta<0?1:-1);},{passive:true});
+document.addEventListener("keydown",e=>{if(!document.getElementById("productModal")?.classList.contains("open")||["INPUT","TEXTAREA"].includes(document.activeElement?.tagName))return;if(e.key==="ArrowLeft")changeGalleryImage(-1);if(e.key==="ArrowRight")changeGalleryImage(1);});
 function openProductModal(p){
   modalProduct=p; modalQty=1;
   updateProductDeliveryEstimate();
@@ -2745,8 +2910,9 @@ function openProductModal(p){
   const finalPrice=salePrice(p);
   const stockLabel=productStockLabel(p);
   const unavailable=!!stockLabel&&(stockLabel==="Išparduota"||stockLabel==="Parduota"||stockLabel==="Laikinai rezervuota");
-  document.getElementById("modalImage").src=p.image_url||"";
-  document.getElementById("modalImage").alt=p.name||"";
+  modalGalleryImages=getProductGallery(p);
+  modalGalleryIndex=0;
+  renderProductGallery();
   document.getElementById("modalName").textContent=p.name||"";
   document.getElementById("modalCategory").textContent=p.category||"";
   document.getElementById("modalDescription").textContent=p.description||"Šiai prekei aprašymas dar neįrašytas.";
@@ -2769,7 +2935,7 @@ function changeModalQty(delta){
   document.getElementById("modalQty").textContent=modalQty;
 }
 function addModalToCart(){if(!modalProduct)return;const before=cart.find(x=>x.key===(modalProduct.id||modalProduct.name))?.qty||0;add(modalProduct.name,salePrice(modalProduct),modalQty,modalProduct);const after=cart.find(x=>x.key===(modalProduct.id||modalProduct.name))?.qty||0;if(after>before)closeProductModal()}
-function closeProductModal(){document.getElementById("productModal").classList.remove("open");modalProduct=null}
+function closeProductModal(){document.getElementById("productModal").classList.remove("open");modalProduct=null;modalGalleryImages=[];modalGalleryIndex=0;}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeProductModal()});
 
 function toast(t){let x=document.getElementById("toast");x.textContent=t;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),1800)}
