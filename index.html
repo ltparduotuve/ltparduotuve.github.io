@@ -460,6 +460,21 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 @media(prefers-reduced-motion:reduce){.payment-await-pulse,.crypto-shell{animation:none}}
 @media(max-width:520px){.cart-thumb{width:56px;height:65px}.payment-await strong{font-size:13px}}
 </style>
+<style id="ltp-product-sizes-styles">
+/* Vienos prekės kelių dydžių pasirinkimas */
+.product-size-admin-note{font-size:10px;color:#8ca6c7;margin-top:7px;line-height:1.55}
+.product-size-admin-note b{color:#e2efff}
+.product-sizes-block{margin:18px 0 16px;padding:15px;border:1px solid #31547b;background:linear-gradient(135deg,#0d1d32,#091522);border-radius:13px}
+.product-sizes-block .product-size-title{font-size:12px;font-weight:800;color:#d9eaff;letter-spacing:.25px;margin-bottom:9px}
+.product-size-buttons{display:flex;gap:9px;flex-wrap:wrap}
+.product-size-button{min-width:52px;padding:11px 14px;border-radius:10px;border:1px solid #456182;background:#0b192a;color:#c9dbf2;cursor:pointer;font-size:12px;font-weight:800;transition:.18s}
+.product-size-button:hover{border-color:#78acfb;background:#142c4c}
+.product-size-button.selected{border-color:#7ab1ff;background:#225bac;color:#fff;box-shadow:0 0 0 2px #316fdb33}
+.product-size-hint{font-size:10px;color:#91a6c0;margin-top:9px;line-height:1.4}
+.product-size-hint.error{color:#ffb0b0}
+.product-card-size-info{color:#87acdd!important;font-size:9px!important;margin-top:4px!important}
+@media(max-width:600px){.product-sizes-block{padding:12px}.product-size-button{min-width:48px}}
+</style>
 </head>
 <body class="auth-locked">
 
@@ -698,6 +713,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
     <div class="admin-field"><label>ŽENKLIUKAS</label><input id="productBadge" placeholder="Nauja / Populiarus / −20%"></div>
     <div class="admin-field"><label>NUOLAIDA (%)</label><input id="productDiscount" type="number" min="0" max="100" step="1" value="0" placeholder="10"></div>
     <div class="admin-field"><label>PREKĖS LIMITAS / KIEKIS SANDĖLYJE</label><input id="productStockLimit" type="number" min="0" step="1" placeholder="Pvz. 4 (0 = neribota)"></div>
+    <div class="admin-field full"><label>👟 GALIMI DYDŽIAI (NEPRIVALOMA)</label><input id="productSizes" type="text" placeholder="Pvz. 43, 44, 45 arba S, M, L" maxlength="200"><p class="product-size-admin-note">Įrašyk dydžius atskirtus kableliais. Pirkėjas išsirinks dydį prieš dėdamas į krepšelį. <b>Vienas skelbimas – keli dydžiai.</b> Jei dydžių nereikia, palik tuščią. Bendras sandėlio limitas neskaidomas pagal dydžius – parduotą dydį pašalink iš sąrašo rankiniu būdu.</p></div>
     <div class="admin-field"><label>PREKĖS BŪSENA</label><select id="productSoldOut"><option value="false">Parduodama</option><option value="true">Parduota / neparduodama (rodyti kataloge)</option></select></div>
     <div class="admin-field"><label>AKTYVI</label><select id="productActive"><option value="true">Taip</option><option value="false">Ne</option></select></div>
     <div class="admin-field full"><label>APRAŠYMAS</label><textarea id="productDescription" placeholder="Trumpas prekės aprašymas"></textarea></div>
@@ -849,6 +865,11 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <div id="modalDescription" class="product-modal-desc"></div>
 <div id="modalStock" class="product-modal-stock"></div>
 <div id="modalPrice"></div>
+<div id="modalSizesBlock" class="product-sizes-block" style="display:none">
+  <div class="product-size-title">👟 PASIRINK DYDĮ</div>
+  <div id="modalSizesButtons" class="product-size-buttons" role="group" aria-label="Pasirinkti prekės dydį"></div>
+  <p id="modalSizeHint" class="product-size-hint">Pasirink norimą dydį prieš pridėdamas į krepšelį.</p>
+</div>
 <div class="delivery-estimate" aria-label="Numatomas pristatymas Lietuvoje">
  <div class="delivery-estimate-title">PRISTATYMAS LIETUVOJE</div>
  <div class="delivery-estimate-track">
@@ -1742,7 +1763,7 @@ async function loadAdminProducts(){
   const {data,error}=await supabaseClient.from("products").select("*").order("created_at",{ascending:false});
   if(error){list.innerHTML='<div class="admin-empty">Nepavyko įkelti prekių. Patikrink Supabase SQL/RLS.</div>';return}
   if(!data?.length){list.innerHTML='<div class="admin-empty">Dar nėra pridėtų prekių.</div>';return}
-  list.innerHTML=data.map(p=>{const d=Number(p.discount_percent||0);const price=salePrice(p);const editData=JSON.stringify(p).replace(/'/g,"&#39;");return `<div class="admin-product"><img src="${escapeHtml(p.image_url||"")}" onerror="this.style.opacity='.25'"><div class="admin-product-info"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(p.category)} • ${d?money(price)+" (−"+d+"%) • ":money(p.price)+" • "}${p.stock_limit!=null&&Number(p.stock_limit)>0?`📦 Limitas: ${Number(p.stock_limit)} • Liko: ${Math.max(0,Number(p.stock_limit)-Number(p.stock_reserved||0)-Number(p.stock_sold||0))}`:"📦 Limitas: neribotas • "}${p.sold_out?"🔴 ISPARDUOTA":""} ${p.active?"🟢 Aktyvi":"🔴 Išjungta"}${p.badge?" • 🏷️ "+escapeHtml(p.badge):""}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editProduct(${editData})'>✏️ Koreguoti</button>${p.stock_limit!=null&&Number(p.stock_limit)>0?`<button class="admin-secondary green" onclick="restockProduct('${p.id}',${Number(p.stock_limit||0)})">📦 Papildyti</button>`:""}<button class="admin-secondary ${p.active?'orange':'green'}" onclick="toggleProduct('${p.id}',${!p.active})">${p.active?'🔴 Išjungti':'🟢 Įjungti'}</button><button class="admin-danger" onclick="deleteProduct('${p.id}')">🗑️ Ištrinti</button></div></div>`}).join("");
+  list.innerHTML=data.map(p=>{const d=Number(p.discount_percent||0);const price=salePrice(p);const editData=JSON.stringify(p).replace(/'/g,"&#39;");return `<div class="admin-product"><img src="${escapeHtml(p.image_url||"")}" onerror="this.style.opacity='.25'"><div class="admin-product-info"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(p.category)} • ${d?money(price)+" (−"+d+"%) • ":money(p.price)+" • "}${p.stock_limit!=null&&Number(p.stock_limit)>0?`📦 Limitas: ${Number(p.stock_limit)} • Liko: ${Math.max(0,Number(p.stock_limit)-Number(p.stock_reserved||0)-Number(p.stock_sold||0))}`:"📦 Limitas: neribotas • "}${p.sold_out?"🔴 ISPARDUOTA":""} ${p.active?"🟢 Aktyvi":"🔴 Išjungta"}${p.badge?" • 🏷️ "+escapeHtml(p.badge):""}${productHasSizes(p)?" • 👟 Dydžiai: "+escapeHtml(normalizeProductSizes(p.available_sizes).join(", ")):""}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick='editProduct(${editData})'>✏️ Koreguoti</button>${p.stock_limit!=null&&Number(p.stock_limit)>0?`<button class="admin-secondary green" onclick="restockProduct('${p.id}',${Number(p.stock_limit||0)})">📦 Papildyti</button>`:""}<button class="admin-secondary ${p.active?'orange':'green'}" onclick="toggleProduct('${p.id}',${!p.active})">${p.active?'🔴 Išjungti':'🟢 Įjungti'}</button><button class="admin-danger" onclick="deleteProduct('${p.id}')">🗑️ Ištrinti</button></div></div>`}).join("");
 }
 function isProductPhotoUrl(url){
   try {const u=new URL(String(url||"").trim());return u.protocol==="https:"||u.protocol==="http:";} catch{return false;}
@@ -1839,6 +1860,41 @@ async function uploadProductPhotos(files){
   }
   return urls;
 }
+// Dydžiai naudojami tik tada, kai administratorius juos įrašo prekei.
+function normalizeProductSizes(value){
+  const array=Array.isArray(value)?value:String(value||"").split(/[,;\n]+/);
+  return [...new Set(array.map(v=>String(v||"").trim().toUpperCase()).filter(Boolean))];
+}
+function validProductSize(value){return /^[\p{L}\p{N} .+\-]{1,16}$/u.test(value)}
+function productHasSizes(product){return normalizeProductSizes(product?.available_sizes).length>0}
+let modalSelectedSize="";
+function chooseModalSize(size){
+  if(!modalProduct)return;
+  const valid=normalizeProductSizes(modalProduct.available_sizes);
+  if(!valid.includes(size))return;
+  modalSelectedSize=size;
+  renderModalSizeChoice();
+}
+function renderModalSizeChoice(){
+  const block=document.getElementById("modalSizesBlock");
+  const area=document.getElementById("modalSizesButtons");
+  const hint=document.getElementById("modalSizeHint");
+  if(!block||!area||!hint)return;
+  const sizes=normalizeProductSizes(modalProduct?.available_sizes);
+  block.style.display=sizes.length?"block":"none";
+  area.replaceChildren();
+  for(const size of sizes){
+    const button=document.createElement("button");
+    button.type="button";
+    button.className="product-size-button"+(modalSelectedSize===size?" selected":"");
+    button.textContent=size;
+    button.setAttribute("aria-pressed",String(modalSelectedSize===size));
+    button.onclick=()=>chooseModalSize(size);
+    area.appendChild(button);
+  }
+  hint.textContent=modalSelectedSize?`Pasirinktas dydis: ${modalSelectedSize}`:"Pasirink norimą dydį prieš pridėdamas į krepšelį.";
+  hint.classList.remove("error");
+}
 function editProduct(p){
   document.getElementById("productEditId").value=p.id||"";
   document.getElementById("productName").value=p.name||"";
@@ -1853,13 +1909,14 @@ function editProduct(p){
   document.getElementById("productBadge").value=p.badge||"";
   document.getElementById("productDiscount").value=p.discount_percent??0;
   document.getElementById("productStockLimit").value=p.stock_limit??0;
+  document.getElementById("productSizes").value=normalizeProductSizes(p.available_sizes).join(", ");
   document.getElementById("productSoldOut").value=String(!!p.sold_out);
   document.getElementById("productActive").value=String(p.active!==false);
   document.getElementById("productDescription").value=p.description||"";
   document.getElementById("productName").scrollIntoView({behavior:"smooth",block:"center"});
 }
 function clearProductForm(){
-  ["productEditId","productName","productPrice","productImage","productImagesExtra","productImageFiles","productBadge","productDescription","productStockLimit"].forEach(id=>document.getElementById(id).value="");
+  ["productEditId","productName","productPrice","productImage","productImagesExtra","productImageFiles","productBadge","productDescription","productStockLimit","productSizes"].forEach(id=>document.getElementById(id).value="");
   resetProductPhotoOrder();
   previewProductPhotos();
   document.getElementById("productSoldOut").value="false";
@@ -1874,6 +1931,8 @@ async function saveProduct(){
   const stockLimit=rawStock===""||Number(rawStock)===0?null:Math.max(0,Math.floor(Number(rawStock)));
   if(rawStock!==""&&!Number.isFinite(stockLimit))return alert("Įrašyk teisingą prekės kiekį.");
   const productName=document.getElementById("productName").value.trim();
+  const productSizes=normalizeProductSizes(document.getElementById("productSizes")?.value);
+  if(productSizes.length>30||productSizes.some(size=>!validProductSize(size)))return alert("Įrašyk iki 30 galimų dydžių, atskirtų kableliais (pvz. 43, 44, 45).");
   const productPrice=Number(document.getElementById("productPrice").value);
   if(!productName||!document.getElementById("productPrice").value.trim()||!Number.isFinite(productPrice)||productPrice<0)
     return alert("Įrašyk prekės pavadinimą ir teisingą kainą.");
@@ -1891,7 +1950,7 @@ async function saveProduct(){
   let filePos=0;
   const imageUrls=sortedEntries.map(item=>item.type==="url"?item.url:uploadedUrls[filePos++]);
   if(!imageUrls.length||imageUrls.some(url=>!url))return alert("Įkelk bent vieną prekės nuotrauką arba įrašyk jos URL.");
-  const payload={name:document.getElementById("productName").value.trim(),price:Number(document.getElementById("productPrice").value),category:document.getElementById("productCategory").value,image_url:imageUrls[0],image_urls:imageUrls,badge:document.getElementById("productBadge").value.trim(),discount_percent:discount,stock_limit:stockLimit,description:document.getElementById("productDescription").value.trim(),active:document.getElementById("productActive").value==="true",sold_out:document.getElementById("productSoldOut").value==="true"||(stockLimit!==null&&Number((window.__editingProduct||{}).stock_sold||0)>=stockLimit)};
+  const payload={name:document.getElementById("productName").value.trim(),price:Number(document.getElementById("productPrice").value),category:document.getElementById("productCategory").value,image_url:imageUrls[0],image_urls:imageUrls,available_sizes:productSizes,badge:document.getElementById("productBadge").value.trim(),discount_percent:discount,stock_limit:stockLimit,description:document.getElementById("productDescription").value.trim(),active:document.getElementById("productActive").value==="true",sold_out:document.getElementById("productSoldOut").value==="true"||(stockLimit!==null&&Number((window.__editingProduct||{}).stock_sold||0)>=stockLimit)};
   if(!payload.name||!Number.isFinite(payload.price)||payload.price<0)return alert("Įrašyk prekės pavadinimą ir teisingą kainą.");
   const id=document.getElementById("productEditId").value;
   if(id){
@@ -1959,8 +2018,8 @@ async function loadStoreProducts(){
     const card=document.createElement("div");card.className="product";card.dataset.cat=p.category;card.dataset.dbId=p.id;
     card.onclick=(e)=>{if(e.target.closest("button"))return;openProductModal(p)};
     const stockBadge=stockLabel?`<span class="stock-badge ${(stockLabel==="Išparduota"||stockLabel==="Parduota")?"sold":""}">${stockLabel}</span>`:"";
-    const addButton=unavailable?`<button class="add stock-disabled" disabled title="${escapeHtml(stockLabel)}">${(stockLabel==="Išparduota"||stockLabel==="Parduota")?"✕":"⏳"}</button>`:`<button class="add" onclick='add(${JSON.stringify(p.name)},${finalPrice},1,${JSON.stringify(p)})'>🛒</button>`;
-    card.innerHTML=`<div class="photo"><img class="product-image" alt="${escapeHtml(p.name)}" src="${escapeHtml(p.image_url||"")}">${p.badge?`<span class="badge ${d?"sale":""}">${escapeHtml(p.badge)}</span>`:d?`<span class="badge sale">−${d}%</span>`:""}${stockBadge}<button class="like" onclick="like(this)">♡</button></div><div class="info"><h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(p.category)}${stockLabel?` • ${escapeHtml(stockLabel)}`:""}</p><div class="price-row"><b class="price">${d?`<span class="discount-old">${money(p.price)}</span><span class="discount-new">${money(finalPrice)}</span>`:money(p.price)}</b>${addButton}</div></div>`;
+    const addButton=unavailable?`<button class="add stock-disabled" disabled title="${escapeHtml(stockLabel)}">${(stockLabel==="Išparduota"||stockLabel==="Parduota")?"✕":"⏳"}</button>`:productHasSizes(p)?`<button class="add" title="Pasirinkti dydį" onclick='openProductModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>👟</button>`:`<button class="add" onclick='add(${JSON.stringify(p.name)},${finalPrice},1,${JSON.stringify(p)})'>🛒</button>`;
+    card.innerHTML=`<div class="photo"><img class="product-image" alt="${escapeHtml(p.name)}" src="${escapeHtml(p.image_url||"")}">${p.badge?`<span class="badge ${d?"sale":""}">${escapeHtml(p.badge)}</span>`:d?`<span class="badge sale">−${d}%</span>`:""}${stockBadge}<button class="like" onclick="like(this)">♡</button></div><div class="info"><h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(p.category)}${stockLabel?` • ${escapeHtml(stockLabel)}`:""}</p>${productHasSizes(p)?`<p class="product-card-size-info">👟 Dydžiai: ${escapeHtml(normalizeProductSizes(p.available_sizes).join(", "))}</p>`:""}<div class="price-row"><b class="price">${d?`<span class="discount-old">${money(p.price)}</span><span class="discount-new">${money(finalPrice)}</span>`:money(p.price)}</b>${addButton}</div></div>`;
     grid.appendChild(card);
   });
   filter();
@@ -2872,11 +2931,59 @@ async function submitOrder(){
   if(remember){localStorage.setItem("ltparduotuve_checkout",JSON.stringify({first_name:first,last_name:last,phone,address,city,postal_code:postal}));const u=await supabaseClient.auth.getUser();if(u.data.user)await supabaseClient.from("profiles").upsert({user_id:u.data.user.id,first_name:first,last_name:last,phone,address,city,postal_code:postal,updated_at:new Date().toISOString()});}
   else localStorage.removeItem("ltparduotuve_checkout");
   const shipping=selectedShipping();
-  const items=cart.map(x=>({product_id:x.product?.id||null,quantity:x.qty}));
-  const {data,error}=await supabaseClient.rpc("create_order",{
-    p_first_name:first,p_last_name:last,p_email:email,p_phone:phone,p_address:address,p_city:city,p_postal_code:postal,
-    p_shipping_method:shipping.method,p_shipping_amount:shipping.price,p_items:items,p_coupon_code:activeCoupon?.code||null
-  });
+  // Vienos prekės įvairių dydžių kiekius grupuojame, kad esamas create_order RPC
+  // teisingai rezervuotų BENDRĄ prekės likutį ir neprireiktų keisti mokėjimų logikos.
+  const grouped=new Map();
+  for(const item of cart){
+    if(!item.product?.id){errorEl.textContent="Atnaujink krepšelį – prekė nebeturi ID.";return;}
+    const id=item.product.id;
+    if(!grouped.has(id))grouped.set(id,{product_id:id,quantity:0,selections:new Map()});
+    const row=grouped.get(id);row.quantity+=item.qty;
+    if(item.selectedSize)row.selections.set(item.selectedSize,(row.selections.get(item.selectedSize)||0)+item.qty);
+  }
+  const ids=[...grouped.keys()];
+  const {data:liveProducts,error:liveError}=await supabaseClient.from("products").select("id,available_sizes,active,sold_out").in("id",ids);
+  if(liveError||!liveProducts||liveProducts.length!==ids.length){errorEl.textContent="Nepavyko patikrinti dydžių. Pabandyk dar kartą.";return;}
+  const liveById=new Map(liveProducts.map(p=>[p.id,p]));
+  for(const item of cart){
+    const live=liveById.get(item.product?.id);
+    if(!live?.active||live.sold_out){errorEl.textContent=`Prekė „${item.baseName||item.name}“ šiuo metu nepasiekiama.`;return;}
+    const valid=normalizeProductSizes(live.available_sizes);
+    if(valid.length&&!valid.includes(item.selectedSize||"")){
+      errorEl.textContent=`Prekei „${item.baseName||item.name}“ pasirinktas dydis nebegalioja. Pašalink ją iš krepšelio ir pasirink iš naujo.`;return;
+    }
+    if(!valid.length&&item.selectedSize){errorEl.textContent=`Prekės „${item.baseName||item.name}“ dydžiai pasikeitė. Atidaryk prekę iš naujo.`;return;}
+  }
+  const items=[...grouped.values()].map(x=>({product_id:x.product_id,quantity:x.quantity}));
+  // Iki užsakymo sukūrimo saugiai išsaugome pasirinkimus. Supabase trigeris,
+  // kurdamas order_items eilutę, prideda dydžius prie product_name.
+  // Todėl dydžiai lieka užsakyme ir yra matomi integracijoms, kurios skaito order_items.product_name.
+  const userResult=await supabaseClient.auth.getUser();
+  const uid=userResult.data?.user?.id;
+  if(!uid){errorEl.textContent="Prisijunk prie paskyros prieš pateikdamas užsakymą.";return;}
+  const clearStage=await supabaseClient.from("shop_cart_size_selections").delete().eq("user_id",uid);
+  if(clearStage.error){console.error("[SIZE STAGE CLEAN]",clearStage.error);errorEl.textContent="Nepavyko paruošti dydžių. Paleisk pridėtą Supabase SQL failą.";return;}
+  const staged=[...grouped.values()].filter(x=>x.selections.size).map(x=>({
+    user_id:uid,product_id:x.product_id,
+    sizes:[...x.selections.entries()].map(([size,quantity])=>({size,quantity})),
+    updated_at:new Date().toISOString()
+  }));
+  if(staged.length){
+    const stageResult=await supabaseClient.from("shop_cart_size_selections").upsert(staged,{onConflict:"user_id,product_id"});
+    if(stageResult.error){console.error("[SIZE STAGE]",stageResult.error);errorEl.textContent="Nepavyko išsaugoti pasirinkto dydžio. Patikrink dydžių SQL.";return;}
+  }
+  let result;
+  try{
+    result=await supabaseClient.rpc("create_order",{
+      p_first_name:first,p_last_name:last,p_email:email,p_phone:phone,p_address:address,p_city:city,p_postal_code:postal,
+      p_shipping_method:shipping.method,p_shipping_amount:shipping.price,p_items:items,p_coupon_code:activeCoupon?.code||null
+    });
+  } finally {
+    // Net nesėkmės atveju pasirinkimai neturi persikelti į kitą užsakymą.
+    const cleanup=await supabaseClient.from("shop_cart_size_selections").delete().eq("user_id",uid);
+    if(cleanup.error)console.warn("[SIZE STAGE CLEANUP]",cleanup.error);
+  }
+  const {data,error}=result;
   if(error){console.error(error);errorEl.textContent=error.message||"Nepavyko sukurti užsakymo.";return}
   const order=data?.[0]||data;
   // Mokėjimo paskirtis priskiriama tik pasirinkus bankinį pavedimą.
@@ -2892,30 +2999,50 @@ async function submitOrder(){
 }
 let cart=[];
 const CART_STORAGE_KEY='ltparduotuve_cart_v2';
-function saveCartSnapshot(){try{localStorage.setItem(CART_STORAGE_KEY,JSON.stringify(cart.map(x=>({key:x.key,name:x.name,price:x.price,qty:x.qty,productId:x.product?.id||null,image:x.product?.image_url||x.image||""}))))}catch(e){console.warn('Cart save',e)}}
-function restoreCartSnapshot(){try{const saved=JSON.parse(localStorage.getItem(CART_STORAGE_KEY)||'[]');if(Array.isArray(saved))cart=saved.filter(x=>typeof x.key==='string'&&Number.isFinite(Number(x.price))&&Number.isInteger(Number(x.qty))&&x.qty>0).slice(0,100).map(x=>({key:x.key,name:String(x.name||''),price:Number(x.price),qty:x.qty,product:x.productId?{id:x.productId,image_url:x.image||""}:null,image:x.image||""}));}catch(e){cart=[]}renderCart()}
+function saveCartSnapshot(){try{localStorage.setItem(CART_STORAGE_KEY,JSON.stringify(cart.map(x=>({key:x.key,name:x.name,baseName:x.baseName||x.name,selectedSize:x.selectedSize||"",price:x.price,qty:x.qty,productId:x.product?.id||null,image:x.product?.image_url||x.image||""}))))}catch(e){console.warn('Cart save',e)}}
+function restoreCartSnapshot(){try{const saved=JSON.parse(localStorage.getItem(CART_STORAGE_KEY)||'[]');if(Array.isArray(saved))cart=saved.filter(x=>typeof x.key==='string'&&Number.isFinite(Number(x.price))&&Number.isInteger(Number(x.qty))&&x.qty>0).slice(0,100).map(x=>({key:x.key,name:String(x.name||''),baseName:String(x.baseName||x.name||''),selectedSize:String(x.selectedSize||''),price:Number(x.price),qty:x.qty,product:x.productId?{id:x.productId,image_url:x.image||""}:null,image:x.image||""}));}catch(e){cart=[]}renderCart()}
 let modalProduct=null;
 let modalQty=1;
 
-function add(name,price,qty=1,product=null){
-  qty=Math.max(1,Number(qty)||1);
-  const key=product?.id || name;
+function add(name,price,qty=1,product=null,selectedSize=""){
+  qty=Math.max(1,Math.floor(Number(qty)||1));
+  const sizes=normalizeProductSizes(product?.available_sizes);
+  selectedSize=String(selectedSize||"").trim().toUpperCase();
+  if(sizes.length&&!sizes.includes(selectedSize)){
+    alert("Prieš pridėdamas šią prekę, pasirink galimą dydį.");
+    return false;
+  }
+  if(!sizes.length)selectedSize="";
+  const key=(product?.id||name)+(selectedSize?"::size:"+selectedSize:"");
   const existing=cart.find(x=>x.key===key);
-  if(product?.stock_limit!==null && product?.stock_limit!==undefined && product?.stock_limit!==""){
+  if(product?.stock_limit!==null&&product?.stock_limit!==undefined&&product?.stock_limit!==""){
     const available=productAvailable(product);
-    const wanted=(existing?.qty||0)+qty;
-    if(wanted>available){
-      return alert(available<=0?"Šios prekės šiuo metu nebėra laisvame sandėlyje.":`Šios prekės galima pridėti tik ${available} vnt.`);
+    const totalInCart=cart.filter(x=>x.product?.id&&x.product.id===product.id).reduce((sum,x)=>sum+x.qty,0);
+    if(totalInCart+qty>available){
+      alert(available<=0?"Šios prekės šiuo metu nebėra laisvame sandėlyje.":`Šios prekės bendrai galima pridėti tik ${available} vnt.`);
+      return false;
     }
   }
-  if(existing) existing.qty+=qty;
-  else cart.push({key,name,price:Number(price),qty,product,image:product?.image_url||""});
+  const itemName=selectedSize?`${name} · dydis ${selectedSize}`:name;
+  if(existing)existing.qty+=qty;
+  else cart.push({key,name:itemName,baseName:name,selectedSize,price:Number(price),qty,product,image:product?.image_url||""});
   renderCart();
-  toast("✓ "+name+" pridėta į krepšelį");
+  toast("✓ "+itemName+" pridėta į krepšelį");
+  return true;
 }
 function changeQty(i,delta){
   if(!cart[i])return;
-  cart[i].qty=Math.max(1,cart[i].qty+delta);
+  const item=cart[i];
+  const next=Math.max(1,item.qty+delta);
+  if(next>item.qty&&item.product?.id){
+    const available=productAvailable(item.product);
+    const allQty=cart.filter(x=>x.product?.id===item.product.id).reduce((sum,x)=>sum+x.qty,0);
+    if(available!==Infinity&&allQty+(next-item.qty)>available){
+      alert(`Šios prekės bendrai galima pridėti tik ${available} vnt.`);
+      return;
+    }
+  }
+  item.qty=next;
   renderCart();
 }
 function removeItem(i){cart.splice(i,1);renderCart()}
@@ -2980,7 +3107,8 @@ document.addEventListener("touchstart",e=>{if(e.target.closest?.("#gallerySwipeA
 document.addEventListener("touchend",e=>{if(gallerySwipeX===null)return;const delta=e.changedTouches[0].screenX-gallerySwipeX;gallerySwipeX=null;if(Math.abs(delta)>40&&document.getElementById("productModal")?.classList.contains("open"))changeGalleryImage(delta<0?1:-1);},{passive:true});
 document.addEventListener("keydown",e=>{if(!document.getElementById("productModal")?.classList.contains("open")||["INPUT","TEXTAREA"].includes(document.activeElement?.tagName))return;if(e.key==="ArrowLeft")changeGalleryImage(-1);if(e.key==="ArrowRight")changeGalleryImage(1);});
 function openProductModal(p){
-  modalProduct=p; modalQty=1;
+  modalProduct=p; modalQty=1;modalSelectedSize="";
+  renderModalSizeChoice();
   updateProductDeliveryEstimate();
   const d=Math.min(100,Math.max(0,Number(p.discount_percent||0)));
   const finalPrice=salePrice(p);
@@ -3010,8 +3138,17 @@ function changeModalQty(delta){
   if(max!==Infinity)modalQty=Math.min(modalQty,Math.max(1,max));
   document.getElementById("modalQty").textContent=modalQty;
 }
-function addModalToCart(){if(!modalProduct)return;const before=cart.find(x=>x.key===(modalProduct.id||modalProduct.name))?.qty||0;add(modalProduct.name,salePrice(modalProduct),modalQty,modalProduct);const after=cart.find(x=>x.key===(modalProduct.id||modalProduct.name))?.qty||0;if(after>before)closeProductModal()}
-function closeProductModal(){document.getElementById("productModal").classList.remove("open");modalProduct=null;modalGalleryImages=[];modalGalleryIndex=0;}
+function addModalToCart(){
+  if(!modalProduct)return;
+  if(productHasSizes(modalProduct)&&!modalSelectedSize){
+    const hint=document.getElementById("modalSizeHint");
+    if(hint){hint.textContent="❌ Pirmiausia pasirink dydį.";hint.classList.add("error");}
+    document.getElementById("modalSizesBlock")?.scrollIntoView({behavior:"smooth",block:"nearest"});
+    return;
+  }
+  if(add(modalProduct.name,salePrice(modalProduct),modalQty,modalProduct,modalSelectedSize))closeProductModal();
+}
+function closeProductModal(){document.getElementById("productModal").classList.remove("open");modalProduct=null;modalGalleryImages=[];modalGalleryIndex=0;modalSelectedSize="";}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeProductModal()});
 
 function toast(t){let x=document.getElementById("toast");x.textContent=t;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),1800)}
