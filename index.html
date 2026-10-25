@@ -372,6 +372,59 @@ body::after { display: none; }
 .admin-quick-stock input:disabled{opacity:.6}
 .admin-quick-stock small{font-size:9px;font-weight:400;color:#82a1c2}
 @media(max-width:700px){.admin-quick-stock-sizes{max-width:100%}.admin-quick-stock{max-width:120px}}
+
+/* LT PARDUOTUVE: kompaktiškas prekių valdymas (tik #adminProductList).
+   Nekeicia kiekio įrašymo, rezervacijų, matomumo ar užsakymų logikos. */
+#adminProductList{gap:7px}
+#adminProductList .admin-product{
+  display:grid;grid-template-columns:54px minmax(135px,1fr) auto;
+  align-items:center;gap:10px;padding:9px 10px;border-radius:10px;
+}
+#adminProductList .admin-product>img{width:54px;height:54px;border-radius:7px}
+#adminProductList .admin-product-info{min-width:0}
+#adminProductList .admin-product-info b{display:block;font-size:11px;line-height:1.35;overflow-wrap:anywhere}
+#adminProductList .admin-product-info small{font-size:9px;line-height:1.45;overflow-wrap:anywhere}
+#adminProductList .admin-product-actions{
+  display:flex;align-items:center;align-content:center;justify-content:flex-end;
+  flex-wrap:wrap;gap:6px;min-width:0;
+}
+#adminProductList .admin-product-actions>button{
+  flex:0 0 auto;align-self:center;width:auto;min-height:34px;height:auto;
+  padding:7px 10px;font-size:10px;line-height:1.2;
+  font-weight:700;white-space:nowrap;border-radius:7px;
+}
+#adminProductList .admin-quick-stock-sizes{display:flex;align-items:center;flex-wrap:wrap;gap:6px;max-width:none}
+#adminProductList .admin-quick-stock{
+  flex:0 0 auto;align-self:center;min-width:78px;width:88px;max-width:88px;
+  padding:5px 7px;gap:3px;border-radius:8px;
+}
+#adminProductList .admin-quick-stock>span{font-size:9px;line-height:1.3;white-space:nowrap}
+#adminProductList .admin-quick-stock input{
+  height:30px;padding:3px 6px;font-size:14px;line-height:1.2;
+}
+#adminProductList .admin-quick-stock small{font-size:9px;line-height:1.2;white-space:nowrap}
+@media(max-width:980px){
+  #adminProductList .admin-product{grid-template-columns:50px minmax(0,1fr);gap:8px;padding:9px}
+  #adminProductList .admin-product>img{width:50px;height:50px}
+  #adminProductList .admin-product-actions{grid-column:1/-1;justify-content:flex-start}
+}
+@media(max-width:600px){
+  #adminPanel:has(#admin-products.active){padding:10px}
+  #admin-products{padding:12px}
+  #adminProductList .admin-product{grid-template-columns:48px minmax(0,1fr);gap:8px;padding:9px}
+  #adminProductList .admin-product>img{width:48px;height:48px}
+  #adminProductList .admin-product-info b{font-size:12px}
+  #adminProductList .admin-product-info small{font-size:10px}
+  #adminProductList .admin-product-actions{gap:6px}
+  #adminProductList .admin-product-actions>button{min-height:36px;padding:8px 9px;font-size:10px}
+  #adminProductList .admin-quick-stock{width:84px;min-width:84px;max-width:84px}
+  #adminProductList .admin-quick-stock-sizes{gap:6px}
+}
+@media(max-width:355px){
+  #adminProductList .admin-product-actions>button{padding:7px;font-size:9px}
+  #adminProductList .admin-quick-stock{width:78px;min-width:78px;max-width:78px}
+}
+
 </style>
 <style id="payment-30min-style">
 .bank-pay-modal{align-items:flex-start;padding:28px 16px;overflow:auto;background:rgba(1,4,10,.96);backdrop-filter:blur(10px)}
