@@ -363,6 +363,15 @@ body::after { display: none; }
 .account-settings-group .account-settings-action{padding:12px 14px;border-radius:10px;background:linear-gradient(110deg,#2557a1,#3c79db);border-color:#6496db;font-size:11px}
 .account-settings-group .account-settings-action:hover{filter:brightness(1.13)}
 @media(max-width:700px){.product-modal-gallery .product-modal-image,.product-modal-gallery .product-modal-image img{min-height:260px;height:290px}.gallery-arrow{width:35px;height:40px}.gallery-thumb{width:54px;height:48px;flex-basis:54px}.account-settings-content{padding:14px}.account-settings-group{padding:16px}.updates-modal-body{padding:11px}.updates-section{padding:13px}}
+
+/* Greitas sandėlio kiekio keitimas administracijos prekių sąraše */
+.admin-quick-stock-sizes{display:flex;flex-wrap:wrap;align-items:center;gap:7px;max-width:460px}
+.admin-quick-stock{display:flex;flex-direction:column;gap:4px;min-width:100px;max-width:135px;border:1px solid #2c4561;background:#0a1828;border-radius:9px;padding:7px 9px;color:#b6cce6;font-size:10px;font-weight:700}
+.admin-quick-stock input{width:100%;height:32px;min-width:0;border:1px solid #416991;background:#07111f;color:#fff;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:800;outline:none}
+.admin-quick-stock input:focus{border-color:#66a5ff;box-shadow:0 0 0 2px #4389ff27}
+.admin-quick-stock input:disabled{opacity:.6}
+.admin-quick-stock small{font-size:9px;font-weight:400;color:#82a1c2}
+@media(max-width:700px){.admin-quick-stock-sizes{max-width:100%}.admin-quick-stock{max-width:120px}}
 </style>
 <style id="payment-30min-style">
 .bank-pay-modal{align-items:flex-start;padding:28px 16px;overflow:auto;background:rgba(1,4,10,.96);backdrop-filter:blur(10px)}
@@ -1813,6 +1822,101 @@ async function saveCategory(){
 async function toggleCategory(id,activeVal){if(!isAdmin)return alert("Neturite administratoriaus teisių.");const {error}=await supabaseClient.from("categories").update({active:activeVal}).eq("id",id);if(error)return alert("Nepavyko pakeisti kategorijos būsenos.");await loadCategories();await loadAdminCategories()}
 async function deleteCategory(id){if(!isAdmin||!confirm("Ar tikrai ištrinti šią kategoriją? Produktai joje nebus ištrinti, bet liks su senu kategorijos pavadinimu."))return;const {error}=await supabaseClient.from("categories").delete().eq("id",id);if(error)return alert("Nepavyko ištrinti kategorijos. Jei joje yra prekių, pirmiausia perkelk jas į kitą kategoriją.");await loadCategories();await loadAdminCategories()}
 
+// Greitas kiekio redagavimas prekių sąraše; pardavimai ir rezervacijos neredaguojami.
+const quickStockSaving = new Set();
+function renderAdminQuickStock(p){
+  const id=escapeHtml(String(p.id));
+  const sizes=normalizeProductSizes(p.available_sizes);
+  const input=(size,total,free)=>{
+    const sizeHtml=escapeHtml(size);
+    const count=Number.isFinite(Number(total)) && total!==null ? Math.max(0,Math.floor(Number(total))) : null;
+    const shown=count===null?'':String(count);
+    const desc=size?`EU ${sizeHtml}`:'Bendras kiekis';
+    return `<label class="admin-quick-stock"><span>📦 ${desc}</span><input type="number" min="0" max="1000000" step="1" inputmode="numeric" data-product-id="${id}" data-size="${sizeHtml}" data-prior="${shown}" value="${shown}" placeholder="∞" aria-label="${desc}" title="Galutinis sandėlio kiekis (ne papildymas). Enter arba palik laukelį, kad išsaugotum." onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}" onchange="quickStockCommit(this)"><small>${Number.isFinite(free)?'Laisva: '+free:'Neribota'}</small></label>`;
+  };
+  if(!sizes.length){
+    const total=p.stock_limit==null || Number(p.stock_limit)===0 ? null : Number(p.stock_limit);
+    const free=total===null?Infinity:Math.max(0,total-Number(p.stock_reserved||0)-Number(p.stock_sold||0));
+    return input('',total,free);
+  }
+  return `<div class="admin-quick-stock-sizes" aria-label="Kiekiai pagal dydžius">${sizes.map(size=>{
+    const row=p.size_inventory?.[size];
+    return input(size,row?Number(row.stock_total):0,variantSizeAvailable(p,size));
+  }).join('')}</div>`;
+}
+async function quickStockCommit(field){
+  if(!isAdmin || !field)return;
+  const id=String(field.dataset.productId||''),size=String(field.dataset.size||'');
+  const previous=field.dataset.prior||'';
+  const raw=field.value.trim();
+  if(raw===previous)return;
+  // Tuščias laukelis išsaugojimo nevykdo. 0 reiškia išparduota, o ne neribota.
+  if(!/^\d+$/.test(raw)||Number(raw)>1000000||!Number.isSafeInteger(Number(raw))){
+    field.value=previous;return alert('Įrašyk sveiką galutinį kiekį nuo 0 iki 1000000.');
+  }
+  const desired=Number(raw);
+  if(quickStockSaving.has(id)){field.value=previous;return alert('Šios prekės kiekis jau atnaujinamas.');}
+  quickStockSaving.add(id);
+  const row=field.closest('.admin-product');
+  if(row)row.querySelectorAll('.admin-quick-stock input').forEach(el=>el.disabled=true);
+  try{
+    if(!size){
+      // Tikriname tikruosius rezervuotus/parduotus vienetus iš DB (ne iš seno DOM).
+      const {data:p,error:e}=await supabaseClient.from('products')
+        .select('stock_limit,stock_reserved,stock_sold,available_sizes').eq('id',id).single();
+      if(e||!p)throw e||new Error('Prekė nerasta');
+      if(normalizeProductSizes(p.available_sizes).length)throw new Error('Prekė turi dydžių – keisk kiekį prie konkretaus dydžio.');
+      const sold=Number(p.stock_sold||0),reserved=Number(p.stock_reserved||0);
+      if(desired<sold+reserved)throw new Error(`Mažiausias galimas bendras kiekis: ${sold+reserved} (parduota ${sold}, rezervuota ${reserved}).`);
+      // Sąlyginis įrašymas: neperrašome pasikeitusio likučio po kliento užsakymo.
+      let q=supabaseClient.from('products')
+        .update({stock_limit:desired,sold_out:desired===0 || desired<=sold})
+        .eq('id',id).eq('stock_reserved',reserved).eq('stock_sold',sold);
+      q=p.stock_limit==null?q.is('stock_limit',null):q.eq('stock_limit',p.stock_limit);
+      const {data:changed,error:changeError}=await q.select('id');
+      if(changeError)throw changeError;
+      if(!changed?.length)throw new Error('Likutis pasikeitė, kol redagavai. Atnaujink sąrašą ir pakartok.');
+    }else{
+      // Dydžiams naudojame tą patį veikiantį administratoriaus RPC kaip ir "Koreguoti".
+      const {data:product,error:pe}=await supabaseClient.from('products')
+        .select('available_sizes').eq('id',id).single();
+      if(pe||!product)throw pe||new Error('Prekė nerasta');
+      const sizes=normalizeProductSizes(product.available_sizes);
+      if(!sizes.includes(size))throw new Error('Dydis pasikeitė. Atnaujink sąrašą.');
+      const {data:rows,error:re}=await supabaseClient.from('product_size_inventory')
+        .select('size,stock_total,stock_reserved,stock_sold').eq('product_id',id);
+      if(re)throw re;
+      const bySize=new Map((rows||[]).map(r=>[String(r.size).toUpperCase(),r]));
+      const selected=bySize.get(size);
+      if(!selected)throw new Error('Dydžio likutis nebuvo rastas.');
+      const reserved=Number(selected.stock_reserved||0),sold=Number(selected.stock_sold||0);
+      if(desired<reserved+sold)throw new Error(`Dydžiui EU ${size} mažiausias galimas kiekis: ${reserved+sold}.`);
+      const values=sizes.map(s=>{
+        const r=bySize.get(s);
+        if(!r)throw new Error(`Trūksta EU ${s} sandėlio įrašo.`);
+        const available=s===size?desired-reserved-sold:Math.max(0,Number(r.stock_total||0)-Number(r.stock_reserved||0)-Number(r.stock_sold||0));
+        return {size:s,available};
+      });
+      const {error:rpcError}=await supabaseClient.rpc('admin_set_product_size_stock',{
+        p_product_id:id,p_sizes:values
+      });
+      if(rpcError)throw rpcError;
+      const hasAvailable=values.some(x=>x.available>0);
+      const {error:statusError}=await supabaseClient.from('products').update({sold_out:!hasAvailable}).eq('id',id);
+      if(statusError)throw statusError;
+    }
+    await Promise.all([loadAdminProducts(),loadAdminStats(),loadStoreProducts()]);
+    toast('✓ Kiekis atnaujintas. Discord pasikeis automatinės sinchronizacijos metu.');
+  }catch(error){
+    field.value=previous;
+    console.error('[QUICK STOCK]',error);
+    alert('Nepavyko pakeisti kiekio: '+String(error?.message||error));
+    await loadAdminProducts();
+  }finally{
+    quickStockSaving.delete(id);
+    if(row)row.querySelectorAll('.admin-quick-stock input').forEach(el=>el.disabled=false);
+  }
+}
 async function loadAdminProducts(){
   const list=document.getElementById("adminProductList");list.innerHTML='<div class="admin-empty">Kraunama...</div>';
   const {data,error}=await supabaseClient.from("products").select("*").order("created_at",{ascending:false});
@@ -1820,7 +1924,7 @@ async function loadAdminProducts(){
   if(!data?.length){list.innerHTML='<div class="admin-empty">Dar nėra pridėtų prekių.</div>';return}
   try{await hydrateSizeInventory(data);}catch(e){list.innerHTML='<div class="admin-empty">'+escapeHtml(e.message)+'</div>';return;}
   adminVisibilityProducts=new Map(data.map(p=>[String(p.id),p]));
-  list.innerHTML=data.map(p=>{const d=Number(p.discount_percent||0);const price=salePrice(p);const editData=JSON.stringify(p).replace(/'/g,"&#39;");return `<div class="admin-product"><img src="${escapeHtml(p.image_url||"")}" onerror="this.style.opacity='.25'"><div class="admin-product-info"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(p.category)} • ${d?money(price)+" (−"+d+"%) • ":money(p.price)+" • "}${p.stock_limit!=null&&Number(p.stock_limit)>0?`📦 Limitas: ${Number(p.stock_limit)} • Liko: ${Math.max(0,Number(p.stock_limit)-Number(p.stock_reserved||0)-Number(p.stock_sold||0))}`:"📦 Limitas: neribotas • "}${p.sold_out?"🔴 ISPARDUOTA":""} ${p.active?"🟢 Aktyvi":"🔴 Išjungta"} • 🌐 ${p.active!==false&&p.show_website!==false?"Svetainėje":"Paslėpta svetainėje"} • 💬 ${p.active!==false&&p.show_discord!==false?"Discord":"Paslėpta Discord"}${p.badge?" • 🏷️ "+escapeHtml(p.badge):""}${productHasSizes(p)?" • 👟 "+escapeHtml(normalizeProductSizes(p.available_sizes).map(s=>`${s}: ${variantSizeAvailable(p,s)} vnt.`).join(" | ")):""}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick="openProductVisibility('${p.id}')">🎚️ Jungikliai</button><button class="admin-secondary" onclick='editProduct(${editData})'>✏️ Koreguoti</button>${!productHasSizes(p)&&p.stock_limit!=null&&Number(p.stock_limit)>0?`<button class="admin-secondary green" onclick="restockProduct('${p.id}',${Number(p.stock_limit||0)})">📦 Papildyti</button>`:""}<button class="admin-danger" onclick="deleteProduct('${p.id}')">🗑️ Ištrinti</button></div></div>`}).join("");
+  list.innerHTML=data.map(p=>{const d=Number(p.discount_percent||0);const price=salePrice(p);const editData=JSON.stringify(p).replace(/'/g,"&#39;");return `<div class="admin-product"><img src="${escapeHtml(p.image_url||"")}" onerror="this.style.opacity='.25'"><div class="admin-product-info"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(p.category)} • ${d?money(price)+" (−"+d+"%) • ":money(p.price)+" • "}${p.stock_limit!=null&&Number(p.stock_limit)>0?`📦 Limitas: ${Number(p.stock_limit)} • Liko: ${Math.max(0,Number(p.stock_limit)-Number(p.stock_reserved||0)-Number(p.stock_sold||0))}`:"📦 Limitas: neribotas • "}${p.sold_out?"🔴 ISPARDUOTA":""} ${p.active?"🟢 Aktyvi":"🔴 Išjungta"} • 🌐 ${p.active!==false&&p.show_website!==false?"Svetainėje":"Paslėpta svetainėje"} • 💬 ${p.active!==false&&p.show_discord!==false?"Discord":"Paslėpta Discord"}${p.badge?" • 🏷️ "+escapeHtml(p.badge):""}${productHasSizes(p)?" • 👟 "+escapeHtml(normalizeProductSizes(p.available_sizes).map(s=>`${s}: ${variantSizeAvailable(p,s)} vnt.`).join(" | ")):""}</small></div><div class="admin-product-actions"><button class="admin-secondary" onclick="openProductVisibility('${p.id}')">🎚️ Jungikliai</button><button class="admin-secondary" onclick='editProduct(${editData})'>✏️ Koreguoti</button>${renderAdminQuickStock(p)}<button class="admin-danger" onclick="deleteProduct('${p.id}')">🗑️ Ištrinti</button></div></div>`}).join("");
 }
 function isProductPhotoUrl(url){
   try {const u=new URL(String(url||"").trim());return u.protocol==="https:"||u.protocol==="http:";} catch{return false;}
@@ -2183,19 +2287,6 @@ document.addEventListener('keydown',event=>{
     event.stopPropagation();closeProductVisibility();
   }
 });
-async function restockProduct(id,currentLimit){
-  if(!isAdmin)return;
-  const raw=prompt(`Kiek naujų vienetų gavai?\n\nDabartinis sandėlio limitas: ${Number(currentLimit||0)}`,"1");
-  if(raw===null)return;
-  const qty=Math.floor(Number(raw));
-  if(!Number.isFinite(qty)||qty<=0)return alert("Įrašyk teigiamą sveiką vienetų skaičių.");
-  const {error}=await supabaseClient.rpc("admin_restock_product",{p_product_id:id,p_quantity:qty});
-  if(error){console.error(error);return alert("Nepavyko papildyti prekės. Paleisk naujausią inventoriaus SQL.");}
-  await loadAdminProducts();
-  await loadAdminStats();
-  await loadStoreProducts();
-  toast(`✓ Sandėlis papildytas +${qty} vnt. — prekė vėl gali būti perkama`);
-}
 function productAvailable(p,size=""){
   if(productHasSizes(p)){
     const variant=size?variantSizeAvailable(p,size):variantFreeTotal(p);
