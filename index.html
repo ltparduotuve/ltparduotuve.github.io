@@ -269,6 +269,14 @@ body.auth-locked{overflow:hidden}
 
 .account-pref-input{width:100%;padding:12px;background:#08111d;border:1px solid #46658d;border-radius:9px;color:white} .admin-chat-badge{display:inline-grid;place-items:center;background:#db354c;color:#fff;border-radius:30px;padding:3px 7px;font-size:10px;min-width:20px;margin-left:5px;box-shadow:0 0 13px #ff365177}.admin-chat-badge[hidden]{display:none}  
 
+
+/* Užsakymų naujienos: tik administracijos UI. */
+#adminPanel .admin-order-new{border-color:#4389ff;box-shadow:inset 3px 0 #4389ff;background:#0d1c31}
+#adminPanel .admin-order-new-label{display:inline-block;padding:3px 7px;margin-left:6px;border-radius:7px;background:#16447d;color:#c7e0ff;font-size:10px;font-weight:800}
+#adminPanel .admin-order-unread-note{padding:10px 12px;margin-bottom:12px;border:1px solid #315b95;border-radius:10px;background:#0c2039;color:#bcd8ff;font-size:12px}
+#adminPanel .admin-order-unread-note[hidden]{display:none}
+#adminPanel #adminOrderBadge,#adminOrderLaunchBadge{vertical-align:middle}
+
 /* Product detail delivery timeline */
 .product-modal-info{display:flex;flex-direction:column;gap:10px}
 .product-modal-info h2,.product-modal-cat,.product-modal-desc{margin-bottom:0}
@@ -680,7 +688,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
 <button class="account-action" onclick="openOrders()">📦 Mano užsakymai</button><button class="account-action" onclick="openAccountSettings()">⚙️ Nustatymai</button><button onclick="logoutUser()">Atsijungti</button>
 </div>
 </div>
-<button id="adminBtn" class="admin-nav-launch" style="display:none" onclick="openAdmin()">⚙ Administravimas <span id="adminNavUnread" class="admin-chat-badge" hidden>0</span></button>
+<button id="adminBtn" class="admin-nav-launch" style="display:none" onclick="openAdmin()">⚙ Administravimas <span id="adminOrderLaunchBadge" class="admin-chat-badge" hidden>0</span><span id="adminNavUnread" class="admin-chat-badge" hidden>0</span></button>
 <button class="nav-icon">♡</button><button class="nav-icon cart" onclick="openCart()">🛒<span class="count" id="count">0</span></button>
 </div></header>
 
@@ -781,7 +789,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
    <button class="admin-tab" onclick="adminTab('coupons',this)">🎟️ Kuponai</button>
    <button class="admin-tab" onclick="adminTab('bulk',this)">🛍️ Kiekio akcijos</button>
    <button class="admin-tab" onclick="adminTab('updates',this)">📰 Atnaujinimai</button>
-   <button class="admin-tab" onclick="adminTab('orders',this)">🧾 Užsakymai</button>
+   <button class="admin-tab" onclick="adminTab('orders',this)">🧾 Užsakymai <span id="adminOrderBadge" class="admin-chat-badge" hidden>0</span></button>
    <button class="admin-tab" onclick="adminTab('payments',this)">🏦 Apmokėjimai</button>
    <button class="admin-tab" onclick="adminTab('storelock',this)">🔒 Parduotuvė</button>
    <button class="admin-tab" onclick="adminTab('chat',this)">💬 Klientų chat <span id="adminChatBadge" class="admin-chat-badge" hidden>0</span></button>
@@ -877,6 +885,7 @@ main{position:relative}.main-floaters{position:absolute;inset:70px 0 auto;height
    <div class="admin-list" id="adminUpdateList"><div class="admin-empty">Kraunama...</div></div>
   </section>
   <section class="admin-section" id="admin-orders">
+   <div id="adminOrderUnreadNote" class="admin-order-unread-note" hidden></div>
    <div class="admin-order-stats" id="adminOrderStats"></div>
    <div class="admin-actions" style="margin-bottom:10px"><button class="admin-secondary" onclick="loadAdminOrders()">↻ Atnaujinti užsakymus</button><button class="admin-danger" onclick="deleteAllAdminOrders()">🗑️ Ištrinti visus užsakymus</button></div>
    <div class="admin-list" id="adminOrderList"><div class="admin-empty">Kraunama...</div></div>
@@ -1747,6 +1756,7 @@ async function checkAdmin(user){
   const {data,error}=await supabaseClient.from("admin_users").select("user_id").eq("user_id",user.id).maybeSingle();
   if(!error && data?.user_id) isAdmin=true;
   if(btn) btn.style.display=isAdmin?"block":"none";
+  renderAdminOrderNotice();
   return isAdmin;
 }
 let publicUpdatesChannel=null;
@@ -1775,18 +1785,18 @@ async function refreshCartInventory(){
   if(updated)saveCartSnapshot();
 }
 function startInventoryRefresh(){if(inventoryRefreshTimer)return;inventoryRefreshTimer=window.setInterval(async()=>{if(document.visibilityState!=="hidden"){await loadStoreProducts();await refreshCartInventory();}},8000);}
-async function initAdmin(user){await checkAdmin(user);await applyStoreLock();subscribeStoreLock();startStoreLockPolling();startStoreLockCountdown();await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();startInventoryRefresh();await loadPaymentSettings();await loadPublicUpdates();subscribePublicUpdates();if(isAdmin){subscribeAdminChat();startAdminChatPolling();}}
+async function initAdmin(user){await checkAdmin(user);await applyStoreLock();subscribeStoreLock();startStoreLockPolling();startStoreLockCountdown();await loadBulkDiscountRules();await loadCategories();await loadStoreProducts();startInventoryRefresh();await loadPaymentSettings();await loadPublicUpdates();subscribePublicUpdates();if(isAdmin){startAdminOrderNotifications(user.id);subscribeAdminChat();startAdminChatPolling();}}
 async function openAdmin(){
   document.getElementById("userDropdown")?.classList.remove("open");
   if(!isAdmin)return alert("Neturite administratoriaus teisių.");
   document.getElementById("adminPanel").classList.add("open");
-  await loadAdminStats();await loadCategories();await loadAdminProducts();await loadAdminCoupons();await loadAdminBulkDiscounts();await loadAdminOrders();await loadPaymentSettings();await loadCryptoSettings();await loadStoreLockSettings();subscribeAdminOrders();await loadAdminChats();
+  await checkAdminNewOrders();await loadAdminStats();await loadCategories();await loadAdminProducts();await loadAdminCoupons();await loadAdminBulkDiscounts();await loadAdminOrders();await loadPaymentSettings();await loadCryptoSettings();await loadStoreLockSettings();subscribeAdminOrders();await loadAdminChats();
 }
 function closeAdmin(){document.getElementById("adminPanel").classList.remove("open")}
 function adminTab(name,btn){
   document.querySelectorAll(".admin-tab").forEach(x=>x.classList.remove("active"));
   document.querySelectorAll(".admin-section").forEach(x=>x.classList.remove("active"));
-  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders")loadAdminOrders();if(name==="updates")loadAdminUpdates();if(name==="bulk")loadAdminBulkDiscounts();if(name==="payments"){loadPaymentSettings();loadCryptoSettings();}if(name==="storelock")loadStoreLockSettings();
+  btn.classList.add("active");document.getElementById("admin-"+name).classList.add("active");if(name==="chat")loadAdminChats();if(name==="orders"){void checkAdminNewOrders();loadAdminOrders();}if(name==="updates")loadAdminUpdates();if(name==="bulk")loadAdminBulkDiscounts();if(name==="payments"){loadPaymentSettings();loadCryptoSettings();}if(name==="storelock")loadStoreLockSettings();
 }
 async function loadAdminStats(){
   const p=await supabaseClient.from("products").select("id",{count:"exact",head:true});
@@ -2446,8 +2456,114 @@ async function deleteStoreUpdate(id){
   await loadAdminUpdates();await loadPublicUpdates();toast("✓ Atnaujinimas ištrintas");
 }
 
+// Užsakymų pranešimai yra lokalūs šio administratoriaus naršyklei; Supabase lentelių keisti nereikia.
+// Nauji tik iki šiol nematyti užsakymų ID, todėl būsenos atnaujinimai naujo pranešimo nesukuria.
+let adminOrderNoticeKey = null;
+let adminOrderNoticePrimed = false;
+let adminOrderKnown = new Set();
+let adminOrderUnread = new Set();
+let adminOrderNoticeTimer = null;
+let adminOrderNoticeRequest = null;
+
+function setupAdminOrderNotices(userId) {
+  if(!isAdmin || !userId) return;
+  const key = `ltparduotuve_admin_new_orders_v1_${userId}`;
+  if(adminOrderNoticeKey === key) return;
+  adminOrderNoticeKey = key;
+  adminOrderKnown = new Set(); adminOrderUnread = new Set(); adminOrderNoticePrimed = false;
+  try {
+    const state = JSON.parse(localStorage.getItem(key) || 'null');
+    if(state?.primed && Array.isArray(state.known) && Array.isArray(state.unread)) {
+      adminOrderNoticePrimed = true;
+      adminOrderKnown = new Set(state.known.map(String));
+      adminOrderUnread = new Set(state.unread.map(String));
+    }
+  } catch(e) { console.warn('[ORDER NOTICE STORAGE]', e); }
+  renderAdminOrderNotice();
+}
+function saveAdminOrderNotices() {
+  if(!adminOrderNoticeKey) return;
+  try {
+    localStorage.setItem(adminOrderNoticeKey, JSON.stringify({
+      primed:adminOrderNoticePrimed,
+      known:[...adminOrderKnown].slice(-5000),
+      unread:[...adminOrderUnread]
+    }));
+  } catch(e) { console.warn('[ORDER NOTICE SAVE]', e); }
+}
+function renderAdminOrderNotice() {
+  const count = isAdmin ? adminOrderUnread.size : 0;
+  for(const id of ['adminOrderBadge','adminOrderLaunchBadge']) {
+    const badge=document.getElementById(id);
+    if(badge) { badge.hidden=count===0; badge.textContent=count>99?'99+':String(count); }
+  }
+  const note=document.getElementById('adminOrderUnreadNote');
+  if(note) {
+    note.hidden=count===0;
+    note.textContent=count===1?'🔔 Turite 1 naują užsakymą. Atidarykite jo duomenis, kad pažymėtumėte kaip peržiūrėtą.'
+      :`🔔 Turite ${count} naujus užsakymus. Peržiūrėti užsakymai bus pažymėti kaip perskaityti.`;
+  }
+}
+function applyAdminOrderNoticeRows(rows, notify=true) {
+  if(!isAdmin || !adminOrderNoticeKey || !Array.isArray(rows)) return;
+  const currentIds = new Set(rows.map(o=>String(o.id)));
+  let added = 0;
+  if(!adminOrderNoticePrimed) {
+    // Pirmą kartą jau buvę užsakymai nelaikomi naujais.
+    currentIds.forEach(id=>adminOrderKnown.add(id));
+    adminOrderNoticePrimed = true;
+  } else {
+    for(const row of rows) {
+      const id = String(row.id);
+      if(!adminOrderKnown.has(id)) {
+        adminOrderKnown.add(id); adminOrderUnread.add(id); added++;
+      }
+    }
+    // Ištrinti užsakymai nepaliekami kaip amžini neperskaityti pranešimai.
+    for(const id of adminOrderUnread) if(!currentIds.has(id)) adminOrderUnread.delete(id);
+  }
+  saveAdminOrderNotices(); renderAdminOrderNotice();
+  if(added && notify) toast(added===1?'🔔 Gautas naujas užsakymas!':`🔔 Nauji užsakymai: ${added}`);
+}
+async function checkAdminNewOrders() {
+  if(!isAdmin || !adminOrderNoticeKey) return;
+  if(adminOrderNoticeRequest) return adminOrderNoticeRequest;
+  adminOrderNoticeRequest = (async()=>{
+    const {data,error}=await supabaseClient.from('orders').select('id,order_number,created_at').order('created_at',{ascending:false});
+    if(error) {console.warn('[NEW ORDERS]',error);return;}
+    applyAdminOrderNoticeRows(data||[]);
+  })().finally(()=>{adminOrderNoticeRequest=null;});
+  return adminOrderNoticeRequest;
+}
+function markAdminOrderSeen(id) {
+  if(!id || !adminOrderUnread.delete(String(id))) return;
+  saveAdminOrderNotices(); renderAdminOrderNotice();
+  document.querySelectorAll('.admin-order-new[data-order-id]').forEach(el=>{
+    if(el.dataset.orderId===String(id)) {
+      el.classList.remove('admin-order-new');
+      el.querySelector('.admin-order-new-label')?.remove();
+    }
+  });
+}
+function startAdminOrderNotifications(userId) {
+  if(!isAdmin || !userId) return;
+  setupAdminOrderNotices(userId);
+  void checkAdminNewOrders();
+  subscribeAdminOrders();
+  if(!adminOrderNoticeTimer) {
+    // Atsarginis tikrinimas, jei Supabase Realtime neveikia arba buvo praleistas įvykis.
+    adminOrderNoticeTimer=window.setInterval(()=>{
+      if(isAdmin && document.visibilityState!=='hidden') void checkAdminNewOrders();
+    },20000);
+    document.addEventListener('visibilitychange',()=>{
+      if(isAdmin && document.visibilityState==='visible') void checkAdminNewOrders();
+    });
+    window.addEventListener('focus',()=>{if(isAdmin)void checkAdminNewOrders();});
+  }
+}
+
 let adminOrdersChannel=null;
-function subscribeAdminOrders(){if(adminOrdersChannel||!isAdmin)return;adminOrdersChannel=supabaseClient.channel("admin-live-orders").on("postgres_changes",{event:"*",schema:"public",table:"orders"},()=>{loadAdminOrders();loadAdminStats()}).subscribe()}
+function subscribeAdminOrders(){if(adminOrdersChannel||!isAdmin)return;adminOrdersChannel=supabaseClient.channel("admin-live-orders").on("postgres_changes",{event:"*",schema:"public",table:"orders"},()=>{void checkAdminNewOrders();if(document.getElementById("admin-orders")?.classList.contains("active"))void loadAdminOrders();void loadAdminStats()}).subscribe()}
 
 function statusLabel(status){
   const map={"pending":"Laukia apmokėjimo","paid":"Apmokėtas","processing":"Ruošiama","shipped":"Išsiųstas","completed":"Įvykdyta","cancelled":"Atšauktas","unpaid":"Neapmokėta"};
@@ -2765,6 +2881,7 @@ async function loadAdminOrders(){
   await expireAllPendingOrders();
   const {data,error}=await supabaseClient.from("orders").select("*, order_items(*)").order("created_at",{ascending:false});
   if(error){console.error(error);list.innerHTML='<div class="admin-empty">Nepavyko įkelti užsakymų. Patikrink RLS/SQL.</div>';return}
+  applyAdminOrderNoticeRows(data||[],false);
   if(!data?.length){list.innerHTML='<div class="admin-empty">Kol kas užsakymų nėra.</div>';await loadAdminOrderStats();return}
   const {data:cryptoRows}=await supabaseClient.from('order_crypto_payments').select('order_id,currency,crypto_amount,wallet_address').in('order_id',data.map(x=>x.id));
   const cryptoMap=new Map((cryptoRows||[]).map(x=>[x.order_id,x]));
@@ -2785,7 +2902,8 @@ async function loadAdminOrders(){
     }else if(o.status==="unpaid"){
       flow=`<div class="admin-order-flow"><div class="admin-order-flow-note admin-cancelled">✕ Užsakymas pažymėtas kaip neapmokėtas.</div></div>`;
     }
-    return `<div class="order-card clean-order-card"><div class="order-top"><div><div class="order-number">#${escapeHtml(o.order_number)}</div><div class="order-date">${formatDate(o.created_at)}</div><div class="admin-order-customer">${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")}<br>${escapeHtml(items||"Prekių nėra")}${crypto?`<br>💰 Crypto: ${Number(crypto.crypto_amount).toFixed(8)} ${escapeHtml(crypto.currency)} · ${escapeHtml(crypto.wallet_address)}`:""}</div></div><span class="order-status ${statusClass(o.status)}">${statusLabel(o.status)}</span></div><div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div><div class="order-actions"><button class="order-view-btn" onclick="showOrderDetailsById('${o.id}')">👁️ Peržiūrėti duomenis</button><button class="admin-danger" onclick="deleteOneAdminOrder('${o.id}','${escapeHtml(o.order_number)}')">🗑️ Ištrinti</button>${o.status==="pending"&&!o.payment_sent_at?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Peržiūrėti apmokėjimą</button>`:""}</div>${flow}</div>`;
+    const isNew=adminOrderUnread.has(String(o.id));
+    return `<div class="order-card clean-order-card ${isNew?"admin-order-new":""}" data-order-id="${escapeHtml(o.id)}"><div class="order-top"><div><div class="order-number">#${escapeHtml(o.order_number)}${isNew?'<span class="admin-order-new-label">NAUJAS</span>':""}</div><div class="order-date">${formatDate(o.created_at)}</div><div class="admin-order-customer">${escapeHtml((o.first_name||"")+" "+(o.last_name||""))} • ${escapeHtml(o.email||"")}<br>${escapeHtml(items||"Prekių nėra")}${crypto?`<br>💰 Crypto: ${Number(crypto.crypto_amount).toFixed(8)} ${escapeHtml(crypto.currency)} · ${escapeHtml(crypto.wallet_address)}`:""}</div></div><span class="order-status ${statusClass(o.status)}">${statusLabel(o.status)}</span></div><div class="order-bottom"><span>${(o.order_items||[]).reduce((n,x)=>n+Number(x.quantity||0),0)} prek.</span><strong>${money(o.total_amount)}</strong></div><div class="order-actions"><button class="order-view-btn" onclick="showOrderDetailsById('${o.id}')">👁️ Peržiūrėti duomenis</button><button class="admin-danger" onclick="deleteOneAdminOrder('${o.id}','${escapeHtml(o.order_number)}')">🗑️ Ištrinti</button>${o.status==="pending"&&!o.payment_sent_at?`<button class="order-pay-btn" onclick='openPaymentModal(${JSON.stringify(o).replace(/'/g,"&#39;")})'>💳 Peržiūrėti apmokėjimą</button>`:""}</div>${flow}</div>`;
   }).join("");
   await loadAdminOrderStats();
 }
@@ -2855,6 +2973,7 @@ async function showOrderDetailsById(orderId){
   if(!isAdmin||!orderId)return;
   const {data:o,error}=await supabaseClient.from("orders").select("*, order_items(*)").eq("id",orderId).maybeSingle();
   if(error||!o)return alert("Nepavyko įkelti užsakymo duomenų.");
+  markAdminOrderSeen(orderId);
   const items=(o.order_items||[]).map(x=>`${x.product_name} × ${x.quantity} — ${money(Number(x.unit_price||0)*Number(x.quantity||0))}`).join("\n");
   alert(`Užsakymas #${o.order_number}
 
